@@ -128,7 +128,9 @@
         This.S_Gui["Hotkey_Scoope"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
 
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "xp y+5 w120 section vThumbnailBackgroundColor", This.ThumbnailBackgroundColor)
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xp+130 yp+4", Tr("common.hex_rgb"))
+        BackgroundColorButton := This.S_Gui.Add("Button", "x+5 yp-3 w105", Tr("common.choose_color"))
+        This.S_Gui.Controls.Global_Settings.Push BackgroundColorButton
+        BackgroundColorButton.OnEvent("Click", (*) => This.ChooseSingleColor("ThumbnailBackgroundColor"))
         This.S_Gui["ThumbnailBackgroundColor"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
 
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs+2 y+17 section", "x:")
@@ -219,6 +221,63 @@
             }
             SetTimer(This.Save_Settings_Delay_Timer, -200)
         }
+    }
+
+    ChooseSingleColor(ControlName) {
+        ColorControl := This.S_Gui[ControlName]
+        SelectedColor := ColorPicker.Choose(This.S_Gui.Hwnd, ColorControl.Value)
+        if (SelectedColor = "")
+            return
+
+        ColorControl.Value := SelectedColor
+        switch ControlName {
+            case "ThumbnailBackgroundColor":
+                This.ThumbnailBackgroundColor := SelectedColor
+            case "ThumbnailTextColor":
+                This.ThumbnailTextColor := SelectedColor
+            case "ClientHighligtColor":
+                This.ClientHighligtColor := SelectedColor
+            case "InactiveClientBorderColor":
+                This.InactiveClientBorderColor := SelectedColor
+        }
+        This.NeedRestart := 1
+        SetTimer(This.Save_Settings_Delay_Timer, -200)
+    }
+
+    ChooseListColor(ControlName) {
+        ColorControl := This.S_Gui[ControlName]
+        if (Trim(ColorControl.Value) = "") {
+            MsgBox(Tr("colors.no_client"), AppInfo.Name, "Iconi")
+            return
+        }
+
+        Rows := StrSplit(ColorControl.Value, "`n")
+        SelectedRow := SendMessage(0xC9, -1, 0, ColorControl.Hwnd) + 1
+        if (SelectedRow < 1 || SelectedRow > Rows.Length)
+            SelectedRow := 1
+        InitialColor := RegExReplace(Trim(Rows[SelectedRow], "`r`n "), "^\d+\s*:\s*", "")
+        SelectedColor := ColorPicker.Choose(This.S_Gui.Hwnd, InitialColor)
+        if (SelectedColor = "")
+            return
+
+        Rows[SelectedRow] := SelectedRow ": " SelectedColor
+        NewValue := ""
+        for Index, Row in Rows
+            NewValue .= (Index > 1 ? "`n" : "") Row
+
+        switch ControlName {
+            case "CBorderColor":
+                This.CustomColors_AllBColors := NewValue
+                ColorControl.Value := This.CustomColors_AllBColors
+            case "CTextColor":
+                This.CustomColors_AllTColors := NewValue
+                ColorControl.Value := This.CustomColors_AllTColors
+            case "IABorderColor":
+                This.CustomColors_IABorder_Colors := NewValue
+                ColorControl.Value := This.CustomColors_IABorder_Colors
+        }
+        This.NeedRestart := 1
+        SetTimer(This.Save_Settings_Delay_Timer, -200)
     }
 
     ;This Function creates all Settings controls for the Profile Settings Button
@@ -329,6 +388,16 @@
 
         CustomColors.Push This.S_Gui.Add("Edit", " x+10 yp wp hp -Wrap vIABorderColor", This.CustomColors_IABorder_Colors)
         This.S_Gui["IABorderColor"].OnEvent("Change", (obj, *) => Cclors_Eventhandler(obj))
+
+        BorderPaletteButton := This.S_Gui.Add("Button", "x190 y+5 w120 h25", Tr("colors.choose_row"))
+        BorderPaletteButton.OnEvent("Click", (*) => This.ChooseListColor("CBorderColor"))
+        CustomColors.Push BorderPaletteButton
+        TextPaletteButton := This.S_Gui.Add("Button", "x+10 yp wp hp", Tr("colors.choose_row"))
+        TextPaletteButton.OnEvent("Click", (*) => This.ChooseListColor("CTextColor"))
+        CustomColors.Push TextPaletteButton
+        InactivePaletteButton := This.S_Gui.Add("Button", "x+10 yp wp hp", Tr("colors.choose_row"))
+        InactivePaletteButton.OnEvent("Click", (*) => This.ChooseListColor("IABorderColor"))
+        CustomColors.Push InactivePaletteButton
 
         This.S_Gui.Controls.Profile_Settings.PsDDL["Custom Colors"] := CustomColors
         for k, v in This.S_Gui.Controls.Profile_Settings.PsDDL["Custom Colors"]
@@ -539,7 +608,7 @@
     ThumbnailSettings_Ctrl() {
         This.S_Gui.Controls.Profile_Settings.PsDDL["Thumbnail Settings"] := [], ThumbnailSettings := []
 
-        ThumbnailSettings.Push This.S_Gui.Add("GroupBox", "x20 y80 h580 w500 Section", "")
+        ThumbnailSettings.Push This.S_Gui.Add("GroupBox", "x20 y80 h580 w565 Section", "")
 
         ThumbnailSettings.Push This.S_Gui.Add("Text", "xp+15 yp+140 Section", Tr("thumbnail.show_text"))
         ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.text_color"))
@@ -560,7 +629,9 @@
         This.S_Gui["ShowThumbnailTextOverlay"].OnEvent("Click", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
         ThumbnailSettings.Push This.S_Gui.Add("Edit", "xs y+11  w120 vThumbnailTextColor -Wrap", This.ThumbnailTextColor)
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " x+5 yp+3 ", Tr("common.hex_rgb"))
+        ThumbnailTextColorButton := This.S_Gui.Add("Button", "x+5 yp-3 w105", Tr("common.choose_color"))
+        ThumbnailTextColorButton.OnEvent("Click", (*) => This.ChooseSingleColor("ThumbnailTextColor"))
+        ThumbnailSettings.Push ThumbnailTextColorButton
         This.S_Gui["ThumbnailTextColor"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
         ThumbnailSettings.Push This.S_Gui.Add("Edit", "xs y+10 w30 vThumbnailTextSize -Wrap", This.ThumbnailTextSize)
@@ -578,7 +649,9 @@
         This.S_Gui["ThumbnailTextMarginsy"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
         ThumbnailSettings.Push This.S_Gui.Add("Edit", "xs y+7 w120 vClientHighligtColor -Wrap", This.ClientHighligtColor)
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " x+5 yp+3 ", Tr("common.hex_rgb"))
+        HighlightColorButton := This.S_Gui.Add("Button", "x+5 yp-3 w105", Tr("common.choose_color"))
+        HighlightColorButton.OnEvent("Click", (*) => This.ChooseSingleColor("ClientHighligtColor"))
+        ThumbnailSettings.Push HighlightColorButton
         This.S_Gui["ClientHighligtColor"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
         ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", "px:")
@@ -606,7 +679,9 @@
         This.S_Gui["InactiveClientBorderthickness"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
         ThumbnailSettings.Push This.S_Gui.Add("Edit", "xs y+5 w120 vInactiveClientBorderColor -Wrap", This.InactiveClientBorderColor)
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " x+5 yp+3 ", Tr("common.hex_rgb"))
+        InactiveColorButton := This.S_Gui.Add("Button", "x+5 yp-3 w105 vInactiveClientBorderColorPicker", Tr("common.choose_color"))
+        InactiveColorButton.OnEvent("Click", (*) => This.ChooseSingleColor("InactiveClientBorderColor"))
+        ThumbnailSettings.Push InactiveColorButton
         This.S_Gui["InactiveClientBorderColor"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
         This.S_Gui.Controls.Profile_Settings.PsDDL["Thumbnail Settings"] := ThumbnailSettings
@@ -666,6 +741,7 @@
                 This.ShowAllColoredBorders := obj.value
                 This.S_Gui["InactiveClientBorderthickness"].Enabled := This.ShowAllColoredBorders
                 This.S_Gui["InactiveClientBorderColor"].Enabled := This.ShowAllColoredBorders
+                This.S_Gui["InactiveClientBorderColorPicker"].Enabled := This.ShowAllColoredBorders
                 This.NeedRestart := 1
             }
             else if (obj.Name = "InactiveClientBorderColor") {
@@ -860,6 +936,7 @@
         }
         This.S_Gui["InactiveClientBorderthickness"].Enabled := This.ShowAllColoredBorders
         This.S_Gui["InactiveClientBorderColor"].Enabled := This.ShowAllColoredBorders
+        This.S_Gui["InactiveClientBorderColorPicker"].Enabled := This.ShowAllColoredBorders
     }
 
 

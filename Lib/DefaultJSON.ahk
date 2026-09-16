@@ -28,11 +28,7 @@
                 "MinimizeInactiveClients": false,
                 "AlwaysMaximize": false,
                 "TrackClientPossitions": false,
-                "Dont_Minimize_Clients": [
-                    "Example Name1",
-                    "Example Name2",
-                    "Example Name3"
-                ]
+                "Dont_Minimize_Clients": []
             },
             "Thumbnail Settings": {
                 "ShowThumbnailTextOverlay": true,
@@ -53,12 +49,7 @@
                 "InactiveClientBorderthickness": 2,
                 "InactiveClientBorderColor": "#8A8A8A"
             },
-            "Hotkeys":[
-                {"Example Name1":"1"},
-                {"Example Name2":"ctrl & 1"},
-                {"Example Name3":"Xbutton1 & 1"},
-                {"Example Name4":"^XButton1 & 1"}
-            ],
+            "Hotkeys":[],
             "Thumbnail Positions": {},
             "Client Possitions": {},
             "Thumbnail Visibility":{},
@@ -66,10 +57,10 @@
             "Custom Colors":{                
                 "cColorActive": "0",
                 "cColors": {
-                    "CharNames": ["Example Char"],
-                    "TextColor": ["FFFFFF"],
-                    "Bordercolor":["FFFFFF"],                
-                    "IABordercolor":["FFFFFF"]                    
+                    "CharNames": [],
+                    "TextColor": [],
+                    "Bordercolor":[],
+                    "IABordercolor":[]
                 }                               
             }
         }

@@ -72,6 +72,35 @@ def validate_default_settings() -> None:
         fail("German must be the default language for new configurations")
     if "LastNotifiedVersion" not in globals_:
         fail("LastNotifiedVersion is missing from default settings")
+    if "Example Name" in source or "Example Char" in source:
+        fail("Default settings must not contain example client placeholders")
+
+
+def validate_client_discovery() -> None:
+    main_class = (ROOT / "src" / "Main_Class.ahk").read_text(encoding="utf-8-sig")
+    if "This.RememberClientName(WinList.%hwnd%.Title)" not in main_class:
+        fail("Detected clients are not connected to profile discovery")
+    if 'RegExReplace(title, "i)^EVE\\s*-\\s*", "")' not in main_class:
+        fail("Window title cleanup is not protected against character names beginning with Eve")
+
+
+def validate_color_picker() -> None:
+    main = (ROOT / "Main.ahk").read_text(encoding="utf-8-sig")
+    settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
+    if "#Include <../src/ColorPicker>" not in main:
+        fail("ColorPicker is not included")
+    required_controls = [
+        "ThumbnailBackgroundColor",
+        "ThumbnailTextColor",
+        "ClientHighligtColor",
+        "InactiveClientBorderColor",
+        "CBorderColor",
+        "CTextColor",
+        "IABorderColor",
+    ]
+    missing = [name for name in required_controls if f'ChooseSingleColor("{name}")' not in settings_gui and f'ChooseListColor("{name}")' not in settings_gui]
+    if missing:
+        fail(f"Color palette is missing for: {missing}")
 
 
 def validate_portable_contract() -> None:
@@ -95,6 +124,8 @@ def main() -> int:
         validate_version,
         validate_locales,
         validate_default_settings,
+        validate_client_discovery,
+        validate_color_picker,
         validate_portable_contract,
     ]
     for check in checks:
