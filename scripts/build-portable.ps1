@@ -28,15 +28,24 @@ if (Test-Path $distRoot) {
 }
 New-Item $portableRoot -ItemType Directory -Force | Out-Null
 
-& $Ahk2ExePath `
-    /in (Join-Path $projectRoot "Main.ahk") `
-    /out $outputExe `
-    /base $baseExe `
-    /icon (Join-Path $projectRoot "Icon.ico") `
-    /silent verbose
+$mainScript = Join-Path $projectRoot "Main.ahk"
+$iconPath = Join-Path $projectRoot "Icon.ico"
+$compilerArguments = @(
+    "/in", "`"$mainScript`"",
+    "/out", "`"$outputExe`"",
+    "/base", "`"$baseExe`"",
+    "/icon", "`"$iconPath`"",
+    "/silent", "verbose"
+)
+$compilerProcess = Start-Process `
+    -FilePath $Ahk2ExePath `
+    -ArgumentList $compilerArguments `
+    -Wait `
+    -PassThru `
+    -NoNewWindow
 
-if ($LASTEXITCODE -ne 0 -or -not (Test-Path $outputExe -PathType Leaf)) {
-    throw "Ahk2Exe compilation failed with exit code $LASTEXITCODE"
+if ($compilerProcess.ExitCode -ne 0 -or -not (Test-Path $outputExe -PathType Leaf)) {
+    throw "Ahk2Exe compilation failed with exit code $($compilerProcess.ExitCode)"
 }
 
 Copy-Item (Join-Path $projectRoot "locales") $portableRoot -Recurse
