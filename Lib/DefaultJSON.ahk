@@ -2,6 +2,8 @@
 (
 {
     "global_Settings": {
+        "Language": "de",
+        "LastNotifiedVersion": "",
         "Suspend_Hotkeys_Hotkey": "",
         "Global_Hotkeys": 1,
         "LastUsedProfile": "Default",

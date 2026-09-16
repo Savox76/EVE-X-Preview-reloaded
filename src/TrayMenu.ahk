@@ -1,81 +1,74 @@
-﻿
-
 Class TrayMenu extends Settings_Gui {
     TrayMenuObj := A_TrayMenu
     Saved_overTray := 0
     Tray_Profile_scwitch := 0
 
     TrayMenu() {
-        Profiles_Submenu := Menu()
-
-        for k in This.Profiles {
-            If (k = This.LastUsedProfile) {
-                Profiles_Submenu.Add(This.LastUsedProfile, MenuHandler)
-                Profiles_Submenu.Check(This.LastUsedProfile)
-            }
-            Profiles_Submenu.Add(k, MenuHandler)
+        ProfilesSubmenu := Menu()
+        for ProfileName in This.Profiles {
+            ProfilesSubmenu.Add(ProfileName, ObjBindMethod(This, "SelectTrayProfile", ProfileName))
+            if (ProfileName = This.LastUsedProfile)
+                ProfilesSubmenu.Check(ProfileName)
         }
 
         TrayMenu := This.TrayMenuObj
-        TrayMenu.Delete() ; Delete the Default TrayMenu Items
+        TrayMenu.Delete()
 
-        TrayMenu.Add("Open", MenuHandler)
-        TrayMenu.Add() ; Seperator
-        TrayMenu.Add("Profiles", Profiles_Submenu)
-        TrayMenu.Add() ; Seperator
-        TrayMenu.Add("Suspend Hotkeys", MenuHandler)
+        OpenLabel := Tr("tray.open")
+        SuspendLabel := Tr("tray.suspend")
+        RestoreLabel := Tr("tray.restore_positions")
+        VersionLabel := Tr("update.version", AppInfo.Version)
+
+        TrayMenu.Add(OpenLabel, ObjBindMethod(This, "OpenSettings"))
         TrayMenu.Add()
+        TrayMenu.Add(Tr("tray.profiles"), ProfilesSubmenu)
         TrayMenu.Add()
-        TrayMenu.Add("Close all EVE Clients", (*) => This.CloseAllEVEWindows())
+        TrayMenu.Add(SuspendLabel, ObjBindMethod(This, "ToggleHotkeysFromTray", SuspendLabel))
         TrayMenu.Add()
+        TrayMenu.Add(Tr("tray.close_clients"), (*) => This.CloseAllEVEWindows())
         TrayMenu.Add()
-        TrayMenu.Add("Restore Client Positions", MenuHandler)
+        TrayMenu.Add(RestoreLabel, ObjBindMethod(This, "ToggleRestoreClientPositions", RestoreLabel))
         if (This.TrackClientPossitions)
-            TrayMenu.check("Restore Client Positions")
-        else
-            TrayMenu.Uncheck("Restore Client Positions")
+            TrayMenu.Check(RestoreLabel)
 
-        TrayMenu.Add("Save Client Positions", (*) => This.Client_Possitions())
+        TrayMenu.Add(Tr("tray.save_client_positions"), (*) => This.Client_Possitions())
+        TrayMenu.Add(Tr("tray.save_thumbnail_positions"), (*) => This.Save_ThumbnailPossitions())
         TrayMenu.Add()
+        TrayMenu.Add(Tr("tray.check_updates"), (*) => This.CheckForUpdates(false))
+        TrayMenu.Add(Tr("tray.github_releases"), (*) => Run(AppInfo.ReleasesUrl))
         TrayMenu.Add()
-        TrayMenu.Add("Save Thumbnail Positions", MenuHandler)
-        TrayMenu.Add("Reload", (*) => Reload())
+        TrayMenu.Add(Tr("tray.reload"), (*) => Reload())
+        TrayMenu.Add(Tr("tray.exit"), (*) => ExitApp())
         TrayMenu.Add()
-        TrayMenu.Add("Exit", (*) => ExitApp())
-        TrayMenu.Default := "Open"
+        TrayMenu.Add(VersionLabel, (*) => 0)
+        TrayMenu.Disable(VersionLabel)
+        TrayMenu.Default := OpenLabel
+    }
 
-        MenuHandler(ItemName, ItemPos, MyMenu) {
-            If (ItemName = "Exit")
-                ExitApp
-            Else if (ItemName = "Save Thumbnail Positions") {
-                ; Saved Thumbnail Positions only if the Saved button is used on the Traymenu
-                This.Save_ThumbnailPossitions
-            }
-            Else if (ItemName = "Restore Client Positions") {
-                This.TrackClientPossitions := !This.TrackClientPossitions
-                TrayMenu.ToggleCheck("Restore Client Positions")
-                SetTimer(This.Save_Settings_Delay_Timer, -200)
-            }
-            Else if (This.Profiles.Has(ItemName)) {
-                ; Change the lastUsedProfile to the Profile name, save it to Json file and reload the script with the new Settings
-                This.LastUsedProfile := ItemName
-                This.SaveJsonToFile()
-                Sleep(500)
-                Reload()
-            }
-            Else if (ItemName = "Open") {
-                if WinExist("EVE-X-Preview - Settings") {
-                    WinActivate("EVE-X-Preview - Settings")
-                    Return
-                }
-                This.MainGui()
-            }
-            Else If (ItemName = "Suspend Hotkeys") {
-                Suspend(-1)
-                TrayMenu.ToggleCheck("Suspend Hotkeys")
-            }
-
+    OpenSettings(*) {
+        if WinExist(This.SettingsWindowTitle) {
+            WinActivate(This.SettingsWindowTitle)
+            return
         }
+        This.MainGui()
+    }
+
+    SelectTrayProfile(ProfileName, *) {
+        This.LastUsedProfile := ProfileName
+        This.SaveJsonToFile()
+        Sleep(250)
+        Reload()
+    }
+
+    ToggleHotkeysFromTray(ItemLabel, *) {
+        Suspend(-1)
+        This.TrayMenuObj.ToggleCheck(ItemLabel)
+    }
+
+    ToggleRestoreClientPositions(ItemLabel, *) {
+        This.TrackClientPossitions := !This.TrackClientPossitions
+        This.TrayMenuObj.ToggleCheck(ItemLabel)
+        SetTimer(This.Save_Settings_Delay_Timer, -200)
     }
 
     CloseAllEVEWindows(*) {

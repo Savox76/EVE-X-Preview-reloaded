@@ -1,0 +1,6 @@
+EVE-X-Preview.json
+build/
+dist/
+*.zip
+*.exe
+__pycache__/

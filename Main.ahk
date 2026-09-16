@@ -3,6 +3,8 @@
 #Include <DefaultJSON> ; The Default Settings Values
 #Include <JSON>
 #Include <LiveThumb>
+#Include <../src/AppInfo>
+#Include <../src/UpdateChecker>
 #Include <../src/Main_Class>
 #Include <../src/ThumbWindow>
 #Include <../src/TrayMenu>
@@ -26,13 +28,12 @@ A_MaxHotKeysPerInterval := 10000
 TODO #########################
 */
 
-;@Ahk2Exe-Let U_version = 1.0.4.
-;@Ahk2Exe-SetVersion %U_version%
-;@Ahk2Exe-SetFileVersion %U_version%
-;@Ahk2Exe-SetCopyright gonzo83
-;@Ahk2Exe-SetDescription EVE-X-Preview
-;@Ahk2Exe-SetProductName EVE-X-Preview
-;@Ahk2Exe-ExeName EVE-X-Preview
+;@Ahk2Exe-SetVersion 1.1.0.1
+;@Ahk2Exe-SetFileVersion 1.1.0.1
+;@Ahk2Exe-SetCopyright g0nzo83 and Savox76 contributors
+;@Ahk2Exe-SetDescription EVE-X-Preview Reloaded
+;@Ahk2Exe-SetProductName EVE-X-Preview Reloaded
+;@Ahk2Exe-ExeName EVE-X-Preview-Reloaded
 
 ;@Ahk2Exe-AddResource icon.ico, 160  ; Replaces 'H on blue'
 ;@Ahk2Exe-AddResource icon-suspend.ico, 206  ; Replaces 'S on green'
@@ -47,6 +48,7 @@ if !(A_IsCompiled)
 ; Catch all unhandled Errors to prevent the Script from stopping 
 OnError(Error_Handler)
 
+I18n.Initialize("en")
 Call := Main_Class()
 
 
@@ -72,7 +74,7 @@ Load_JSON() {
             FileAppend(JSON.Dump(_JSON,,"    " ), "EVE-X-Preview.json")
         }
         catch as e  {
-            value := MsgBox("The settings file is corrupted. Do you want to create a new one?",,"OKCancel")
+            value := MsgBox(Tr("dialog.settings_corrupt"), AppInfo.Name, "OKCancel")
             if (value = "Cancel") 
                 ExitApp()
 

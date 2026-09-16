@@ -1,5 +1,18 @@
 ﻿##  EVE-X-Preview
 
+> **EVE-X-Preview Reloaded** continues this MIT-licensed project with a German/English interface, GitHub update notifications, and portable ZIP releases.
+
+### Reloaded portable version
+
+1. Download `EVE-X-Preview-Reloaded-*-portable.zip` from the [Releases page](https://github.com/Savox76/EVE-X-Preview-reloaded/releases).
+2. Extract the complete ZIP into a writable folder, for example inside Documents.
+3. Start `EVE-X-Preview-Reloaded.exe` from that folder.
+4. Keep the `locales` folder beside the program. Your personal `EVE-X-Preview.json` is created in the same folder and is retained during updates.
+
+The language can be changed under **Global Settings / Allgemeine Einstellungen**. The tray menu can check for updates manually; the application also notifies you automatically when a newer GitHub release is available. No installer or separate EXE download is published.
+
+---
+
 EVE-X-Preview is a tool for Windows for the game EVE Online that makes it easy to manage and use multiple EVE clients. 
 It allows displaying thumbnails of the running EVE clients and bringing EVE clients to the foreground with a click on the thumbnail or with a set hotkey. <br>
 Mouse and keyboard buttons are supported.
@@ -31,9 +44,9 @@ It is possible to create multiple profiles to quickly change the hotkey assignme
 
 ## How To Use
 
-1. Download the EXE file from here https://github.com/g0nzo83/EVE-X-Preview/releases
-2. Create a new Folder on Dektop or in Documents or where you like with the exception of the Programs folders. And move EVE-X-Preview.exe to the created folder.
-3. Start EVE-X-Preview.exe. It should create a json file. This file must always be in the same folder as EVE-X-Preview.exe. It contains all your settings 
+1. Download the portable ZIP from https://github.com/Savox76/EVE-X-Preview-reloaded/releases
+2. Extract the complete ZIP to Desktop, Documents, or another writable folder outside the Windows Program Files folders.
+3. Start EVE-X-Preview-Reloaded.exe. It creates an `EVE-X-Preview.json` file in the same folder. This file contains all your settings.
 4. A tray icon should then appear at the bottom right of the taskbar. Right-click on it to access the settings. 
 5. Right Click on the Tryicon and klick "Open" or double klick it and klick on "Profile Settings" create a new Profile.
 6. From here on you can adjust as you like
@@ -43,7 +56,7 @@ It is possible to create multiple profiles to quickly change the hotkey assignme
 ## Run from Source
 
 1. Download and install [Autohotkey v2](https://www.autohotkey.com/)
-2. Download the Zip file from https://github.com/g0nzo83/EVE-X-Preview/releases
+2. Clone or download this repository.
 3. Unpack the Zip file and Run the file `Main.ahk`
 
 ## Will I get banned if I use it?
@@ -161,4 +174,5 @@ There are several ways to specify hotkeys <br> For a detailed description you ca
 
 
 ## About
-EVE-X-Preview is Created and Maintained by [g0nzo83](https://github.com/g0nzo83) also known as "*John Xer*" in EVE Online 
+
+EVE-X-Preview was created by [g0nzo83](https://github.com/g0nzo83), also known as "*John Xer*" in EVE Online. EVE-X-Preview Reloaded continues that MIT-licensed work in [Savox76/EVE-X-Preview-reloaded](https://github.com/Savox76/EVE-X-Preview-reloaded).
