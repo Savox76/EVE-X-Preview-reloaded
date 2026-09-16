@@ -29,8 +29,8 @@ A_MaxHotKeysPerInterval := 10000
 TODO #########################
 */
 
-;@Ahk2Exe-SetVersion 1.1.0.2
-;@Ahk2Exe-SetFileVersion 1.1.0.2
+;@Ahk2Exe-SetVersion 1.1.0.3
+;@Ahk2Exe-SetFileVersion 1.1.0.3
 ;@Ahk2Exe-SetCopyright g0nzo83 and Savox76 contributors
 ;@Ahk2Exe-SetDescription EVE-X-Preview Reloaded
 ;@Ahk2Exe-SetProductName EVE-X-Preview Reloaded

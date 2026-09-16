@@ -65,6 +65,7 @@
   "thumbnail.hide_lost_focus": "Hide thumbnails when EVE loses focus:",
   "thumbnail.opacity": "Thumbnail opacity:",
   "thumbnail.always_on_top": "Keep thumbnails always on top:",
+  "thumbnail.lock_positions": "Lock positions and size:",
   "thumbnail.show_all_borders": "Show borders for inactive clients:",
   "thumbnail.inactive_thickness": "Inactive client border thickness:",
   "thumbnail.inactive_color": "Inactive client border color:",

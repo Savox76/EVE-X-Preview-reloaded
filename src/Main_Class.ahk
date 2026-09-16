@@ -256,12 +256,17 @@ Class Main_Class extends ThumbWindow {
         }
     }    
 
-    RememberClientName(ClientName) {
+    RememberClientName(ClientName, ProfileName := "") {
         ClientName := Trim(This.CleanTitle(ClientName))
         if (ClientName = "")
             return false
 
-        Profile := This._JSON["_Profiles"][This.LastUsedProfile]
+        if (ProfileName = "")
+            ProfileName := This.LastUsedProfile
+        if (!This._JSON["_Profiles"].Has(ProfileName))
+            return false
+
+        Profile := This._JSON["_Profiles"][ProfileName]
         Changed := false
         FoundHotkey := false
         for HotkeyEntry in Profile["Hotkeys"] {
@@ -294,6 +299,18 @@ Class Main_Class extends ThumbWindow {
         if (Changed)
             SetTimer(This.Save_Settings_Delay_Timer, -200)
         return Changed
+    }
+
+    PopulateProfileWithActiveClients(ProfileName) {
+        AddedClients := 0
+        try {
+            for EveHwnd in WinGetList(This.EVEExe) {
+                ClientName := This.CleanTitle(WinGetTitle("ahk_id " EveHwnd))
+                if (This.RememberClientName(ClientName, ProfileName))
+                    AddedClients += 1
+            }
+        }
+        return AddedClients
     }
 
     ;Register the Hotkeys for cycle Groups if any set
@@ -475,6 +492,8 @@ Class Main_Class extends ThumbWindow {
 
             ; Move the Window with right mouse button 
             If (msg == Main_Class.WM_RBUTTONDOWN) {
+                    if (This.LockThumbnailPositions)
+                        return 0
                     while (GetKeyState("RButton")) {
                         
                         if !(GetKeyState("LButton")) {

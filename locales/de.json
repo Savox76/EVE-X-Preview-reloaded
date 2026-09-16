@@ -65,6 +65,7 @@
   "thumbnail.hide_lost_focus": "Vorschaubilder ausblenden, wenn EVE inaktiv ist:",
   "thumbnail.opacity": "Transparenz der Vorschaubilder:",
   "thumbnail.always_on_top": "Vorschaubilder immer im Vordergrund:",
+  "thumbnail.lock_positions": "Positionen und Größe sperren:",
   "thumbnail.show_all_borders": "Rahmen für inaktive Clients anzeigen:",
   "thumbnail.inactive_thickness": "Rahmenstärke inaktiver Clients:",
   "thumbnail.inactive_color": "Rahmenfarbe inaktiver Clients:",

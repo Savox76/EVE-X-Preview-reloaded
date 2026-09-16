@@ -148,6 +148,15 @@ class Propertys extends TrayMenu {
         get => This._JSON["_Profiles"][This.LastUsedProfile]["Thumbnail Settings"]["ShowThumbnailsAlwaysOnTop"]
         set => This._JSON["_Profiles"][This.LastUsedProfile]["Thumbnail Settings"]["ShowThumbnailsAlwaysOnTop"] := value
     }
+    LockThumbnailPositions {
+        get {
+            ThumbnailSettings := This._JSON["_Profiles"][This.LastUsedProfile]["Thumbnail Settings"]
+            if (!ThumbnailSettings.Has("LockThumbnailPositions"))
+                ThumbnailSettings["LockThumbnailPositions"] := false
+            return ThumbnailSettings["LockThumbnailPositions"]
+        }
+        set => This._JSON["_Profiles"][This.LastUsedProfile]["Thumbnail Settings"]["LockThumbnailPositions"] := value
+    }
 
     ThumbnailOpacity {
         get {
@@ -569,9 +578,10 @@ class Propertys extends TrayMenu {
 
     Create_Profile(*) {
         Obj := InputBox(Tr("dialog.profile_name"), Tr("dialog.profile_create"), "w260 h110")
-        if (Obj.Result != "OK" || Obj.Result = "")
+        ProfileName := Trim(Obj.Value)
+        if (Obj.Result != "OK" || ProfileName = "")
             return
-        if (This.Profiles.Has(Obj.value)) {
+        if (This.Profiles.Has(ProfileName)) {
             MsgBox(Tr("dialog.profile_exists"), AppInfo.Name)
             return
         }
@@ -582,18 +592,22 @@ class Propertys extends TrayMenu {
             Result := "No"
 
         if Result = "Yes"
-            This._JSON["_Profiles"][Obj.value] := JSON.Load(FileRead("EVE-X-Preview.json"))["_Profiles"][This.LastUsedProfile]
+            SourceProfile := This._JSON["_Profiles"][This.LastUsedProfile]
         else if Result = "No"
-            This._JSON["_Profiles"][Obj.value] := This.default_JSON["_Profiles"]["Default"]
+            SourceProfile := This.default_JSON["_Profiles"]["Default"]
         else
             Return 0
 
-        FileDelete("EVE-X-Preview.json")
-        FileAppend(JSON.Dump(This._JSON, , "    "), "EVE-X-Preview.json")
+        ; Use a deep copy so later changes cannot leak into the source profile.
+        This._JSON["_Profiles"][ProfileName] := JSON.Load(JSON.Dump(SourceProfile))
+        This.LastUsedProfile := ProfileName
+        This.PopulateProfileWithActiveClients(ProfileName)
+        This.SaveJsonToFile()
+
         This.SelectProfile_DDL.Delete()
         This.SelectProfile_DDL.Add(This.Profiles_to_Array())
-        ControlChooseString(Obj.value, This.SelectProfile_DDL, This.SettingsWindowTitle)
-        This.LastUsedProfile := Obj.value
+        ControlChooseString(ProfileName, This.SelectProfile_DDL, This.SettingsWindowTitle)
+        This._Button_Load()
         Return
     }
     Save_ThumbnailPossitions() {

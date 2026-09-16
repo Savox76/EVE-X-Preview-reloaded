@@ -11,6 +11,7 @@ Die Einträge sind zunächst gemeldete Beobachtungen. Vor einer Übernahme werde
 | [#3 – Clientnamen automatisch eintragen](https://github.com/g0nzo83/EVE-X-Preview/issues/3) | Ab `1.1.0-preview.2` werden tatsächlich geöffnete Charaktere im aktiven Profil automatisch für Hotkeys und individuelle Farben gespeichert. Platzhalter werden entfernt. |
 | [#19 – „Eve“ im Charakternamen](https://github.com/g0nzo83/EVE-X-Preview/issues/19) | Die Titelbereinigung ist ab `1.1.0-preview.2` wiederholbar, ohne Namen wie „Eve Valkyrie“ zu verändern. Das dürfte auch einen Teil von #25 beheben. |
 | [#4 – Rahmen inaktiver Clients](https://github.com/g0nzo83/EVE-X-Preview/issues/4) | Bereits im bestehenden Funktionsumfang vorhanden; ab `1.1.0-preview.2` zusätzlich über die Farbpalette auswählbar. |
+| [#28 – Versehentliches Verschieben](https://github.com/g0nzo83/EVE-X-Preview/issues/28) | Ab `1.1.0-preview.3` lassen sich Position und Größe profilbezogen sperren. Frei belegbare Mausaktionen bleiben als spätere Erweiterung offen. |
 
 ## Priorität 1 – Fehler untersuchen
 

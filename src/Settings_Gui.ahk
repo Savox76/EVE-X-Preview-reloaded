@@ -621,6 +621,7 @@
         ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.hide_lost_focus"))
         ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.opacity"))
         ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.always_on_top"))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15", Tr("thumbnail.lock_positions"))
         ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15", Tr("thumbnail.show_all_borders"))
         ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15", Tr("thumbnail.inactive_thickness"))
         ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15", Tr("thumbnail.inactive_color"))
@@ -670,6 +671,9 @@
 
         ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+12 vShowThumbnailsAlwaysOnTop Checked" This.ShowThumbnailsAlwaysOnTop, Tr("common.on_off"))
         This.S_Gui["ShowThumbnailsAlwaysOnTop"].OnEvent("Click", (obj, *) => ThumbnailSettings_EventHandler(obj))
+
+        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+15 vLockThumbnailPositions Checked" This.LockThumbnailPositions, Tr("common.on_off"))
+        This.S_Gui["LockThumbnailPositions"].OnEvent("Click", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
         ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+15 vShowAllBorders Checked" This.ShowAllColoredBorders, Tr("common.on_off"))
         This.S_Gui["ShowAllBorders"].OnEvent("Click", (obj, *) => ThumbnailSettings_EventHandler(obj))
@@ -736,6 +740,9 @@
             else if (obj.name = "ShowThumbnailsAlwaysOnTop") {
                 This.ShowThumbnailsAlwaysOnTop := obj.value
                 This.NeedRestart := 1
+            }
+            else if (obj.name = "LockThumbnailPositions") {
+                This.LockThumbnailPositions := obj.value
             }
             else if (obj.Name = "ShowAllBorders") {
                 This.ShowAllColoredBorders := obj.value
@@ -911,6 +918,7 @@
         This.S_Gui["HideThumbnailsOnLostFocus"].value := This.HideThumbnailsOnLostFocus
         This.S_Gui["ThumbnailOpacity"].value := IntegerToPercentage(This.ThumbnailOpacity)
         This.S_Gui["ShowThumbnailsAlwaysOnTop"].value := This.ShowThumbnailsAlwaysOnTop
+        This.S_Gui["LockThumbnailPositions"].value := This.LockThumbnailPositions
         This.S_Gui["ShowAllBorders"].value := This.ShowAllColoredBorders
         This.S_Gui["InactiveClientBorderthickness"].value := This.InactiveClientBorderthickness
         This.S_Gui["InactiveClientBorderColor"].value := This.InactiveClientBorderColor
