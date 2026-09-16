@@ -120,7 +120,7 @@
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_snap_distance"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.minimize_delay"))
 
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("DDL", "xs+290 ys-3 w180 Section vLanguage Choose" (This.Language = "de" ? 1 : 2), [Tr("common.german"), Tr("common.english")]))
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("DDL", "xs+290 ys-3 w180 Section vLanguage Choose" (This.Language = "de" ? 1 : 2), [Tr("common.german"), Tr("common.english")])
         This.S_Gui["Language"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "xp y+5 w150 vSuspend_Hotkeys_Hotkey", This.Suspend_Hotkeys_Hotkey)
         This.S_Gui["Suspend_Hotkeys_Hotkey"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
