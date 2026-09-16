@@ -78,10 +78,27 @@ def validate_default_settings() -> None:
 
 def validate_client_discovery() -> None:
     main_class = (ROOT / "src" / "Main_Class.ahk").read_text(encoding="utf-8-sig")
+    properties = (ROOT / "src" / "Propertys.ahk").read_text(encoding="utf-8-sig")
     if "This.RememberClientName(WinList.%hwnd%.Title)" not in main_class:
         fail("Detected clients are not connected to profile discovery")
     if 'RegExReplace(title, "i)^EVE\\s*-\\s*", "")' not in main_class:
         fail("Window title cleanup is not protected against character names beginning with Eve")
+    if "This.PopulateProfileWithActiveClients(ProfileName)" not in properties:
+        fail("New profiles are not populated with currently active clients")
+    if "JSON.Load(JSON.Dump(SourceProfile))" not in properties:
+        fail("New profiles must be deep copies")
+
+
+def validate_thumbnail_lock() -> None:
+    defaults = (ROOT / "Lib" / "DefaultJSON.ahk").read_text(encoding="utf-8-sig")
+    main_class = (ROOT / "src" / "Main_Class.ahk").read_text(encoding="utf-8-sig")
+    settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
+    if '"LockThumbnailPositions": false' not in defaults:
+        fail("Thumbnail position lock must default to false")
+    if "if (This.LockThumbnailPositions)" not in main_class:
+        fail("Thumbnail mouse handling does not enforce the position lock")
+    if "vLockThumbnailPositions" not in settings_gui:
+        fail("Thumbnail position lock is missing from settings")
 
 
 def validate_color_picker() -> None:
@@ -125,6 +142,7 @@ def main() -> int:
         validate_locales,
         validate_default_settings,
         validate_client_discovery,
+        validate_thumbnail_lock,
         validate_color_picker,
         validate_portable_contract,
     ]

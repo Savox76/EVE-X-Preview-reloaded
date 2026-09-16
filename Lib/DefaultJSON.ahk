@@ -45,6 +45,7 @@
                 "HideThumbnailsOnLostFocus": false,
                 "ThumbnailOpacity": 80,
                 "ShowThumbnailsAlwaysOnTop": true,
+                "LockThumbnailPositions": false,
                 "ShowAllColoredBorders":0,
                 "InactiveClientBorderthickness": 2,
                 "InactiveClientBorderColor": "#8A8A8A"
