@@ -147,6 +147,7 @@ Class Main_Class extends ThumbWindow {
                 ;Check if a window exist without Thumbnail and if the user is in Character selection screen or not
                 for index, hwnd in WinList {
                     WinList.%hwnd% := { Title: This.CleanTitle(WinGetTitle(hwnd)) }
+                    This.RememberClientName(WinList.%hwnd%.Title)
                     if !This.ThumbWindows.HasProp(hwnd) {
                         This.EVE_WIN_Created(hwnd, WinList.%hwnd%.title)
                         if (!This.HideThumbnailsOnLostFocus)                            
@@ -254,6 +255,46 @@ Class Main_Class extends ThumbWindow {
             }
         }
     }    
+
+    RememberClientName(ClientName) {
+        ClientName := Trim(This.CleanTitle(ClientName))
+        if (ClientName = "")
+            return false
+
+        Profile := This._JSON["_Profiles"][This.LastUsedProfile]
+        Changed := false
+        FoundHotkey := false
+        for HotkeyEntry in Profile["Hotkeys"] {
+            if (HotkeyEntry.Has(ClientName)) {
+                FoundHotkey := true
+                break
+            }
+        }
+        if (!FoundHotkey) {
+            Profile["Hotkeys"].Push(Map(ClientName, ""))
+            Changed := true
+        }
+
+        Colors := Profile["Custom Colors"]["cColors"]
+        FoundColor := false
+        for StoredName in Colors["CharNames"] {
+            if (StoredName = ClientName) {
+                FoundColor := true
+                break
+            }
+        }
+        if (!FoundColor) {
+            Colors["CharNames"].Push(ClientName)
+            Colors["TextColor"].Push(This.ThumbnailTextColor)
+            Colors["Bordercolor"].Push(This.ClientHighligtColor)
+            Colors["IABordercolor"].Push(This.InactiveClientBorderColor)
+            Changed := true
+        }
+
+        if (Changed)
+            SetTimer(This.Save_Settings_Delay_Timer, -200)
+        return Changed
+    }
 
     ;Register the Hotkeys for cycle Groups if any set
     Register_Hotkey_Groups() {
@@ -763,11 +804,12 @@ Class Main_Class extends ThumbWindow {
         Return DllCall("SetWindowPos", "Ptr", hWnd, "Ptr", hWndInsertAfter, "Int", x, "Int", y, "Int", w, "Int", h, "UInt", uFlags)
     }
 
-    ;removes "EVE" from the Titel and leaves only the Character names
+    ; Removes only the actual EVE window prefix and remains safe when called twice.
     CleanTitle(title) {
-        Return RegExReplace(title, "^(?i)eve(?:\s*-\s*)?\b", "")
-        ;RegExReplace(title, "(?i)eve\s*-\s*", "")
-
+        title := Trim(title)
+        if (RegExMatch(title, "i)^EVE\s*$"))
+            return ""
+        return RegExReplace(title, "i)^EVE\s*-\s*", "")
     }
 
     SaveJsonToFile() {

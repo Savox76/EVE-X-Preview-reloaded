@@ -1,24 +1,28 @@
-## EVE-X-Preview Reloaded 1.1.0-preview.1
+## EVE-X-Preview Reloaded 1.1.0-preview.2
 
-First Reloaded preview package.
+Second Reloaded preview package.
 
 ### New
 
-- Complete German and English settings interface, tray menu, dialogs, and notifications.
-- Saved DE/EN language selection; German is the default for new configurations.
-- Automatic GitHub release check after startup.
-- Manual update check and GitHub release link in the tray menu.
-- Current application version shown in the tray menu.
-- Portable ZIP release without an installer or separate EXE asset.
+- Native Windows color palette for global, thumbnail, and per-character colors.
+- Detected EVE character names are automatically added to the active profile's hotkey and custom-color lists.
+- The selected palette color is written back as a hexadecimal value.
+- A prioritized backlog derived from the original repository's issue tracker.
+
+### Fixed
+
+- Removed all `Example Name` and `Example Char` placeholders from new and existing settings files.
+- Character names beginning with `Eve`, such as `Eve Valkyrie`, are no longer damaged when window titles are cleaned more than once.
 
 ### Compatibility
 
-- Existing `EVE-X-Preview.json` files are merged with the new language and update settings.
 - Existing profiles, hotkeys, colors, and saved positions are preserved.
+- Placeholder cleanup only removes the known default example values.
+- The "do not minimize" list remains opt-in and is not populated automatically.
 
 ### Test focus
 
-- Switch between German and English under Global Settings.
-- Confirm all settings pages and tray menu entries change language after the automatic restart.
-- Use the tray menu to run a manual update check.
-- Confirm existing profiles and hotkeys remain available.
+- Open the color palette for every color field and confirm the chosen hexadecimal value is saved.
+- In per-character colors, place the caret in a row before selecting its row color.
+- Start EVE clients and confirm their real character names appear in Hotkeys and Custom Colors after reopening Settings.
+- Confirm names beginning with `Eve` remain complete in hotkey groups.

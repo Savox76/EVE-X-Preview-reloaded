@@ -4,6 +4,7 @@
 #Include <JSON>
 #Include <LiveThumb>
 #Include <../src/AppInfo>
+#Include <../src/ColorPicker>
 #Include <../src/UpdateChecker>
 #Include <../src/Main_Class>
 #Include <../src/ThumbWindow>
@@ -28,8 +29,8 @@ A_MaxHotKeysPerInterval := 10000
 TODO #########################
 */
 
-;@Ahk2Exe-SetVersion 1.1.0.1
-;@Ahk2Exe-SetFileVersion 1.1.0.1
+;@Ahk2Exe-SetVersion 1.1.0.2
+;@Ahk2Exe-SetFileVersion 1.1.0.2
 ;@Ahk2Exe-SetCopyright g0nzo83 and Savox76 contributors
 ;@Ahk2Exe-SetDescription EVE-X-Preview Reloaded
 ;@Ahk2Exe-SetProductName EVE-X-Preview Reloaded
@@ -70,6 +71,7 @@ Load_JSON() {
                                             DJSON,
                                             JSON.Load(FileRead("EVE-X-Preview.json"))
                                         )
+            RemoveExampleClients(_JSON)
             FileDelete("EVE-X-Preview.json")   
             FileAppend(JSON.Dump(_JSON,,"    " ), "EVE-X-Preview.json")
         }
@@ -84,6 +86,69 @@ Load_JSON() {
         }
     }
     return _JSON
+}
+
+; Removes placeholder clients from configurations created by older versions.
+RemoveExampleClients(Settings) {
+    PlaceholderNames := Map(
+        "Example Name1", true,
+        "Example Name2", true,
+        "Example Name3", true,
+        "Example Name4", true,
+        "Example Char", true
+    )
+
+    for _, Profile in Settings["_Profiles"] {
+        if (Profile.Has("Client Settings") && Profile["Client Settings"].Has("Dont_Minimize_Clients")) {
+            ClientSettings := Profile["Client Settings"]
+            FilteredExceptions := []
+            for ClientName in ClientSettings["Dont_Minimize_Clients"] {
+                if (!PlaceholderNames.Has(ClientName))
+                    FilteredExceptions.Push(ClientName)
+            }
+            ClientSettings["Dont_Minimize_Clients"] := FilteredExceptions
+        }
+
+        if (Profile.Has("Hotkeys")) {
+            FilteredHotkeys := []
+            for HotkeyEntry in Profile["Hotkeys"] {
+                KeepEntry := true
+                for ClientName, _ in HotkeyEntry {
+                    if (PlaceholderNames.Has(ClientName)) {
+                        KeepEntry := false
+                        break
+                    }
+                }
+                if (KeepEntry)
+                    FilteredHotkeys.Push(HotkeyEntry)
+            }
+            Profile["Hotkeys"] := FilteredHotkeys
+        }
+
+        if (!Profile.Has("Custom Colors") || !Profile["Custom Colors"].Has("cColors"))
+            continue
+        Colors := Profile["Custom Colors"]["cColors"]
+        Names := Colors["CharNames"]
+        TextColors := Colors["TextColor"]
+        BorderColors := Colors["Bordercolor"]
+        if (!Colors.Has("IABordercolor"))
+            Colors["IABordercolor"] := []
+        InactiveBorderColors := Colors["IABordercolor"]
+        FilteredNames := [], FilteredText := [], FilteredBorders := [], FilteredInactiveBorders := []
+
+        for Index, ClientName in Names {
+            if (PlaceholderNames.Has(ClientName))
+                continue
+            FilteredNames.Push(ClientName)
+            FilteredText.Push(TextColors.Length >= Index ? TextColors[Index] : "FFFFFF")
+            FilteredBorders.Push(BorderColors.Length >= Index ? BorderColors[Index] : "FFFFFF")
+            FilteredInactiveBorders.Push(InactiveBorderColors.Length >= Index ? InactiveBorderColors[Index] : "FFFFFF")
+        }
+        Colors["CharNames"] := FilteredNames
+        Colors["TextColor"] := FilteredText
+        Colors["Bordercolor"] := FilteredBorders
+        Colors["IABordercolor"] := FilteredInactiveBorders
+    }
 }
 
 ;Compare the User json wit the default Json to check if any key changed for possible future updates.
