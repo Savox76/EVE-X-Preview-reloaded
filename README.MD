@@ -11,7 +11,7 @@
 
 The language can be changed under **Global Settings / Allgemeine Einstellungen**. The tray menu can check for updates manually; the application also notifies you automatically when a newer GitHub release is available. No installer or separate EXE download is published.
 
-Color fields provide a native Windows color palette and still accept hexadecimal or RGB input. Character names from running EVE clients are saved automatically in the active profile for hotkeys and individual colors. The evaluated ideas and bug reports from the upstream project are tracked in [`docs/ORIGINAL_REPO_BACKLOG.md`](docs/ORIGINAL_REPO_BACKLOG.md).
+Color fields provide a native Windows color palette and still accept hexadecimal or RGB input. Character names from running EVE clients are saved automatically in the active profile for hotkeys and individual colors. The selectable next development packages are documented in the [`development master plan`](docs/MASTERPLAN.md); evaluated ideas and bug reports from the upstream project remain tracked in the [`original-repository backlog`](docs/ORIGINAL_REPO_BACKLOG.md).
 
 New profiles immediately receive all currently active character names without restarting. Thumbnail Settings also provides a per-profile lock that prevents accidental right-drag movement and mouse resizing.
 
