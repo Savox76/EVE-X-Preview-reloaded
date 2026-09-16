@@ -4,6 +4,8 @@ Stand: 16. September 2026. Quelle: [Issues von g0nzo83/EVE-X-Preview](https://gi
 
 Die Einträge sind zunächst gemeldete Beobachtungen. Vor einer Übernahme werden Ursache, Reproduzierbarkeit unter Windows 10/11 und mögliche Nebenwirkungen geprüft.
 
+Die daraus abgeleiteten, einzeln wählbaren Entwicklungspakete und ihre Abhängigkeiten stehen im [Entwicklungs-Masterplan](MASTERPLAN.md).
+
 ## Bereits in Reloaded berücksichtigt
 
 | Original-Issue | Umsetzung in Reloaded |
