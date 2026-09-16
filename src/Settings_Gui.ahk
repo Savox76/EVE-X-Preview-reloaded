@@ -5,15 +5,15 @@
 
         SetControlDelay(-1)
         This.S_Gui := Gui("+OwnDialogs +MinimizeBox -Resize -MaximizeBox SysMenu +MinSize500x250")
-        This.S_Gui.Title := "EVE-X-Preview - Settings"
+        This.S_Gui.Title := This.SettingsWindowTitle
 
         ;Font options for the Buttons
         This.S_Gui.SetFont("s10 w700")
 
         ;Sets Margins for the following Buttons
         This.S_Gui.MarginX := 80, This.S_Gui.MarginY := 20
-        This.S_Gui.Add("Button", " x140 y20 w120 h40 vGlobal_Settings", "Global Settings").OnEvent("Click", (obj, *) => Button_Handler(obj))
-        This.S_Gui.Add("Button", "x+40 y+-40 wp hp vProfile_Settings", "Profile Settings").OnEvent("Click", (obj, *) => Button_Handler(obj))
+        This.S_Gui.Add("Button", " x110 y20 w160 h40 vGlobal_Settings", Tr("main.global_settings")).OnEvent("Click", (obj, *) => Button_Handler(obj))
+        This.S_Gui.Add("Button", "x+30 y+-40 wp hp vProfile_Settings", Tr("main.profile_settings")).OnEvent("Click", (obj, *) => Button_Handler(obj))
 
         This.S_Gui.Show("hide")
 
@@ -43,8 +43,9 @@
         }
 
         SettingsDDL_Handler(Obj) {
+            SelectedSection := This.GetSelectedProfileSection()
             for k, v in This.S_Gui.Controls.Profile_Settings.PsDDL {
-                if k = Obj.Text {
+                if k = SelectedSection {
                     for _, ob in v
                         ob.Visible := 1
                 }
@@ -83,7 +84,7 @@
                             Ctrl.Visible := 1
                         }
                         for _, Ctrl in This.S_Gui.Controls.Profile_Settings.PsDDL {
-                            if (This.Seetings_DDL.Text = _) {
+                            if (This.GetSelectedProfileSection() = _) {
                                 for k, v in Ctrl {
                                     v.Visible := 1
                                 }
@@ -97,7 +98,7 @@
                     }
                 }
                 if (This.Profiles.Count = 1 && This.SelectProfile_DDL.Text = "Default")
-                    MsgBox("you need create a profile first to change the settings")
+                    MsgBox(Tr("profile.default_locked"), AppInfo.Name)
             }
 
             This.S_Gui.Show("AutoSize")
@@ -108,23 +109,26 @@
     Global_Settings(visible?) {
         This.S_Gui.Controls.Global_Settings := []
         This.S_Gui.SetFont("s10 w400")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("GroupBox", "x20 y80 h280 w500")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xp+15 yp+20 Section", "Suspend Hotkeys - Hotkey:")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", "Hotkey activation Scope:")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", "Thumbnail Background Color:")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", "Thumbnail Default Location:")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", "Thumbnail Minimum Size:")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", "Thumbnail Snap:")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", "Thumbnail Snap Distance:")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", "Minimize EVE Window Delay:")
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("GroupBox", "x20 y80 h320 w560")
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xp+15 yp+20 Section", Tr("common.language"))
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.suspend_hotkeys"))
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.hotkey_scope"))
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_background"))
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_location"))
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_minimum"))
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_snap"))
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_snap_distance"))
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.minimize_delay"))
 
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "xs+230 ys-3 w150 Section vSuspend_Hotkeys_Hotkey", This.Suspend_Hotkeys_Hotkey)
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("DDL", "xs+290 ys-3 w180 Section vLanguage Choose" (This.Language = "de" ? 1 : 2), [Tr("common.german"), Tr("common.english")])
+        This.S_Gui["Language"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "xp y+5 w150 vSuspend_Hotkeys_Hotkey", This.Suspend_Hotkeys_Hotkey)
         This.S_Gui["Suspend_Hotkeys_Hotkey"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("DDL", "xp y+5 w180 vTTT vHotkey_Scoope Choose" (This.Global_Hotkeys ? 1 : 2), ["Global", "If an EVE window is Active"])
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("DDL", "xp y+5 w230 vTTT vHotkey_Scoope Choose" (This.Global_Hotkeys ? 1 : 2), [Tr("global.scope_global"), Tr("global.scope_eve")])
         This.S_Gui["Hotkey_Scoope"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
 
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "xp y+5 w120 section vThumbnailBackgroundColor", This.ThumbnailBackgroundColor)
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xp+130 yp+4", "Hex or RGB")
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xp+130 yp+4", Tr("common.hex_rgb"))
         This.S_Gui["ThumbnailBackgroundColor"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
 
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs+2 y+17 section", "x:")
@@ -143,29 +147,34 @@
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "x+5 y+-18 w40 vThumbnailStartLocationheight", This.ThumbnailStartLocation["height"])
         This.S_Gui["ThumbnailStartLocationheight"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
 
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+10 section ", "width:")
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+10 section ", Tr("common.width") ":")
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "x+5 y+-18 w40 vThumbnailMinimumSizewidth", This.ThumbnailMinimumSize["width"])
         This.S_Gui["ThumbnailMinimumSizewidth"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
 
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "x+8 ys ", "height:")
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "x+8 ys ", Tr("common.height") ":")
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "x+5 y+-18 w40 vThumbnailMinimumSizeheight", This.ThumbnailMinimumSize["height"])
         This.S_Gui["ThumbnailMinimumSizeheight"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
 
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Radio", "xs y+10 w37 vThumbnailSnapOn Checked" This.ThumbnailSnap, "On")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Radio", " xp+50 yp w37 vThumbnailSnapOff Checked" (This.ThumbnailSnap ? 0 : 1), "Off")
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Radio", "xs y+10 w50 vThumbnailSnapOn Checked" This.ThumbnailSnap, Tr("common.on"))
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Radio", " xp+65 yp w50 vThumbnailSnapOff Checked" (This.ThumbnailSnap ? 0 : 1), Tr("common.off"))
         This.S_Gui["ThumbnailSnapOn"].OnEvent("Click", (obj, *) => gSettings_EventHandler(obj))
         This.S_Gui["ThumbnailSnapOff"].OnEvent("Click", (obj, *) => gSettings_EventHandler(obj))
 
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15 ", "pixel:")
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15 ", Tr("common.pixel") ":")
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "x+5 y+-18 w40 vThumbnailSnap_Distance", This.ThumbnailSnap_Distance)
         This.S_Gui["ThumbnailSnap_Distance"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
 
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+9 ", "Milliseconds:")
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+9 ", Tr("common.milliseconds") ":")
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "xp+80 yp-3 w40 vMinimizeclients_Delay", This.Minimizeclients_Delay)
         This.S_Gui["Minimizeclients_Delay"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
 
         gSettings_EventHandler(obj) {
-            if (obj.name = "Suspend_Hotkeys_Hotkey") {
+            if (obj.name = "Language") {
+                This.Language := obj.value = 1 ? "de" : "en"
+                This.SaveJsonToFile()
+                SetTimer((*) => Reload(), -200)
+            }
+            else if (obj.name = "Suspend_Hotkeys_Hotkey") {
                 This.Suspend_Hotkeys_Hotkey := Trim(obj.value, "`n ")
                 This.NeedRestart := 1
             }
@@ -217,18 +226,18 @@
         This.S_Gui.Controls.Profile_Settings := [], This.S_Gui.Controls.Profile_Settings.PsDDL := Map()
 
         ;This.S_Gui.Controls.Profile_Settings.Push This.S_Gui.Add("GroupBox", "x20 y80 h200 w500 vPSGroupBox", "")
-        This.S_Gui.Controls.Profile_Settings.Push This.S_Gui.Add("Text", "x58 y95", "Select Profile:")
+        This.S_Gui.Controls.Profile_Settings.Push This.S_Gui.Add("Text", "x58 y95", Tr("profile.select"))
 
         This.SelectProfile_DDL := This.S_Gui.Add("DDL", "w200 xp-30 yp+18 Section vSelectedProfile", This.Profiles_to_Array())
         This.S_Gui.Controls.Profile_Settings.Push This.SelectProfile_DDL
         This.SelectProfile_DDL.Choose(This.LastUsedProfile)
         This.SelectProfile_DDL.OnEvent("Change", (obj,*) => This._Button_Load(Obj))
 
-        Button_Delete := This.S_Gui.Add("Button", "w60 xs+360 yp-2 ", "Delete")
+        Button_Delete := This.S_Gui.Add("Button", "w80 xs+340 yp-2 ", Tr("common.delete"))
         This.S_Gui.Controls.Profile_Settings.Push Button_Delete
         Button_Delete.OnEvent("Click", ObjBindMethod(This, "Delete_Profile"))
 
-        Button_New := This.S_Gui.Add("Button", "wp x+5 yp ", "New")
+        Button_New := This.S_Gui.Add("Button", "wp x+5 yp ", Tr("common.new"))
         This.S_Gui.Controls.Profile_Settings.Push Button_New
         Button_New.OnEvent("Click", ObjBindMethod(This, "Create_Profile"))
 
@@ -236,9 +245,13 @@
         This.Seperator_text := This.S_Gui.Add("Text", "xs+15 y+5 w460 h2 +0x10")
         This.S_Gui.Controls.Profile_Settings.Push This.Seperator_text
 
-        This.S_Gui.Controls.Profile_Settings.Push This.S_Gui.Add("Text", "xp+190 y+5", "Profile Settings:")
+        This.S_Gui.Controls.Profile_Settings.Push This.S_Gui.Add("Text", "xp+175 y+5", Tr("profile.settings"))
 
-        This.Seetings_DDL := This.S_Gui.Add("DDL", "w180 xp-40 y+5 vSeetings_Props", This._ProfileProps)
+        This.ProfilePropKeys := This._ProfileProps
+        ProfilePropLabels := []
+        for ProfilePropKey in This.ProfilePropKeys
+            ProfilePropLabels.Push(This.ProfileSectionLabel(ProfilePropKey))
+        This.Seetings_DDL := This.S_Gui.Add("DDL", "w240 xp-65 y+5 vSeetings_Props", ProfilePropLabels)
         This.Seetings_DDL.Choose(1)
         ;This.Seetings_DDL.OnEvent("Change", ObjBindMethod(This, "ProfileSettings_DDL"))
         This.S_Gui.Controls.Profile_Settings.Push This.Seetings_DDL
@@ -255,14 +268,14 @@
         This.S_Gui.Controls.Profile_Settings.PsDDL["Client Settings"] := [], ClientSettings := []
 
         ClientSettings.Push This.S_Gui.Add("GroupBox", "x20 y80 h400 w500 Section", "")
-        ClientSettings.Push This.S_Gui.Add("Text", " xp+15 yp+140 Section ", "Minimize Inactive Clients:")
-        ClientSettings.Push This.S_Gui.Add("Text", "xs y+15 ", "Always Maximize Clients:")
-        ClientSettings.Push This.S_Gui.Add("Text", "xs y+15 ", "Dont Minimize Clients:")
+        ClientSettings.Push This.S_Gui.Add("Text", " xp+15 yp+140 Section ", Tr("client.minimize_inactive"))
+        ClientSettings.Push This.S_Gui.Add("Text", "xs y+15 ", Tr("client.always_maximize"))
+        ClientSettings.Push This.S_Gui.Add("Text", "xs y+15 ", Tr("client.dont_minimize"))
 
-        ClientSettings.Push This.S_Gui.Add("CheckBox", "xs+230 ys Section vMinimizeInactiveClients Checked" This.MinimizeInactiveClients, "On/Off")
+        ClientSettings.Push This.S_Gui.Add("CheckBox", "xs+280 ys Section vMinimizeInactiveClients Checked" This.MinimizeInactiveClients, Tr("common.on_off"))
         This.S_Gui["MinimizeInactiveClients"].OnEvent("Click", (obj, *) => cSettings_EventHandler(obj))
 
-        ClientSettings.Push This.S_Gui.Add("CheckBox", "xs y+15 vAlwaysMaximize Checked" This.AlwaysMaximize, "On/Off")
+        ClientSettings.Push This.S_Gui.Add("CheckBox", "xs y+15 vAlwaysMaximize Checked" This.AlwaysMaximize, Tr("common.on_off"))
         This.S_Gui["AlwaysMaximize"].OnEvent("Click", (obj, *) => cSettings_EventHandler(obj))
 
         ClientSettings.Push This.S_Gui.Add("Edit", "xs y+15 w220 h180 vDont_Minimize_Clients -Wrap", This.Dont_Minimize_List())
@@ -296,13 +309,13 @@
         This.S_Gui.Controls.Profile_Settings.PsDDL["Custom Colors"] := [], CustomColors := []
         CustomColors.Push This.S_Gui.Add("GroupBox", "x20 y80 h480 w565 Section", "")
 
-        CustomColors.Push This.S_Gui.Add("Text", " xp+25 yp+140 Section ", "Custom Colors Active - On/Off")        
-        CustomColors.Push This.S_Gui.Add("Text", " x35 yp+40  ", "Character Name:")
-        CustomColors.Push This.S_Gui.Add("Text", " xp+155 yp ", "Active Border Color:")
-        CustomColors.Push This.S_Gui.Add("Text", " xp+135 yp ", "Text Color:")
-        CustomColors.Push This.S_Gui.Add("Text", " xp+125 yp ", "Inactive Border Color:")
+        CustomColors.Push This.S_Gui.Add("Text", " xp+25 yp+140 Section ", Tr("colors.active"))
+        CustomColors.Push This.S_Gui.Add("Text", " x35 yp+40  ", Tr("colors.character"))
+        CustomColors.Push This.S_Gui.Add("Text", " xp+155 yp ", Tr("colors.active_border"))
+        CustomColors.Push This.S_Gui.Add("Text", " xp+135 yp ", Tr("colors.text"))
+        CustomColors.Push This.S_Gui.Add("Text", " xp+125 yp ", Tr("colors.inactive_border"))
 
-        CustomColors.Push This.S_Gui.Add("CheckBox", " xs+200 ys vCcoloractive Checked" This.CustomColorsActive, " ON / Off")
+        CustomColors.Push This.S_Gui.Add("CheckBox", " xs+230 ys vCcoloractive Checked" This.CustomColorsActive, Tr("common.on_off"))
         This.S_Gui["Ccoloractive"].OnEvent("Click", (obj, *) => Cclors_Eventhandler(obj))
 
         CustomColors.Push This.S_Gui.Add("Edit", " x30 yp+60 w150 h250 -Wrap vCchars", This.CustomColors_AllCharNames)
@@ -369,13 +382,13 @@
         This.S_Gui.Controls.Profile_Settings.PsDDL["Hotkey Groups"] := [], Hotkey_Groups := []
 
         Hotkey_Groups.Push This.S_Gui.Add("GroupBox", "x20 y80 h440 w500 Section", "")
-        Hotkey_Groups.Push This.S_Gui.Add("Text", "x58 yp+130", "Select Group:")
+        Hotkey_Groups.Push This.S_Gui.Add("Text", "x58 yp+130", Tr("groups.select"))
         ddl := This.S_Gui.Add("DropDownList", " xp-30 yp+18 w180 vHotkeyGroupDDL", This.GetGroupList())
         Hotkey_Groups.Push ddl
         This.S_Gui["HotkeyGroupDDL"].OnEvent("Change", (*) => SetEditText(ddl, EditBox, HKForwards, HKBackwards))
 
-        DeleteButton := This.S_Gui.Add("Button", "xs+370 yp-1 w60", "Delete")
-        NewButton := This.S_Gui.Add("Button", "x+5 yp w60", "New")
+        DeleteButton := This.S_Gui.Add("Button", "xs+340 yp-1 w80", Tr("common.delete"))
+        NewButton := This.S_Gui.Add("Button", "x+5 yp w80", Tr("common.new"))
         DeleteButton.OnEvent("Click", (*) => Delete_Group(ddl, HKForwards, HKBackwards, EditBox))
         NewButton.OnEvent("Click", (*) => CreateNewGroup(ddl, HKForwards, HKBackwards, EditBox))
 
@@ -386,12 +399,12 @@
         Hotkey_Groups.Push EditBox
         This.S_Gui["HKCharlist"].OnEvent("Change", (obj, *) => SaveHKGroupList(obj))
 
-        Hotkey_Groups.Push This.S_Gui.Add("Text", "xs300 yp20", "Forwards Hotkey:")
+        Hotkey_Groups.Push This.S_Gui.Add("Text", "xs300 yp20", Tr("groups.forward"))
         HKForwards := This.S_Gui.Add("Edit", "xp yp+20 w150 Disabled vForwardsKey")
         Hotkey_Groups.Push HKForwards
         This.S_Gui["ForwardsKey"].OnEvent("Change", (obj, *) => SaveHKGroupList(obj))
 
-        Hotkey_Groups.Push This.S_Gui.Add("Text", "xp yp50", "Backwards Hotkey:")
+        Hotkey_Groups.Push This.S_Gui.Add("Text", "xp yp50", Tr("groups.backward"))
         HKBackwards := This.S_Gui.Add("Edit", "xp yp+20 w150 Disabled vBackwardsdKey")
         Hotkey_Groups.Push HKBackwards
         This.S_Gui["BackwardsdKey"].OnEvent("Change", (obj, *) => SaveHKGroupList(obj))
@@ -403,7 +416,7 @@
 
         CreateNewGroup(ddlObj, ForwardHKObj, BackwardHKObj, EditObj) {
             ArrayIndex := 0
-            Obj := InputBox("Enter a Groupname", "Create New Group", "w200 h90")
+            Obj := InputBox(Tr("groups.enter_name"), Tr("groups.create_title"), "w260 h110")
             if (Obj.Result != "OK")
                 return
             This.Hotkey_Groups[Obj.value] := []
@@ -483,12 +496,12 @@
             }
         }
 
-        Hotkeys.Push This.S_Gui.Add("Text", " x115 yp+130 section", "Character Name:")
+        Hotkeys.Push This.S_Gui.Add("Text", " x115 yp+130 section", Tr("hotkeys.character"))
         HKCharList := This.S_Gui.Add("Edit", " xp-30 yp20 w180 h350 -Wrap vHotkeyCharList", Charlist)
         Hotkeys.Push HKCharList
         HKCharList.OnEvent("Change", (obj, *) => EventHandler(obj))
 
-        Hotkeys.Push This.S_Gui.Add("Text", " xs+210 ys", "Hotkeys:")
+        Hotkeys.Push This.S_Gui.Add("Text", " xs+210 ys", Tr("hotkeys.hotkey"))
         HKKeylist := This.S_Gui.Add("Edit", " xp-50 yp20 w180 h350 -Wrap vHotkeyList", Hklist)
         Hotkeys.Push HKKeylist
         HKKeylist.OnEvent("Change", (obj, *) => EventHandler(obj))
@@ -528,26 +541,26 @@
 
         ThumbnailSettings.Push This.S_Gui.Add("GroupBox", "x20 y80 h580 w500 Section", "")
 
-        ThumbnailSettings.Push This.S_Gui.Add("Text", "xp+15 yp+140 Section", "Show Thumbnail Text Overlay:")
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", "Thumbnail Text Color:")
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", "Thumbnail Text Size:")
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", "Thumbnail Text Font:")
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", "Thumbnail Text Margins:")
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", "Client Highligt Color:")
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", "Client Highligt Border Thickness:")
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", "Show Client Highlight Border:")
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", "Hide Thumbnails On Lost Focus:")
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", "Thumbnail Opacity:")
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", "Show Thumbnails AlwaysOnTop:")
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15", "Show All Borders:")
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15", "Inactive Client Border Thickness:")
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15", "Inactive Client Border Color:")
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "xp+15 yp+140 Section", Tr("thumbnail.show_text"))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.text_color"))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.text_size"))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.text_font"))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.text_margins"))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.highlight_color"))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.highlight_thickness"))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.show_highlight"))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.hide_lost_focus"))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.opacity"))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.always_on_top"))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15", Tr("thumbnail.show_all_borders"))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15", Tr("thumbnail.inactive_thickness"))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15", Tr("thumbnail.inactive_color"))
 
-        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs+230 ys Section vShowThumbnailTextOverlay Checked" This.ShowThumbnailTextOverlay, "On/Off")
+        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs+300 ys Section vShowThumbnailTextOverlay Checked" This.ShowThumbnailTextOverlay, Tr("common.on_off"))
         This.S_Gui["ShowThumbnailTextOverlay"].OnEvent("Click", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
         ThumbnailSettings.Push This.S_Gui.Add("Edit", "xs y+11  w120 vThumbnailTextColor -Wrap", This.ThumbnailTextColor)
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " x+5 yp+3 ", "Hex or RGB")
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " x+5 yp+3 ", Tr("common.hex_rgb"))
         This.S_Gui["ThumbnailTextColor"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
         ThumbnailSettings.Push This.S_Gui.Add("Edit", "xs y+10 w30 vThumbnailTextSize -Wrap", This.ThumbnailTextSize)
@@ -556,36 +569,36 @@
         ThumbnailSettings.Push This.S_Gui.Add("Edit", "xs y+8 w120 vThumbnailTextFont -Wrap", This.ThumbnailTextFont)
         This.S_Gui["ThumbnailTextFont"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+12", "width px:")
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+12", Tr("common.width") " px:")
         ThumbnailSettings.Push This.S_Gui.Add("Edit", "x+5 yp-4  w40 vThumbnailTextMarginsx -Wrap", This.ThumbnailTextMargins["x"])
         This.S_Gui["ThumbnailTextMarginsx"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs+100 yp+4 ", "height px:")
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs+110 yp+4 ", Tr("common.height") " px:")
         ThumbnailSettings.Push This.S_Gui.Add("Edit", "xp+60 yp-4  w40 vThumbnailTextMarginsy -Wrap", This.ThumbnailTextMargins["y"])
         This.S_Gui["ThumbnailTextMarginsy"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
         ThumbnailSettings.Push This.S_Gui.Add("Edit", "xs y+7 w120 vClientHighligtColor -Wrap", This.ClientHighligtColor)
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " x+5 yp+3 ", "Hex or RGB")
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " x+5 yp+3 ", Tr("common.hex_rgb"))
         This.S_Gui["ClientHighligtColor"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
         ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", "px:")
         ThumbnailSettings.Push This.S_Gui.Add("Edit", "x+5 yp-3  w30 vClientHighligtBorderthickness -Wrap", This.ClientHighligtBorderthickness)
         This.S_Gui["ClientHighligtBorderthickness"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+10 vShowClientHighlightBorder Checked" This.ShowClientHighlightBorder, "On/Off")
+        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+10 vShowClientHighlightBorder Checked" This.ShowClientHighlightBorder, Tr("common.on_off"))
         This.S_Gui["ShowClientHighlightBorder"].OnEvent("Click", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+16 vHideThumbnailsOnLostFocus Checked" This.HideThumbnailsOnLostFocus, "On/Off")
+        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+16 vHideThumbnailsOnLostFocus Checked" This.HideThumbnailsOnLostFocus, Tr("common.on_off"))
         This.S_Gui["HideThumbnailsOnLostFocus"].OnEvent("Click", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
         ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", "%")
         ThumbnailSettings.Push This.S_Gui.Add("Edit", "x+4 yp-4  w40 vThumbnailOpacity -Wrap", IntegerToPercentage(This.ThumbnailOpacity))
         This.S_Gui["ThumbnailOpacity"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+12 vShowThumbnailsAlwaysOnTop Checked" This.ShowThumbnailsAlwaysOnTop, "On/Off")
+        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+12 vShowThumbnailsAlwaysOnTop Checked" This.ShowThumbnailsAlwaysOnTop, Tr("common.on_off"))
         This.S_Gui["ShowThumbnailsAlwaysOnTop"].OnEvent("Click", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+15 vShowAllBorders Checked" This.ShowAllColoredBorders, "On/Off")
+        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+15 vShowAllBorders Checked" This.ShowAllColoredBorders, Tr("common.on_off"))
         This.S_Gui["ShowAllBorders"].OnEvent("Click", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
         ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+12 ", "px:")
@@ -593,7 +606,7 @@
         This.S_Gui["InactiveClientBorderthickness"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
         ThumbnailSettings.Push This.S_Gui.Add("Edit", "xs y+5 w120 vInactiveClientBorderColor -Wrap", This.InactiveClientBorderColor)
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " x+5 yp+3 ", "Hex or RGB")
+        ThumbnailSettings.Push This.S_Gui.Add("Text", " x+5 yp+3 ", Tr("common.hex_rgb"))
         This.S_Gui["InactiveClientBorderColor"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
         This.S_Gui.Controls.Profile_Settings.PsDDL["Thumbnail Settings"] := ThumbnailSettings
@@ -672,8 +685,8 @@
         This.S_Gui.Controls.Profile_Settings.PsDDL["Thumbnail Visibility"] := [], Thumbnail_visibility := []
 
         Thumbnail_visibility.Push This.S_Gui.Add("GroupBox", "x20 y80 h610 w500 Section", "")
-        Thumbnail_visibility.Push This.S_Gui.Add("Text", "xp+140 yp+130 w250", "Select any Client to hide the Thumbnail")
-        This.Tv_LV := This.S_Gui.Add("ListView", "xp+15 yp+30 w210 Checked -LV0x10 -Multi r20 -Sort vVisibility_List", ["Client Name       "])
+        Thumbnail_visibility.Push This.S_Gui.Add("Text", "xp+90 yp+130 w360", Tr("visibility.help"))
+        This.Tv_LV := This.S_Gui.Add("ListView", "xp+65 yp+30 w260 Checked -LV0x10 -Multi r20 -Sort vVisibility_List", [Tr("visibility.client")])
         Thumbnail_visibility.Push This.Tv_LV
 
         for k, v in This.compare_openclients_with_list() {
@@ -707,6 +720,27 @@
             }
             PrevHwnd := Hwnd
         }
+    }
+
+    ProfileSectionLabel(ProfileKey) {
+        Labels := Map(
+            "Client Settings", "section.client_settings",
+            "Custom Colors", "section.custom_colors",
+            "Hotkey Groups", "section.hotkey_groups",
+            "Hotkeys", "section.hotkeys",
+            "Thumbnail Settings", "section.thumbnail_settings",
+            "Thumbnail Visibility", "section.thumbnail_visibility"
+        )
+        return Labels.Has(ProfileKey) ? Tr(Labels[ProfileKey]) : ProfileKey
+    }
+
+    GetSelectedProfileSection() {
+        if (!This.HasProp("ProfilePropKeys") || !This.ProfilePropKeys.Length)
+            return ""
+        SelectedIndex := This.Seetings_DDL.Value
+        if (SelectedIndex < 1 || SelectedIndex > This.ProfilePropKeys.Length)
+            return ""
+        return This.ProfilePropKeys[SelectedIndex]
     }
 
     Profiles_to_Array() {
@@ -743,6 +777,7 @@
 
     Refresh_ControlValues() {
         ; Global Settings
+        This.S_Gui["Language"].value := (This.Language = "de" ? 1 : 2)
         This.S_Gui["Suspend_Hotkeys_Hotkey"].value := This.Suspend_Hotkeys_Hotkey
         This.S_Gui["Hotkey_Scoope"].value := (This.Global_Hotkeys ? 1 : 2)
         This.S_Gui["ThumbnailBackgroundColor"].value := This.ThumbnailBackgroundColor

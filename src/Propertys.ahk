@@ -33,6 +33,18 @@ class Propertys extends TrayMenu {
 
     ;######################
     ;## global Settings
+    Language {
+        get => This._JSON["global_Settings"]["Language"]
+        set => This._JSON["global_Settings"]["Language"] := value
+    }
+
+    LastNotifiedVersion {
+        get => This._JSON["global_Settings"]["LastNotifiedVersion"]
+        set => This._JSON["global_Settings"]["LastNotifiedVersion"] := value
+    }
+
+    SettingsWindowTitle => Tr("app.settings_title")
+
     ThumbnailStartLocation[key] {
         get => This._JSON["global_Settings"]["ThumbnailStartLocation"][key]
         set => This._JSON["global_Settings"]["ThumbnailStartLocation"][key] := value
@@ -451,7 +463,7 @@ class Propertys extends TrayMenu {
     }
 
     _Hotkey_Add(*) {
-        Obj := InputBox("Enter the Char Name", "Add New Char", "w200 h90")
+        Obj := InputBox(Tr("dialog.char_name"), Tr("dialog.char_add"), "w260 h110")
         if (Obj.Result = "OK") {
             This._Hotkeys[Trim(Obj.Value, " ")] := ""
             This.LV.Add(, Trim(Obj.Value, " "))
@@ -464,7 +476,7 @@ class Propertys extends TrayMenu {
         if (This.LV_Item) {
             HKey_Char_Key := This.LV.GetText(This.LV_Item, 2), HKey_Char_Name := This.LV.GetText(This.LV_Item)
             if (This._Hotkeys.Has(HKey_Char_Name)) {
-                Obj := InputBox(HKey_Char_Key, "Edit Hotkey for -> " HKey_Char_Name, "w250 h100")
+                Obj := InputBox(HKey_Char_Key, Tr("dialog.hotkey_edit", HKey_Char_Name), "w300 h120")
                 if (Obj.Result = "OK") {
                     This._Hotkeys[HKey_Char_Name] := Trim(Obj.Value, " ")
                     This.LV.Modify(This.LV_Item, , , Trim(Obj.Value, " "))
@@ -516,7 +528,7 @@ class Propertys extends TrayMenu {
         static state := 0
         ToolTip()
         state := !state
-        state ? ToolTip("Hotkeys disabled") : ToolTip("Hotkeys enabled")
+        state ? ToolTip(Tr("tooltip.hotkeys_disabled")) : ToolTip(Tr("tooltip.hotkeys_enabled"))
         Suspend(-1)
 
         SetTimer((*) => ToolTip(), -1500)
@@ -524,7 +536,7 @@ class Propertys extends TrayMenu {
 
     Delete_Profile(*) {
         if (This.SelectProfile_DDL.Text = "Default") {
-            MsgBox("You cannot delete the default settings")
+            MsgBox(Tr("dialog.default_delete"), AppInfo.Name)
             Return
         }
 
@@ -556,15 +568,15 @@ class Propertys extends TrayMenu {
 
 
     Create_Profile(*) {
-        Obj := InputBox("Enter a Profile Name", "Create New Profile", "w200 h90")
+        Obj := InputBox(Tr("dialog.profile_name"), Tr("dialog.profile_create"), "w260 h110")
         if (Obj.Result != "OK" || Obj.Result = "")
             return
         if (This.Profiles.Has(Obj.value)) {
-            MsgBox("A profile with this name already exists")
+            MsgBox(Tr("dialog.profile_exists"), AppInfo.Name)
             return
         }
         if !(This.LastUsedProfile = "Default") {
-            Result := MsgBox("Do you want to use the current settings for the new profile?", , "YesNo")
+            Result := MsgBox(Tr("dialog.profile_copy"), AppInfo.Name, "YesNo")
         }
         else
             Result := "No"
@@ -580,7 +592,7 @@ class Propertys extends TrayMenu {
         FileAppend(JSON.Dump(This._JSON, , "    "), "EVE-X-Preview.json")
         This.SelectProfile_DDL.Delete()
         This.SelectProfile_DDL.Add(This.Profiles_to_Array())
-        ControlChooseString(Obj.value, This.SelectProfile_DDL, "EVE-X-Preview - Settings")
+        ControlChooseString(Obj.value, This.SelectProfile_DDL, This.SettingsWindowTitle)
         This.LastUsedProfile := Obj.value
         Return
     }

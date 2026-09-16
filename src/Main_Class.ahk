@@ -45,6 +45,7 @@ Class Main_Class extends ThumbWindow {
 
         This._JSON := Load_JSON()
         This.default_JSON := JSON.Load(default_JSON)
+        I18n.SetLanguage(This.Language)
        
         This.TrayMenu()   
         This.MinimizeDelay := This.Minimizeclients_Delay    
@@ -62,7 +63,7 @@ Class Main_Class extends ThumbWindow {
                 Hotkey This.Suspend_Hotkeys_Hotkey, ( * ) => This.Suspend_Hotkeys(), "S1"
             }
             catch ValueError as e {
-                MsgBox(e.Message ": --> " e.Extra " <-- in: Global Settings -> Suspend Hotkeys-Hotkey" )
+                MsgBox(Tr("error.invalid_hotkey", e.Message, e.Extra), AppInfo.Name)
             }
         }
         
@@ -90,8 +91,48 @@ Class Main_Class extends ThumbWindow {
         ;Register the Hotkeys for cycle groups 
         This.Register_Hotkey_Groups()
         This.BorderActive := 0
+        SetTimer(ObjBindMethod(This, "CheckForUpdates", true), -3000)
 
         return This
+    }
+
+    CheckForUpdates(Automatic := false, *) {
+        Result := UpdateChecker.Check()
+
+        if (Result["status"] = "update") {
+            if (!Automatic) {
+                Choice := MsgBox(
+                    Tr("update.available_question", Result["version"]),
+                    Tr("update.available_title"),
+                    "YesNo Iconi"
+                )
+                if (Choice = "Yes")
+                    Run(Result["url"])
+            }
+            else if (This.LastNotifiedVersion != Result["version"]) {
+                TrayTip(
+                    Tr("update.available_text", Result["version"]),
+                    Tr("update.available_title"),
+                    1
+                )
+                This.LastNotifiedVersion := Result["version"]
+                This.SaveJsonToFile()
+            }
+        }
+        else if (!Automatic && Result["status"] = "current") {
+            MsgBox(
+                Tr("update.current_text", AppInfo.Version),
+                Tr("update.current_title"),
+                "Iconi"
+            )
+        }
+        else if (!Automatic) {
+            MsgBox(
+                Tr("update.error_text"),
+                Tr("update.error_title"),
+                "Icon!"
+            )
+        }
     }
 
     HandleMainTimer() {
@@ -192,12 +233,12 @@ Class Main_Class extends ThumbWindow {
             ;if the user has selected Global Hotkey. This means the Hotkey will alsways trigger as long at least 1 EVE Window exist.
             ;if a Window does not Exist which was assigned to the hotkey the hotkey will be dissabled until the Window exist again
             if(This.Global_Hotkeys) {
-                HotIf (*) => WinExist(This.EVEExe) && WinExist("EVE - " title ) && !WinActive("EVE-X-Preview - Settings")
+                HotIf (*) => WinExist(This.EVEExe) && WinExist("EVE - " title ) && !WinActive(This.SettingsWindowTitle)
                 try {
                     Hotkey This._Hotkeys[title], (*) => This.ActivateEVEWindow(,,title), "P1"
                 }
                 catch ValueError as e {
-                    MsgBox(e.Message ": --> " e.Extra " <-- in Profile Settings - " This.LastUsedProfile " Hotkeys" )
+                    MsgBox(Tr("error.invalid_hotkey", e.Message, e.Extra), AppInfo.Name)
                 }
             }
             ;if the user has selected (Win Active) the hotkeys will only trigger if at least 1 EVE Window is Active and in Focus
@@ -208,7 +249,7 @@ Class Main_Class extends ThumbWindow {
                     Hotkey This._Hotkeys[title], (*) => This.ActivateEVEWindow(,,title),"P1"
                 }
                 catch ValueError as e {
-                    MsgBox(e.Message ": --> " e.Extra " <-- in Profile Settings - " This.LastUsedProfile " Hotkeys" )
+                    MsgBox(Tr("error.invalid_hotkey", e.Message, e.Extra), AppInfo.Name)
                 }
             }
         }
@@ -228,7 +269,7 @@ Class Main_Class extends ThumbWindow {
                             Hotkey( v["ForwardsHotkey"], ObjBindMethod(This, "Cycle_Hotkey_Groups",Arr,"ForwardsHotkey"), "P1")
                         }
                         catch ValueError as e {
-                            MsgBox(e.Message ": --> " e.Extra " <-- in Profile Settings - " This.LastUsedProfile " - Hotkey Groups - " k "  - Forwards Hotkey" )
+                            MsgBox(Tr("error.invalid_hotkey", e.Message, e.Extra), AppInfo.Name)
                         }
                     }
                     if( v["BackwardsHotkey"] != "" ) {
@@ -238,7 +279,7 @@ Class Main_Class extends ThumbWindow {
                             Hotkey( v["BackwardsHotkey"], ObjBindMethod(This, "Cycle_Hotkey_Groups",Arr,"BackwardsHotkey"), "P1")   
                         }
                         catch ValueError as e {
-                            MsgBox(e.Message ": --> " e.Extra " <-- in Profile Settings - " This.LastUsedProfile " Hotkey Groups - " k " - Backwards Hotkey" )
+                            MsgBox(Tr("error.invalid_hotkey", e.Message, e.Extra), AppInfo.Name)
                         }
                     }  
                 }  
@@ -251,7 +292,7 @@ Class Main_Class extends ThumbWindow {
                             Hotkey( v["ForwardsHotkey"], ObjBindMethod(This, "Cycle_Hotkey_Groups",Arr,"ForwardsHotkey"), "P1")
                         }
                         catch ValueError as e {
-                            MsgBox(e.Message ": --> " e.Extra " <-- in Profile Settings - " This.LastUsedProfile " - Hotkey Groups - " k "  - Forwards Hotkey" )
+                            MsgBox(Tr("error.invalid_hotkey", e.Message, e.Extra), AppInfo.Name)
                         }
                     }
                     if( v["BackwardsHotkey"] != "" ) {
@@ -261,7 +302,7 @@ Class Main_Class extends ThumbWindow {
                             Hotkey( v["BackwardsHotkey"], ObjBindMethod(This, "Cycle_Hotkey_Groups",Arr,"BackwardsHotkey"), "P1")   
                         }
                         catch ValueError as e {
-                            MsgBox(e.Message ": --> " e.Extra " <-- in Profile Settings - " This.LastUsedProfile " Hotkey Groups - " k " - Backwards Hotkey" )
+                            MsgBox(Tr("error.invalid_hotkey", e.Message, e.Extra), AppInfo.Name)
                         } 
                     }  
                 }             
@@ -325,7 +366,7 @@ Class Main_Class extends ThumbWindow {
      ; To Check if atleast One Win stil Exist in the Array for the cycle groups hotkeys
     OnWinExist(Arr, *) {
         for index, Name in Arr {
-            If ( WinExist("EVE - " Name " Ahk_Exe exefile.exe") && !WinActive("EVE-X-Preview - Settings") ) {
+            If ( WinExist("EVE - " Name " Ahk_Exe exefile.exe") && !WinActive(This.SettingsWindowTitle) ) {
                 return true
             }
         }
@@ -734,4 +775,3 @@ Class Main_Class extends ThumbWindow {
         FileAppend(JSON.Dump(This._JSON, , "    "), "EVE-X-Preview.json")
     }
 }
-
