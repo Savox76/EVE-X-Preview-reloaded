@@ -194,7 +194,7 @@
         }
 
         This.S_Gui.SetFont("s9 w400 c" Muted, "Segoe UI")
-        This.ModernChrome.Push This.S_Gui.Add("Text", "x18 y595 w195 h20", Tr("global.interface_theme")))
+        This.ModernChrome.Push This.S_Gui.Add("Text", "x18 y595 w195 h20", Tr("global.interface_theme"))
         This.ModernThemeSelector := This.S_Gui.Add("DDL", "x18 y618 w195 Choose" This.InterfaceThemeIndex(), This.InterfaceThemeLabels())
         This.ModernThemeSelector.OnEvent("Change", ObjBindMethod(This, "SwitchInterfaceTheme"))
         This.ModernChrome.Push This.ModernThemeSelector
