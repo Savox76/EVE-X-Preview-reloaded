@@ -182,7 +182,7 @@
         This.ModernChrome.Push This.S_Gui.Add("Text", "x0 y50 w1120 h1 Background" Border)
         This.ModernChrome.Push This.S_Gui.Add("Text", "x225 y50 w1 h750 Background" Border)
 
-        This.S_Gui.SetFont("s18 w700 c" Foreground, "Segoe UI")
+        This.S_Gui.SetFont("s21 w700 c" Foreground, "Segoe UI")
         This.ModernPageTitle := This.S_Gui.Add("Text", "x253 y75 w820 h36 BackgroundTrans", Tr("main.global_settings"))
         This.ModernChrome.Push This.ModernPageTitle
 
@@ -198,7 +198,7 @@
         This.ModernNavButtons := Map()
         This.ModernNavLabels := Map()
         NavY := 74
-        This.S_Gui.SetFont("s10 w500 c" Foreground, "Segoe UI")
+        This.S_Gui.SetFont("s11 w500 c" Foreground, "Segoe UI")
         for Entry in Navigation {
             PageKey := Entry[1], Label := Entry[2], Icon := Entry[3]
             NavButton := This.S_Gui.Add("Text", "x6 y" NavY " w214 h48 +0x100 +0x200 Background" Sidebar, "      " Label)
@@ -272,7 +272,7 @@
         Bottom := This.S_Gui.Add("Text", "x" X " y" (Y + Height - 1) " w" Width " h1 Background" BorderColor)
         Left := This.S_Gui.Add("Text", "x" X " y" Y " w1 h" Height " Background" BorderColor)
         Right := This.S_Gui.Add("Text", "x" (X + Width - 1) " y" Y " w1 h" Height " Background" BorderColor)
-        This.S_Gui.SetFont("s12 w700 c" Foreground, "Segoe UI")
+        This.S_Gui.SetFont("s14 w700 c" Foreground, "Segoe UI")
         Title := This.S_Gui.Add("Text", "x" (X + 24) " y" (Y + 18) " w" (Width - 48) " h26 BackgroundTrans", Heading)
         Line := This.S_Gui.Add("Text", "x" (X + 24) " y" (Y + 53) " w" (Width - 48) " h1 Background" BorderColor)
         This.ModernPageExtras[PageKey].Push(Top, Bottom, Left, Right, Title, Line)
@@ -346,7 +346,7 @@
         }
     }
 
-    AddModernLabel(PageKey, X, Y, Width, Label, Foreground, FontOptions := "s10 w400") {
+    AddModernLabel(PageKey, X, Y, Width, Label, Foreground, FontOptions := "s11 w400") {
         This.S_Gui.SetFont(FontOptions " c" Foreground, "Segoe UI")
         Ctrl := This.S_Gui.Add("Text", "x" X " y" Y " w" Width " h24 BackgroundTrans", Label)
         This.ModernPageExtras[PageKey].Push(Ctrl)
@@ -394,6 +394,8 @@
         State := !!This.S_Gui[ControlName].Value
         Toggle["Track"].Opt("+Background" (State ? This.ModernAccentColor : This.ModernToggleOffColor))
         Toggle["Knob"].Move(Toggle["X"] + (State ? 25 : 3))
+        This.RoundModernControl(Toggle["Track"], 24)
+        This.RoundModernControl(Toggle["Knob"], 18)
         Toggle["Track"].Redraw(), Toggle["Knob"].Redraw()
     }
 
@@ -412,7 +414,7 @@
             ImagePanel := This.S_Gui.Add("Text", "x" X " y" Y " w260 h143 +Center +0x200 Background" Tile[4], Tile[5])
             ImagePanel.SetFont("s22 w400 cD9DEE4", "Segoe UI Symbol")
             CaptionPanel := This.S_Gui.Add("Text", "x" X " y" (Y + 143) " w260 h34 Background" CardColor)
-            Caption := This.AddModernLabel("Thumbnail Settings", X + 10, Y + 150, 230, Tile[3], Foreground, "s9 w400")
+            Caption := This.AddModernLabel("Thumbnail Settings", X + 10, Y + 150, 230, Tile[3], Foreground, "s10 w400")
             BorderTop := This.S_Gui.Add("Text", "x" X " y" Y " w260 h1 Background" BorderColor)
             BorderBottom := This.S_Gui.Add("Text", "x" X " y" (Y + 176) " w260 h1 Background" BorderColor)
             BorderLeft := This.S_Gui.Add("Text", "x" X " y" Y " w1 h177 Background" BorderColor)
@@ -438,7 +440,7 @@
     CreateModernActionButton(PageKey, X, Y, Width, Height, Label, Background, Foreground, BorderColor) {
         Outline := This.S_Gui.Add("Text", "x" X " y" Y " w" Width " h" Height " Background" BorderColor)
         Button := This.S_Gui.Add("Text", "x" (X + 1) " y" (Y + 1) " w" (Width - 2) " h" (Height - 2) " +Center +0x200 Background" Background, Label)
-        Button.SetFont("s10 w600 c" Foreground, "Segoe UI")
+        Button.SetFont("s11 w600 c" Foreground, "Segoe UI")
         This.RoundModernControl(Outline, 8)
         This.RoundModernControl(Button, 8)
         This.ModernPageExtras[PageKey].Push(Outline, Button)
