@@ -160,6 +160,26 @@ class Propertys extends TrayMenu {
         set => This._JSON["_Profiles"][This.LastUsedProfile]["Thumbnail Settings"]["LockThumbnailPositions"] := value
     }
 
+    KeepThumbnailAspectRatio {
+        get {
+            ThumbnailSettings := This._JSON["_Profiles"][This.LastUsedProfile]["Thumbnail Settings"]
+            if (!ThumbnailSettings.Has("KeepThumbnailAspectRatio"))
+                ThumbnailSettings["KeepThumbnailAspectRatio"] := true
+            return ThumbnailSettings["KeepThumbnailAspectRatio"]
+        }
+        set => This._JSON["_Profiles"][This.LastUsedProfile]["Thumbnail Settings"]["KeepThumbnailAspectRatio"] := value
+    }
+
+    DimInactiveClients {
+        get {
+            ThumbnailSettings := This._JSON["_Profiles"][This.LastUsedProfile]["Thumbnail Settings"]
+            if (!ThumbnailSettings.Has("DimInactiveClients"))
+                ThumbnailSettings["DimInactiveClients"] := false
+            return ThumbnailSettings["DimInactiveClients"]
+        }
+        set => This._JSON["_Profiles"][This.LastUsedProfile]["Thumbnail Settings"]["DimInactiveClients"] := value
+    }
+
     ThumbnailOpacity {
         get {
             percentage := This._JSON["_Profiles"][This.LastUsedProfile]["Thumbnail Settings"]["ThumbnailOpacity"]

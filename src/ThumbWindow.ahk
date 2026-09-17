@@ -261,6 +261,13 @@ Class ThumbWindow extends Propertys {
             MouseGetPos(&DragX, &DragY)
             x := DragX - Bx, Wn := Width + x
             y := DragY - BY, Wh := Height + y
+            if (This.KeepThumbnailAspectRatio && Width > 0 && Height > 0) {
+                AspectRatio := Width / Height
+                if (Abs(x) >= Abs(y))
+                    Wh := Round(Wn / AspectRatio)
+                else
+                    Wn := Round(Wh * AspectRatio)
+            }
             ; Windows needs positive dimensions, but the app no longer imposes a
             ; configurable minimum. Keep the last valid size while the pointer
             ; crosses the opposite edge of the thumbnail.
@@ -485,6 +492,12 @@ Class ThumbWindow extends Propertys {
             Win_Title := This.CleanTitle(WinGetTitle("Ahk_Id " EVEHwnd))
 
             for EW_Hwnd, Objs in This.ThumbWindows.OwnProps() {
+                IsActiveClient := (EW_Hwnd = EVEHwnd)
+                ClientOpacity := (This.DimInactiveClients && !IsActiveClient) ? Round(This.ThumbnailOpacity * 0.55) : This.ThumbnailOpacity
+                for ObjectName in ["Window", "TextOverlay", "Border"] {
+                    if (Objs.Has(ObjectName))
+                        try WinSetTransparent(ClientOpacity, "ahk_id " Objs[ObjectName].Hwnd)
+                }
                 for names, GuiObj in Objs {
                     if (names = "Border") {
                         if ((!This.ShowAllColoredBorders && !This.ShowClientHighlightBorder) || (!This.ShowAllColoredBorders && This.ShowClientHighlightBorder)) {
