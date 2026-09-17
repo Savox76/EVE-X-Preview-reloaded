@@ -199,7 +199,7 @@
         This.ModernThemeSelector.OnEvent("Change", ObjBindMethod(This, "SwitchInterfaceTheme"))
         This.ModernChrome.Push This.ModernThemeSelector
         This.S_Gui.SetFont("s9 w400 c" Muted, "Segoe UI")
-        This.ModernChrome.Push This.S_Gui.Add("Text", "x18 y670 w195 h20", "●  " Tr("theme.auto_saved")))
+        This.ModernChrome.Push This.S_Gui.Add("Text", "x18 y670 w195 h20", "●  " Tr("theme.auto_saved"))
 
         This.StyleModernControls(IsDark, Foreground)
         if (IsDark)
