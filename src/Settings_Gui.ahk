@@ -213,11 +213,9 @@
 
     ConfigureModernPageLayouts(CardColor, BorderColor, Foreground, Muted) {
         This.ModernPageExtras := Map()
-        This.ModernCardPanels := Map()
         Pages := ["Global Settings", "Client Settings", "Thumbnail Settings", "Custom Colors", "Hotkeys", "Hotkey Groups", "Thumbnail Visibility"]
         for PageKey in Pages {
             This.ModernPageExtras[PageKey] := []
-            This.ModernCardPanels[PageKey] := []
         }
 
         ; Allgemein: eine klare zweispaltige Karte statt verschobener Classic-Zeilen.
@@ -262,13 +260,17 @@
     }
 
     AddModernCard(PageKey, X, Y, Width, Height, Heading, CardColor, BorderColor, Foreground) {
-        Panel := This.S_Gui.Add("Text", "x" X " y" Y " w" Width " h" Height " +Border Background" CardColor)
-        This.SendControlToBack(Panel)
+        ; Use four thin border controls rather than an opaque panel. Native AHK
+        ; sibling controls otherwise repaint above edits and checkboxes after a
+        ; page is shown, which made the first implementation look empty.
+        Top := This.S_Gui.Add("Text", "x" X " y" Y " w" Width " h1 Background" BorderColor)
+        Bottom := This.S_Gui.Add("Text", "x" X " y" (Y + Height - 1) " w" Width " h1 Background" BorderColor)
+        Left := This.S_Gui.Add("Text", "x" X " y" Y " w1 h" Height " Background" BorderColor)
+        Right := This.S_Gui.Add("Text", "x" (X + Width - 1) " y" Y " w1 h" Height " Background" BorderColor)
         This.S_Gui.SetFont("s12 w700 c" Foreground, "Segoe UI")
         Title := This.S_Gui.Add("Text", "x" (X + 24) " y" (Y + 18) " w" (Width - 48) " h26 BackgroundTrans", Heading)
         Line := This.S_Gui.Add("Text", "x" (X + 24) " y" (Y + 53) " w" (Width - 48) " h1 Background" BorderColor)
-        This.ModernPageExtras[PageKey].Push(Panel, Title, Line)
-        This.ModernCardPanels[PageKey].Push(Panel)
+        This.ModernPageExtras[PageKey].Push(Top, Bottom, Left, Right, Title, Line)
     }
 
     SendControlToBack(Ctrl) {
@@ -435,11 +437,6 @@
             for _, Ctrl in This.ModernPageExtras[PageKey]
                 Ctrl.Visible := true
         }
-        if (This.HasProp("ModernCardPanels") && This.ModernCardPanels.Has(PageKey)) {
-            for _, Panel in This.ModernCardPanels[PageKey]
-                This.SendControlToBack(Panel)
-        }
-
         for Key, Button in This.ModernNavButtons {
             Button.Text := (Key = PageKey ? "●  " : "    ") This.ModernNavLabels[Key]
             Button.Opt("+Background" (Key = PageKey ? This.ModernAccentColor : This.ModernSidebarColor))
