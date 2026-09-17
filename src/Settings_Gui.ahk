@@ -356,18 +356,23 @@
     CreateModernToggle(PageKey, ControlName, X, Y, Label, RightEdge, Foreground) {
         State := !!This.S_Gui[ControlName].Value
         TrackColor := State ? This.ModernAccentColor : This.ModernToggleOffColor
-        Track := This.S_Gui.Add("Text", "x" X " y" Y " w46 h24 Background" TrackColor)
-        KnobX := X + (State ? 25 : 3)
-        Knob := This.S_Gui.Add("Text", "x" KnobX " y" (Y + 3) " w18 h18 Background" This.ModernToggleKnobColor)
-        This.RoundModernControl(Track, 24)
-        This.RoundModernControl(Knob, 18)
+        LeftCap := This.S_Gui.Add("Text", "x" (X - 1) " y" (Y - 6) " w30 h34 BackgroundTrans", "●")
+        RightCap := This.S_Gui.Add("Text", "x" (X + 21) " y" (Y - 6) " w30 h34 BackgroundTrans", "●")
+        LeftCap.SetFont("s20 c" TrackColor, "Segoe UI Symbol")
+        RightCap.SetFont("s20 c" TrackColor, "Segoe UI Symbol")
+        Track := This.S_Gui.Add("Text", "x" (X + 11) " y" (Y + 3) " w25 h18 Background" TrackColor)
+        KnobX := X + (State ? 22 : 0)
+        Knob := This.S_Gui.Add("Text", "x" KnobX " y" (Y - 3) " w28 h30 BackgroundTrans", "●")
+        Knob.SetFont("s16 c" This.ModernToggleKnobColor, "Segoe UI Symbol")
         LabelCtrl := This.AddModernLabel(PageKey, X + 66, Y + 2, RightEdge - X - 66, Label, Foreground)
         Callback := ObjBindMethod(This, "ToggleModernControl", ControlName)
+        LeftCap.OnEvent("Click", Callback)
+        RightCap.OnEvent("Click", Callback)
         Track.OnEvent("Click", Callback)
         Knob.OnEvent("Click", Callback)
         LabelCtrl.OnEvent("Click", Callback)
-        This.ModernPageExtras[PageKey].Push(Track, Knob)
-        This.ModernToggles[ControlName] := Map("Track", Track, "Knob", Knob, "X", X)
+        This.ModernPageExtras[PageKey].Push(LeftCap, RightCap, Track, Knob)
+        This.ModernToggles[ControlName] := Map("Track", Track, "LeftCap", LeftCap, "RightCap", RightCap, "Knob", Knob, "X", X)
         return Track
     }
 
@@ -392,11 +397,15 @@
             return
         Toggle := This.ModernToggles[ControlName]
         State := !!This.S_Gui[ControlName].Value
-        Toggle["Track"].Opt("+Background" (State ? This.ModernAccentColor : This.ModernToggleOffColor))
-        Toggle["Knob"].Move(Toggle["X"] + (State ? 25 : 3))
-        This.RoundModernControl(Toggle["Track"], 24)
-        This.RoundModernControl(Toggle["Knob"], 18)
-        Toggle["Track"].Redraw(), Toggle["Knob"].Redraw()
+        TrackColor := State ? This.ModernAccentColor : This.ModernToggleOffColor
+        Toggle["Track"].Opt("+Background" TrackColor)
+        Toggle["LeftCap"].SetFont("c" TrackColor, "Segoe UI Symbol")
+        Toggle["RightCap"].SetFont("c" TrackColor, "Segoe UI Symbol")
+        Toggle["Knob"].Move(Toggle["X"] + (State ? 22 : 0))
+        Toggle["Track"].Redraw()
+        Toggle["LeftCap"].Redraw()
+        Toggle["RightCap"].Redraw()
+        Toggle["Knob"].Redraw()
     }
 
     RoundModernControl(Ctrl, Radius) {
