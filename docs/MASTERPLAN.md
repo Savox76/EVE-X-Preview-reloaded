@@ -21,6 +21,7 @@ Dieser Plan bündelt die nächsten möglichen Entwicklungsschritte für EVE-X-Pr
 | 1 – Portable Grundlage | `1.1.0-preview.1` | Deutscher/englischer Sprachwechsel, Update-Hinweis über GitHub, reproduzierbares portables ZIP | Erledigt |
 | 2 – Farben und Clientnamen | `1.1.0-preview.2` | Windows-Farbpalette mit HEX-/RGB-Übernahme, automatische Clientnamen, Entfernung der Beispielnamen, sichere Titelbereinigung | Erledigt |
 | 3 – Profile und Layout-Sperre | `1.1.0-preview.3` | Aktive Clients sofort in neuen Profilen, unabhängige Profilkopien, profilbezogene Sperre gegen versehentliches Verschieben und Skalieren | Erledigt |
+| Sofortkorrektur – Live-Größe | `1.1.0-preview.4` | Änderungen an Breite und Höhe werden ohne Neustart auf sichtbare Thumbnails angewendet und gespeichert | Erledigt |
 
 ## Empfehlung für das nächste Paket
 
