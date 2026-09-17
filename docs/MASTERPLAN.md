@@ -12,6 +12,7 @@ Dieser Plan bündelt die nächsten möglichen Entwicklungsschritte für EVE-X-Pr
 - Jedes Paket bleibt möglichst klein und erhält einen eigenen Pull Request.
 - Zusammengeführt wird erst nach erfolgreicher Projektprüfung und grünem Windows-Build.
 - Eine neue Programmversion und ein GitHub-Release gibt es nur bei Änderungen am Programm. Reine Dokumentationsänderungen erhöhen die Version nicht.
+- `1.1.0-preview.4` ist die letzte geplante Preview. Wenn der abschließende Praxistest keinen schwerwiegenden Fehler zeigt, erhält die nächste Programmveröffentlichung die stabile Version `2.0.0` ohne Preview-Zusatz.
 - Funktionen, die Eingaben an mehrere EVE-Clients senden, bleiben ausgeschlossen.
 
 ## Aktueller Stand
@@ -22,6 +23,20 @@ Dieser Plan bündelt die nächsten möglichen Entwicklungsschritte für EVE-X-Pr
 | 2 – Farben und Clientnamen | `1.1.0-preview.2` | Windows-Farbpalette mit HEX-/RGB-Übernahme, automatische Clientnamen, Entfernung der Beispielnamen, sichere Titelbereinigung | Erledigt |
 | 3 – Profile und Layout-Sperre | `1.1.0-preview.3` | Aktive Clients sofort in neuen Profilen, unabhängige Profilkopien, profilbezogene Sperre gegen versehentliches Verschieben und Skalieren | Erledigt |
 | Sofortkorrektur – Live-Größe | `1.1.0-preview.4` | Änderungen an Breite und Höhe werden ohne Neustart auf sichtbare Thumbnails angewendet und gespeichert | Erledigt |
+
+## Freigabeweg zu Version 2.0.0
+
+Die Preview-Phase endet mit `1.1.0-preview.4`, sofern der reale Abschlusstest keine schwerwiegende Regression bestätigt. Offene Beobachtungen aus dem Originalprojekt gelten nicht automatisch als Fehler in Reloaded; reproduzierbare Probleme werden jedoch vor der stabilen Freigabe behoben oder als bekannte Einschränkung dokumentiert.
+
+Vor der stabilen Veröffentlichung werden mindestens diese Punkte praktisch geprüft:
+
+- Breite und Höhe offener Thumbnails ändern sich ohne Neustart; Position und Größe bleiben nach einem Neustart erhalten.
+- Mehrere EVE-Clients lassen sich wiederholt per Thumbnail, Einzel-Hotkey und Gruppenwechsel aktivieren, ohne hängen zu bleiben oder einen vorhandenen Client zu überspringen.
+- Layout-Sperre, Verschieben, Skalieren und Speichern der Positionen funktionieren weiterhin wie vorgesehen.
+- Deutsche und englische Oberfläche lassen sich öffnen und bedienen; die vorhandene Konfigurationsdatei bleibt erhalten.
+- Bei Nutzung mehrerer Monitore werden Vorschau, Position und DPI-Skalierung mindestens in der tatsächlich verwendeten Monitoranordnung kontrolliert.
+
+Ist diese Teststrecke ohne schwerwiegenden Fehler bestanden, wird die nächste Programmänderung direkt als stabile `2.0.0` veröffentlicht. Ein weiterer Preview-Zusatz ist dafür nicht vorgesehen.
 
 ## Empfehlung für das nächste Paket
 
@@ -62,7 +77,7 @@ Die Reihenfolge ist nicht fest. Abhängigkeiten und Risiko zeigen, welche Pakete
 | 13 | Konfigurationssicherheit | Atomisches Speichern, Schema-Version, Sicherungen, Wiederherstellung sowie Import/Export | Keine | Mittel |
 | 14 | Diagnose und Support | Datenschutzfreundliches Protokoll und exportierbarer Systembericht für reproduzierbare Fehler | Vor Paket 12 empfohlen | Niedrig bis mittel |
 | 15 | Release-Härtung | Prüfsummen, In-App-Änderungsübersicht und Bewertung einer optionalen Signierung | Stabile Build-Pipeline | Mittel |
-| 16 | Stabile Version `1.1.0` | Gesamttest, kleinere Bedienungs- und Übersetzungsfehler, Abschluss der Preview-Phase | Gewählte Kernpakete | Mittel |
+| 16 | Stabile Version `2.0.0` | Gesamttest, kleinere Bedienungs- und Übersetzungsfehler, Abschluss der Preview-Phase | Gewählte Kernpakete | Mittel |
 
 ## Paketdetails und Abnahmekriterien
 
@@ -157,7 +172,7 @@ Bezug zum Originalprojekt: [#22](https://github.com/g0nzo83/EVE-X-Preview/issues
 - Reproduzierbarkeit und Nutzen einer optionalen Code-Signierung prüfen, ohne einen Installer einzuführen.
 - Abnahme: Weiterhin genau ein portables ZIP als Programm-Download; Prüfsumme passt zum veröffentlichten Archiv; Updateprüfung bleibt fehlertolerant.
 
-### Paket 16 – Stabile Version `1.1.0`
+### Paket 16 – Stabile Version `2.0.0`
 
 - Gewählte Kernfunktionen gemeinsam auf Windows 10 und 11 prüfen.
 - Deutsche und englische Oberfläche vollständig gegenlesen.
