@@ -235,14 +235,17 @@
         switch ControlName {
             case "ThumbnailBackgroundColor":
                 This.ThumbnailBackgroundColor := SelectedColor
+                This.NeedRestart := 1
             case "ThumbnailTextColor":
                 This.ThumbnailTextColor := SelectedColor
+                This.ScheduleProfileApply()
             case "ClientHighligtColor":
                 This.ClientHighligtColor := SelectedColor
+                This.ScheduleProfileApply()
             case "InactiveClientBorderColor":
                 This.InactiveClientBorderColor := SelectedColor
+                This.ScheduleProfileApply()
         }
-        This.NeedRestart := 1
         SetTimer(This.Save_Settings_Delay_Timer, -200)
     }
 
@@ -278,8 +281,7 @@
                 This.CustomColors_IABorder_Colors := NewValue
                 ColorControl.Value := This.CustomColors_IABorder_Colors
         }
-        This.NeedRestart := 1
-        SetTimer(This.Save_Settings_Delay_Timer, -200)
+        This.ScheduleProfileApply()
     }
 
     ;This Function creates all Settings controls for the Profile Settings Button
@@ -361,7 +363,7 @@
             else if (obj.name = "Dont_Minimize_Clients") {
                 This.Dont_Minimize_Clients := obj.value
             }
-            SetTimer(This.Save_Settings_Delay_Timer, -200)
+            This.ScheduleProfileApply()
         }
     }
 
@@ -416,7 +418,6 @@
                     obj.value := This.CustomColors_AllCharNames
                     ControlSend("^{End}", obj.Hwnd)
                 }
-                This.NeedRestart := 1
             }
             else if (obj.Name = "CBorderColor") {
                 indexOld := This.IndexcBorder
@@ -425,7 +426,6 @@
                     obj.value := This.CustomColors_AllBColors
                     ControlSend("^{End}", obj.Hwnd)
                 }
-                This.NeedRestart := 1
             }
             else if (obj.Name = "CTextColor") {
                 indexOld := This.IndexcText
@@ -434,7 +434,6 @@
                     obj.value := This.CustomColors_AllTColors
                     ControlSend("^{End}", obj.Hwnd)
                 }
-                This.NeedRestart := 1
             }            
             else if (obj.Name = "IABorderColor") {
                 indexOld := This.IndexcText
@@ -443,9 +442,8 @@
                     obj.value := This.CustomColors_IABorder_Colors
                     ControlSend("^{End}", obj.Hwnd)
                 }
-                This.NeedRestart := 1
             }            
-            SetTimer(This.Save_Settings_Delay_Timer, -200)
+            This.ScheduleProfileApply()
         }
     }
 
@@ -502,8 +500,7 @@
             EditObj.value := "", ForwardHKObj.value := "", BackwardHKObj.value := ""
             ForwardHKObj.Enabled := 1, BackwardHKObj.Enabled := 1, EditObj.Enabled := 1
             ddlObj.Choose(ArrayIndex)
-            This.NeedRestart := 1
-            SetTimer(This.Save_Settings_Delay_Timer, -200)
+            This.ScheduleProfileApply()
         }
 
         Delete_Group(ddlObj, ForwardHKObj, BackwardHKObj, EditObj) {
@@ -514,9 +511,7 @@
             ddlObj.Add(This.GetGroupList())
             ForwardHKObj.value := "", BackwardHKObj.value := "", EditObj.value := ""
             ForwardHKObj.Enabled := 0, BackwardHKObj.Enabled := 0, EditObj.Enabled := 0
-            This.NeedRestart := 1
-
-            SetTimer(This.Save_Settings_Delay_Timer, -200)
+            This.ScheduleProfileApply()
         }
 
         SetEditText(ddlObj, EditObj, ForwardHKObj?, BackwardHKObj?) {
@@ -548,8 +543,7 @@
             else if (obj.Name = "BackwardsdKey" && ddl.Text != "") {
                 This.Hotkey_Groups[ddl.Text]["BackwardsHotkey"] := Trim(obj.value, "`n ")
             }
-            This.NeedRestart := 1
-            SetTimer(This.Save_Settings_Delay_Timer, -200)
+            This.ScheduleProfileApply()
         }
     }
 
@@ -601,8 +595,7 @@
                 tempvar.Push Map(chars, keys)
             }
             this._Hotkeys := tempvar
-            This.NeedRestart := 1
-            SetTimer(This.Save_Settings_Delay_Timer, -200)
+            This.ScheduleProfileApply()
         }
 
     }
@@ -719,35 +712,27 @@
         ThumbnailSettings_EventHandler(obj) {
             if (obj.name = "ShowThumbnailTextOverlay") {
                 This.ShowThumbnailTextOverlay := obj.value
-                This.NeedRestart := 1
             }
             else if (obj.name = "ThumbnailTextColor") {
                 This.ThumbnailTextColor := obj.value
-                This.NeedRestart := 1
             }
             else if (obj.name = "ThumbnailTextSize") {
                 This.ThumbnailTextSize := obj.value
-                This.NeedRestart := 1
             }
             else if (obj.name = "ThumbnailTextFont") {
                 This.ThumbnailTextFont := obj.value
-                This.NeedRestart := 1
             }
             else if (obj.name = "ThumbnailTextMarginsx") {
                 This.ThumbnailTextMargins["x"] := obj.value
-                This.NeedRestart := 1
             }
             else if (obj.name = "ThumbnailTextMarginsy") {
                 This.ThumbnailTextMargins["y"] := obj.value
-                This.NeedRestart := 1
             }
             else if (obj.name = "ClientHighligtColor") {
                 This.ClientHighligtColor := obj.value
-                This.NeedRestart := 1
             }
             else if (obj.name = "ClientHighligtBorderthickness") {
                 This.ClientHighligtBorderthickness := obj.value
-                This.NeedRestart := 1
             }
             else if (obj.name = "ShowClientHighlightBorder") {
                 This.ShowClientHighlightBorder := obj.value
@@ -757,11 +742,9 @@
             }
             else if (obj.name = "ThumbnailOpacity") {
                 This.ThumbnailOpacity := obj.value
-                This.NeedRestart := 1
             }
             else if (obj.name = "ShowThumbnailsAlwaysOnTop") {
                 This.ShowThumbnailsAlwaysOnTop := obj.value
-                This.NeedRestart := 1
             }
             else if (obj.name = "LockThumbnailPositions") {
                 This.LockThumbnailPositions := obj.value
@@ -771,18 +754,15 @@
                 This.S_Gui["InactiveClientBorderthickness"].Enabled := This.ShowAllColoredBorders
                 This.S_Gui["InactiveClientBorderColor"].Enabled := This.ShowAllColoredBorders
                 This.S_Gui["InactiveClientBorderColorPicker"].Enabled := This.ShowAllColoredBorders
-                This.NeedRestart := 1
             }
             else if (obj.Name = "InactiveClientBorderColor") {
                 This.InactiveClientBorderColor := obj.value
-                This.NeedRestart := 1
             }
             else if (obj.Name = "InactiveClientBorderthickness") {
                 This.InactiveClientBorderthickness := obj.value
-                This.NeedRestart := 1
             }
 
-            SetTimer(This.Save_Settings_Delay_Timer, -200)
+            This.ScheduleProfileApply()
         }
     }
 
@@ -864,10 +844,14 @@
     }
 
     _Button_Load(obj?,*) {
-        if (IsSet(obj))
-            This.NeedRestart := 1
-        
-        This.LastUsedProfile := This.S_Gui["SelectedProfile"].Text        
+        SelectedProfile := This.S_Gui["SelectedProfile"].Text
+        if (IsSet(obj) && SelectedProfile != This.LastUsedProfile) {
+            ; Store the outgoing profile before switching the property target.
+            This.Save_Settings()
+            This.AutoSaveClientPositions()
+            This.SaveJsonToFile()
+            This.LastUsedProfile := SelectedProfile
+        }
         This.Refresh_ControlValues()
 
         if (This.S_Gui["SelectedProfile"].Text = "Default") {
@@ -877,7 +861,10 @@
                 }
             }
         }
-        SetTimer(This.Save_Settings_Delay_Timer, -200)
+        if (IsSet(obj))
+            This.ApplyProfileSettings(true, false)
+        else
+            SetTimer(This.Save_Settings_Delay_Timer, -200)
     }
 
     Refresh_ControlValues() {

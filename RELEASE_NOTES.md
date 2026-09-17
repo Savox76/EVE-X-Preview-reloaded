@@ -1,18 +1,21 @@
-## EVE-X-Preview Reloaded 2.0.1
+## EVE-X-Preview Reloaded 2.0.2
 
-### Fixed
+### Changed
 
-- The controls in **Profile Settings → Thumbnail Settings** now use a fixed two-column grid.
-- Checkboxes, text fields and numeric inputs begin at the same horizontal position.
-- `px` and `%` units follow their value fields instead of shifting those fields sideways.
-- Every label and its control now share an explicit row position, preventing gradual vertical drift.
+- Moving or resizing thumbnails now saves their coordinates and dimensions automatically in the active profile.
+- EVE client restore rectangles and maximized state are captured automatically without restoring or focusing minimized clients.
+- Switching profiles now applies the selected layout, colors, visibility, borders, client behavior and hotkeys immediately.
+- Editing any profile setting refreshes the active thumbnails and managed hotkeys without restarting the application.
+- Obsolete profile hotkeys are disabled before the current profile mappings are registered.
+- The existing **Restore Client Positions** switch continues to control whether captured EVE window positions are restored.
 
 ### Automated verification
 
-- The project contract now guards the fixed thumbnail-settings grid against accidental reintroduction of relative control positioning.
+- The project contract checks automatic position capture, live profile application, managed hotkey replacement and restart-free profile switching.
 - AutoHotkey regression tests, compilation, portable ZIP creation and ZIP content verification remain mandatory.
 
 ### Recommended practical check
 
-- Open **Profile Settings → Thumbnail Settings** in German and English.
-- Confirm that all primary controls form one straight right-hand column and that each control lines up with its label.
+- Move and resize thumbnails, close the application and confirm the layout returns after reopening.
+- Move an EVE client, change profiles and confirm each profile restores its own saved layout when **Restore Client Positions** is enabled.
+- Change profile colors, borders, visibility and hotkeys while the application remains open and confirm every change takes effect without a restart.

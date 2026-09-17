@@ -85,12 +85,18 @@ Class Main_Class extends ThumbWindow {
         SetTimer(ObjBindMethod(This, "HandleMainTimer"), 50)
         This.Save_Settings_Delay_Timer := ObjBindMethod(This, "SaveJsonToFile")
         This.ApplyThumbnailStartSize_Delay_Timer := ObjBindMethod(This, "ApplyThumbnailStartSize")
+        This.Apply_Profile_Settings_Delay_Timer := ObjBindMethod(This, "ApplyProfileSettings")
+        This.AutoSaveClientPositions_Timer := ObjBindMethod(This, "AutoSaveClientPositions")
+        This.ProfileHotkeyRegistrations := []
+        This.ApplyingProfileSettings := false
         ;Timer property to remove Thumbnails for closed EVE windows 
         This.DestroyThumbnails := ObjBindMethod(This, "EvEWindowDestroy")
         This.DestroyThumbnailsToggle := 1
         
-        ;Register the Hotkeys for cycle groups 
-        This.Register_Hotkey_Groups()
+        ; Register all profile hotkeys through a managed registry so they can be
+        ; replaced immediately after edits or a profile switch.
+        This.RefreshProfileHotkeys()
+        SetTimer(This.AutoSaveClientPositions_Timer, 750)
         This.BorderActive := 0
         SetTimer(ObjBindMethod(This, "CheckForUpdates", true), -3000)
 
@@ -228,34 +234,63 @@ Class Main_Class extends ThumbWindow {
     }
 
     ;Register set Hotkeys by the user in settings
-    RegisterHotkeys(title, EvE_hwnd) {  
-        static registerGroups := 0
+    RegisterHotkeys(title, EvE_hwnd := 0) {
         ;if the user has set Hotkeys in Options 
         if (This._Hotkeys[title]) {  
             ;if the user has selected Global Hotkey. This means the Hotkey will alsways trigger as long at least 1 EVE Window exist.
             ;if a Window does not Exist which was assigned to the hotkey the hotkey will be dissabled until the Window exist again
             if(This.Global_Hotkeys) {
-                HotIf (*) => WinExist(This.EVEExe) && WinExist("EVE - " title ) && !WinActive(This.SettingsWindowTitle)
-                try {
-                    Hotkey This._Hotkeys[title], (*) => This.ActivateEVEWindow(,,title), "P1"
-                }
-                catch ValueError as e {
-                    MsgBox(Tr("error.invalid_hotkey", e.Message, e.Extra), AppInfo.Name)
-                }
+                Criterion := (*) => WinExist(This.EVEExe) && WinExist("EVE - " title ) && !WinActive(This.SettingsWindowTitle)
             }
             ;if the user has selected (Win Active) the hotkeys will only trigger if at least 1 EVE Window is Active and in Focus
             ;This makes it possible to still use all keys outside from EVE 
             else {
-                HotIf (*) => WinExist("EVE - " title ) && WinActive(This.EVEExe)    
-                try {
-                    Hotkey This._Hotkeys[title], (*) => This.ActivateEVEWindow(,,title),"P1"
-                }
-                catch ValueError as e {
-                    MsgBox(Tr("error.invalid_hotkey", e.Message, e.Extra), AppInfo.Name)
-                }
+                Criterion := (*) => WinExist("EVE - " title ) && WinActive(This.EVEExe)
             }
+            This.RegisterManagedProfileHotkey(
+                This._Hotkeys[title],
+                (*) => This.ActivateEVEWindow(,,title),
+                Criterion
+            )
         }
-    }    
+    }
+
+    RegisterManagedProfileHotkey(KeyName, Callback, Criterion) {
+        KeyName := Trim(KeyName)
+        if (KeyName = "")
+            return false
+
+        HotIf(Criterion)
+        try {
+            Hotkey(KeyName, Callback, "P1")
+            This.ProfileHotkeyRegistrations.Push(Map("Key", KeyName, "Criterion", Criterion))
+        }
+        catch ValueError as e {
+            MsgBox(Tr("error.invalid_hotkey", e.Message, e.Extra), AppInfo.Name)
+            HotIf()
+            return false
+        }
+        HotIf()
+        return true
+    }
+
+    ClearProfileHotkeys() {
+        for Registration in This.ProfileHotkeyRegistrations {
+            HotIf(Registration["Criterion"])
+            try Hotkey(Registration["Key"], "Off")
+        }
+        HotIf()
+        This.ProfileHotkeyRegistrations := []
+    }
+
+    RefreshProfileHotkeys() {
+        This.ClearProfileHotkeys()
+        for HotkeyEntry in This._Hotkeys {
+            for Title, KeyName in HotkeyEntry
+                This.RegisterHotkeys(Title)
+        }
+        This.Register_Hotkey_Groups()
+    }
 
     RememberClientName(ClientName, ProfileName := "") {
         ClientName := Trim(This.CleanTitle(ClientName))
@@ -316,53 +351,44 @@ Class Main_Class extends ThumbWindow {
 
     ;Register the Hotkeys for cycle Groups if any set
     Register_Hotkey_Groups() {
-        static Fkey := "", BKey := "", Arr := []
         if (IsObject(This.Hotkey_Groups) && This.Hotkey_Groups.Count != 0) {
             for k, v in This.Hotkey_Groups {
                 ;If any EVE Window Exist and at least 1 character matches the the list from the group windows
                 if(This.Global_Hotkeys) {
                     if( v["ForwardsHotkey"] != "" ) {                        
-                        Fkey := v["ForwardsHotkey"], Arr := v["Characters"]
-                        HotIf ObjBindMethod(This, "OnWinExist", Arr)
-                        try {
-                            Hotkey( v["ForwardsHotkey"], ObjBindMethod(This, "Cycle_Hotkey_Groups",Arr,"ForwardsHotkey"), "P1")
-                        }
-                        catch ValueError as e {
-                            MsgBox(Tr("error.invalid_hotkey", e.Message, e.Extra), AppInfo.Name)
-                        }
+                        Arr := v["Characters"]
+                        This.RegisterManagedProfileHotkey(
+                            v["ForwardsHotkey"],
+                            ObjBindMethod(This, "Cycle_Hotkey_Groups", Arr, "ForwardsHotkey"),
+                            ObjBindMethod(This, "OnWinExist", Arr)
+                        )
                     }
                     if( v["BackwardsHotkey"] != "" ) {
-                        Fkey := v["BackwardsHotkey"], Arr := v["Characters"]
-                        HotIf ObjBindMethod(This, "OnWinExist", Arr)
-                        try {
-                            Hotkey( v["BackwardsHotkey"], ObjBindMethod(This, "Cycle_Hotkey_Groups",Arr,"BackwardsHotkey"), "P1")   
-                        }
-                        catch ValueError as e {
-                            MsgBox(Tr("error.invalid_hotkey", e.Message, e.Extra), AppInfo.Name)
-                        }
+                        Arr := v["Characters"]
+                        This.RegisterManagedProfileHotkey(
+                            v["BackwardsHotkey"],
+                            ObjBindMethod(This, "Cycle_Hotkey_Groups", Arr, "BackwardsHotkey"),
+                            ObjBindMethod(This, "OnWinExist", Arr)
+                        )
                     }  
                 }  
                 ;If any EVE Window is Active
                 else {
                     if( v["ForwardsHotkey"] != "" ) {
-                        Fkey := v["ForwardsHotkey"], Arr := v["Characters"]
-                        HotIf ObjBindMethod(This, "OnWinActive", Arr)
-                        try {
-                            Hotkey( v["ForwardsHotkey"], ObjBindMethod(This, "Cycle_Hotkey_Groups",Arr,"ForwardsHotkey"), "P1")
-                        }
-                        catch ValueError as e {
-                            MsgBox(Tr("error.invalid_hotkey", e.Message, e.Extra), AppInfo.Name)
-                        }
+                        Arr := v["Characters"]
+                        This.RegisterManagedProfileHotkey(
+                            v["ForwardsHotkey"],
+                            ObjBindMethod(This, "Cycle_Hotkey_Groups", Arr, "ForwardsHotkey"),
+                            ObjBindMethod(This, "OnWinActive", Arr)
+                        )
                     }
                     if( v["BackwardsHotkey"] != "" ) {
-                        Fkey := v["BackwardsHotkey"], Arr := v["Characters"]
-                        HotIf ObjBindMethod(This, "OnWinActive", Arr)
-                        try {
-                            Hotkey( v["BackwardsHotkey"], ObjBindMethod(This, "Cycle_Hotkey_Groups",Arr,"BackwardsHotkey"), "P1")   
-                        }
-                        catch ValueError as e {
-                            MsgBox(Tr("error.invalid_hotkey", e.Message, e.Extra), AppInfo.Name)
-                        } 
+                        Arr := v["Characters"]
+                        This.RegisterManagedProfileHotkey(
+                            v["BackwardsHotkey"],
+                            ObjBindMethod(This, "Cycle_Hotkey_Groups", Arr, "BackwardsHotkey"),
+                            ObjBindMethod(This, "OnWinActive", Arr)
+                        )
                     }  
                 }             
             }
@@ -464,7 +490,6 @@ Class Main_Class extends ThumbWindow {
                 } 
             }
             This.BorderActive := 0
-            This.RegisterHotkeys(title, hwnd)
         }
     }
 
@@ -482,7 +507,6 @@ Class Main_Class extends ThumbWindow {
                         if !(GetKeyState("LButton")) {
                             ;sleep 1
                             This.Mouse_DragMove(wparam, lparam, msg, hwnd)
-                            This.Window_Snap(hwnd, This.ThumbWindows)
                         }
                         else
                             This.Mouse_ResizeThumb(wparam, lparam, msg, hwnd)
@@ -511,9 +535,10 @@ Class Main_Class extends ThumbWindow {
     }
 
     ; Creates a new thumbnail if a new window got created
-    EVE_WIN_Created(Win_Hwnd, Win_Title) {
+    EVE_WIN_Created(Win_Hwnd, Win_Title, RestoreClientPosition := true) {
         ; Moves the Window to the saved possition if any are stored 
-        This.RestoreClientPossitions(Win_Hwnd, Win_Title)        
+        if (RestoreClientPosition)
+            This.RestoreClientPossitions(Win_Hwnd, Win_Title)
         
         ;Creates the Thumbnail and stores the EVE Hwnd in the array
         If !(This.ThumbWindows.HasProp(Win_Hwnd)) {       
@@ -546,7 +571,6 @@ Class Main_Class extends ThumbWindow {
                         This.ShowThumb(k, "Show")
                 }
             }
-            This.RegisterHotkeys(Win_Title, Win_Hwnd)
         }
     }
 
@@ -699,42 +723,46 @@ Class Main_Class extends ThumbWindow {
         }
     }
 
-    ;Saves the possitions of all Windows and stores
-    Client_Possitions() {
-        IDs := WinGetList("Ahk_Exe " This.EVEExe)
-        for k, v in IDs {
-            Title := This.CleanTitle(WinGetTitle("Ahk_id " v))
-            if !(Title = "") {
-                ;If Minimzed then restore before saving the coords
-                if (DllCall("IsIconic", "Ptr", v)) {
-                    This.ShowWindowAsync(v)
-                    ;wait for getting Active for maximum of 2 seconds
-                    if (WinWaitActive("Ahk_Id " v, , 2)) {
-                        Sleep(200)
-                        WinGetPos(&X, &Y, &Width, &Height, "Ahk_Id " v)
-                        ;If the Window is Maximized
-                        if (DllCall("IsZoomed", "Ptr", v)) {
-                            This.ClientPossitions[Title] := [X, Y, Width, Height, 1]
-                        }
-                        else {
-                            This.ClientPossitions[Title] := [X, Y, Width, Height, 0]
-                        }
+    ; Saves EVE client positions without restoring or activating minimized clients.
+    ; WINDOWPLACEMENT exposes the normal restore rectangle for every window state.
+    AutoSaveClientPositions(*) {
+        if (This.ApplyingProfileSettings)
+            return false
 
-                    }
-                }
-                ;If the Window is not Minimized
-                else {
-                    WinGetPos(&X, &Y, &Width, &Height, "Ahk_Id " v)
-                    ;is the window Maximized?
-                    if (DllCall("IsZoomed", "Ptr", v)) {
-                        This.ClientPossitions[Title] := [X, Y, Width, Height, 1]
-                    }
-                    else
-                        This.ClientPossitions[Title] := [X, Y, Width, Height, 0]
-                }
+        Changed := false
+        try IDs := WinGetList(This.EVEExe)
+        catch
+            return false
+
+        for Hwnd in IDs {
+            try Title := This.CleanTitle(WinGetTitle("ahk_id " Hwnd))
+            catch
+                continue
+            if (Title = "")
+                continue
+
+            Placement := This.GetWindowPlacement(Hwnd)
+            IsMaximized := DllCall("IsZoomed", "Ptr", Hwnd) || Placement.cmd = 3 || (Placement.flags & 0x2)
+            Existing := This.ClientPossitions[Title]
+            if (!Existing
+                || Existing["x"] != Placement.X
+                || Existing["y"] != Placement.Y
+                || Existing["width"] != Placement.W
+                || Existing["height"] != Placement.H
+                || Existing["IsMaximized"] != IsMaximized) {
+                This.ClientPossitions[Title] := [Placement.X, Placement.Y, Placement.W, Placement.H, IsMaximized ? 1 : 0]
+                Changed := true
             }
         }
-        SetTimer(This.Save_Settings_Delay_Timer, -200)
+
+        if (Changed)
+            SetTimer(This.Save_Settings_Delay_Timer, -250)
+        return Changed
+    }
+
+    ; Saves the current client positions immediately. Kept for the tray command.
+    Client_Possitions() {
+        return This.AutoSaveClientPositions()
     }
 
     ;Restore the clients to the saved positions 
