@@ -145,6 +145,13 @@ def validate_interface_themes_and_free_resize() -> None:
         'Tr("modern.live_preview")',
         'CreateModernToggle(PageKey, ControlName',
         'CreateModernPreview(CardColor, BorderColor, Foreground)',
+        'LayoutModernThumbnailDetails(CardColor, BorderColor, Foreground)',
+        'ToggleModernThumbnailMode(*)',
+        'This.ModernPageExtras["Thumbnail Details"]',
+        '"HideThumbnailsOnLostFocus"',
+        '"ShowThumbnailsAlwaysOnTop"',
+        '"LockThumbnailPositions"',
+        '"ShowAllBorders"',
         '"w1120 h800',
         'This.SaveJsonToFile()',
     ]

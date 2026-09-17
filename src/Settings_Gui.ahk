@@ -222,6 +222,8 @@
         for PageKey in Pages {
             This.ModernPageExtras[PageKey] := []
         }
+        This.ModernPageExtras["Thumbnail Details"] := []
+        This.ModernThumbnailMode := "Overview"
 
         ; Allgemein: eine klare zweispaltige Karte statt verschobener Classic-Zeilen.
         G := This.S_Gui.Controls.Global_Settings
@@ -253,6 +255,7 @@
         C[4].Move(281, 314, 360, 24), C[7].Move(281, 348, 780, 250)
 
         This.LayoutModernThumbnailPage(CardColor, BorderColor, Foreground)
+        This.LayoutModernThumbnailDetails(CardColor, BorderColor, Foreground)
         This.LayoutModernColorPage(CardColor, BorderColor, Foreground)
         This.LayoutModernHotkeysPage(CardColor, BorderColor, Foreground)
         This.LayoutModernGroupsPage(CardColor, BorderColor, Foreground)
@@ -330,6 +333,80 @@
         ApplyButton := This.CreateModernActionButton("Thumbnail Settings", 936, 702, 158, 48, Tr("modern.apply"), This.ModernAccentColor, "151719", This.ModernAccentColor)
         ResetButton.OnEvent("Click", (*) => This.Refresh_ControlValues())
         ApplyButton.OnEvent("Click", (*) => This.Save_Settings())
+
+        This.ModernThumbnailModeButton := This.S_Gui.Add("Button", "x850 y82 w244 h32", Tr("modern.more_settings"))
+        This.ModernThumbnailModeButton.OnEvent("Click", ObjBindMethod(This, "ToggleModernThumbnailMode"))
+        This.ModernPageExtras["Thumbnail Settings"].Push(This.ModernThumbnailModeButton)
+        This.ModernPageExtras["Thumbnail Details"].Push(This.ModernThumbnailModeButton, FooterLine, ResetButton, ApplyButton)
+    }
+
+    LayoutModernThumbnailDetails(CardColor, BorderColor, Foreground) {
+        T := This.S_Gui.Controls.Profile_Settings.PsDDL["Thumbnail Settings"]
+        PageKey := "Thumbnail Details"
+        This.AddModernCard(PageKey, 253, 125, 404, 524, Tr("modern.text_frame"), CardColor, BorderColor, Foreground)
+        This.AddModernCard(PageKey, 673, 125, 421, 524, Tr("modern.behavior"), CardColor, BorderColor, Foreground)
+
+        ; Textfarbe
+        This.AddModernLabel(PageKey, 281, 198, 145, Tr("modern.text_color"), Foreground, "s10 w400")
+        T[5].Move(438, 192, 95, 28), T[6].Move(541, 190, 92, 30)
+        This.ModernPageExtras[PageKey].Push(T[5], T[6])
+
+        ; Textgröße und Schriftart
+        This.AddModernLabel(PageKey, 281, 243, 145, Tr("modern.text_size"), Foreground, "s10 w400")
+        T[8].Move(438, 237, 75, 28)
+        This.ModernPageExtras[PageKey].Push(T[8])
+        This.AddModernLabel(PageKey, 281, 288, 145, Tr("modern.text_font"), Foreground, "s10 w400")
+        T[10].Move(438, 282, 195, 28)
+        This.ModernPageExtras[PageKey].Push(T[10])
+
+        ; Textabstände
+        This.AddModernLabel(PageKey, 281, 333, 145, Tr("modern.text_margins"), Foreground, "s10 w400")
+        T[12].Move(438, 327, 55, 28), T[14].Move(535, 327, 55, 28)
+        This.AddModernLabel(PageKey, 498, 333, 32, "px", Foreground, "s9 w400")
+        This.AddModernLabel(PageKey, 595, 333, 32, "px", Foreground, "s9 w400")
+        This.ModernPageExtras[PageKey].Push(T[12], T[14])
+
+        ; Aktiver Rahmen
+        This.AddModernLabel(PageKey, 281, 378, 145, Tr("modern.active_color"), Foreground, "s10 w400")
+        T[17].Move(438, 372, 95, 28), T[18].Move(541, 370, 92, 30)
+        This.ModernPageExtras[PageKey].Push(T[17], T[18])
+        This.AddModernLabel(PageKey, 281, 423, 145, Tr("modern.active_thickness"), Foreground, "s10 w400")
+        T[20].Move(438, 417, 75, 28)
+        This.AddModernLabel(PageKey, 520, 423, 32, "px", Foreground, "s9 w400")
+        This.ModernPageExtras[PageKey].Push(T[20])
+
+        ; Inaktiver Rahmen
+        This.AddModernLabel(PageKey, 281, 468, 145, Tr("modern.inactive_color"), Foreground, "s10 w400")
+        T[39].Move(438, 462, 95, 28), T[40].Move(541, 460, 92, 30)
+        This.ModernPageExtras[PageKey].Push(T[39], T[40])
+        This.AddModernLabel(PageKey, 281, 513, 145, Tr("modern.inactive_thickness"), Foreground, "s10 w400")
+        T[36].Move(438, 507, 75, 28)
+        This.AddModernLabel(PageKey, 520, 513, 32, "px", Foreground, "s9 w400")
+        This.ModernPageExtras[PageKey].Push(T[36])
+
+        ; Verhalten
+        This.CreateModernToggle(PageKey, "HideThumbnailsOnLostFocus", 701, 198, Tr("thumbnail.hide_lost_focus"), 1060, Foreground)
+        This.CreateModernToggle(PageKey, "ShowThumbnailsAlwaysOnTop", 701, 248, Tr("thumbnail.always_on_top"), 1060, Foreground)
+        This.CreateModernToggle(PageKey, "LockThumbnailPositions", 701, 298, Tr("thumbnail.lock_positions"), 1060, Foreground)
+        This.CreateModernToggle(PageKey, "ShowAllBorders", 701, 348, Tr("thumbnail.show_all_borders"), 1060, Foreground)
+        This.AddModernLabel(PageKey, 701, 407, 190, Tr("modern.opacity"), Foreground, "s10 w400")
+        T[27].Move(915, 401, 75, 28)
+        This.AddModernLabel(PageKey, 998, 407, 32, "%", Foreground, "s9 w400")
+        This.ModernPageExtras[PageKey].Push(T[27])
+    }
+
+    ToggleModernThumbnailMode(*) {
+        This.ModernThumbnailMode := This.ModernThumbnailMode = "Overview" ? "Details" : "Overview"
+        This.ModernNavigate("Thumbnail Settings")
+    }
+
+    ShowModernThumbnailMode() {
+        PageKey := This.ModernThumbnailMode = "Details" ? "Thumbnail Details" : "Thumbnail Settings"
+        for _, Ctrl in This.ModernPageExtras[PageKey]
+            Ctrl.Visible := true
+        This.ModernThumbnailModeButton.Text := This.ModernThumbnailMode = "Details" ? Tr("modern.back_preview") : Tr("modern.more_settings")
+        This.RefreshModernToggles()
+        This.RefreshModernPreview()
     }
 
     MoveModernRowControls(Controls, Row, X, Y) {
@@ -578,13 +655,12 @@
                 ToolTip(Tr("profile.default_locked"), 270, 125)
         }
 
-        if (This.HasProp("ModernPageExtras") && This.ModernPageExtras.Has(PageKey)) {
+        if (PageKey = "Thumbnail Settings") {
+            This.ShowModernThumbnailMode()
+        }
+        else if (This.HasProp("ModernPageExtras") && This.ModernPageExtras.Has(PageKey)) {
             for _, Ctrl in This.ModernPageExtras[PageKey]
                 Ctrl.Visible := true
-        }
-        if (PageKey = "Thumbnail Settings") {
-            This.RefreshModernToggles()
-            This.RefreshModernPreview()
         }
         if (This.HasProp("ModernCardSurfaces")) {
             for _, Surface in This.ModernCardSurfaces {
@@ -594,7 +670,7 @@
         }
         if (This.HasProp("ModernLivePreviews")) {
             for _, Preview in This.ModernLivePreviews {
-                Preview.Visible := (PageKey = "Thumbnail Settings")
+                Preview.Visible := (PageKey = "Thumbnail Settings" && This.ModernThumbnailMode = "Overview")
                 Preview.Update()
             }
         }
