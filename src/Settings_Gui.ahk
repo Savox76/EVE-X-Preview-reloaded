@@ -5,7 +5,7 @@
         IsModern := This.InterfaceTheme != "Classic"
 
         SetControlDelay(-1)
-        This.S_Gui := Gui("+OwnDialogs +MinimizeBox -Resize -MaximizeBox SysMenu " (IsModern ? "+MinSize960x720" : "+MinSize500x250"))
+        This.S_Gui := Gui("+OwnDialogs +MinimizeBox -Resize -MaximizeBox SysMenu " (IsModern ? "+MinSize1120x760" : "+MinSize500x250"))
         This.S_Gui.Title := This.SettingsWindowTitle
 
         ;Font options for the Buttons
@@ -35,7 +35,8 @@
         if (IsModern)
             This.ConfigureModernInterface()
 
-        This.S_Gui.Show(IsModern ? "w960 h720 Center" : "AutoSize Center")
+        ModernShowOptions := This.HasProp("UIVisualPreview") ? "w1120 h760 x0 y0" : "w1120 h760 Center"
+        This.S_Gui.Show(IsModern ? ModernShowOptions : "AutoSize Center")
         This._Button_Load()
         if (IsModern)
             This.ModernNavigate("Global Settings")
@@ -136,39 +137,42 @@
 
     ConfigureModernInterface() {
         IsDark := This.InterfaceTheme = "ModernDark"
-        Background := IsDark ? "151719" : "F5F5F3"
+        Background := IsDark ? "151719" : "F3F4F6"
+        Sidebar := IsDark ? "101214" : "E8EAED"
+        Card := IsDark ? "202326" : "FFFFFF"
+        Border := IsDark ? "34383D" : "D7DCE2"
+        Accent := IsDark ? "F2A91D" : "D88B08"
         Foreground := IsDark ? "F0F1F2" : "17191C"
         Muted := IsDark ? "A7ABB0" : "60656C"
 
         This.S_Gui.BackColor := Background
+        This.ModernSidebarColor := Sidebar
+        This.ModernAccentColor := Accent
+        This.ModernForegroundColor := Foreground
         This.ClassicGlobalButton.Visible := false
         This.ClassicProfileButton.Visible := false
 
-        ; Move the existing, proven controls into a spacious content column. The
-        ; setting handlers remain shared with Classic, so all three designs behave
-        ; identically and stay portable without a browser component.
-        This.MoveControlArray(This.S_Gui.Controls.Global_Settings, 245)
-        for _, Controls in This.S_Gui.Controls.Profile_Settings.PsDDL
-            This.MoveControlArray(Controls, 245)
-
         Header := This.S_Gui.Controls.Profile_Settings
-        Header[1].Move(500, 17, 85, 20)
-        Header[2].Move(585, 12, 175, 28)
-        Header[3].Move(770, 12, 76, 28)
-        Header[4].Move(852, 12, 76, 28)
+        Header[1].Move(580, 20, 75, 20)
+        Header[2].Move(655, 14, 190, 30)
+        Header[3].Move(855, 14, 82, 30)
+        Header[4].Move(945, 14, 82, 30)
         loop Header.Length - 4
             Header[A_Index + 4].Visible := false
 
         This.ModernChrome := []
+        SidebarPanel := This.S_Gui.Add("Text", "x0 y55 w238 h705 Background" Sidebar)
+        This.ModernChrome.Push SidebarPanel
+        This.SendControlToBack(SidebarPanel)
         This.S_Gui.SetFont("s15 w700 c" Foreground, "Segoe UI")
-        This.ModernChrome.Push This.S_Gui.Add("Text", "x18 y15 w360 h30", AppInfo.Name)
+        This.ModernChrome.Push This.S_Gui.Add("Text", "x24 y15 w350 h30 BackgroundTrans", AppInfo.Name)
         This.S_Gui.SetFont("s9 w400 c" Muted, "Segoe UI")
-        This.ModernChrome.Push This.S_Gui.Add("Text", "x365 y20 w120 h20 Right", "v" AppInfo.Version)
-        This.ModernChrome.Push This.S_Gui.Add("Text", "x18 y52 w920 h2 +0x10")
-        This.ModernChrome.Push This.S_Gui.Add("Text", "x229 y54 w2 h646 +0x10")
+        This.ModernChrome.Push This.S_Gui.Add("Text", "x385 y21 w110 h20 BackgroundTrans", "v" AppInfo.Version)
+        This.ModernChrome.Push This.S_Gui.Add("Text", "x0 y54 w1120 h1 Background" Border)
+        This.ModernChrome.Push This.S_Gui.Add("Text", "x237 y55 w1 h705 Background" Border)
 
         This.S_Gui.SetFont("s18 w700 c" Foreground, "Segoe UI")
-        This.ModernPageTitle := This.S_Gui.Add("Text", "x270 y82 w620 h36", Tr("main.global_settings"))
+        This.ModernPageTitle := This.S_Gui.Add("Text", "x270 y82 w790 h36 BackgroundTrans", Tr("main.global_settings"))
         This.ModernChrome.Push This.ModernPageTitle
 
         Navigation := [
@@ -182,11 +186,11 @@
         ]
         This.ModernNavButtons := Map()
         This.ModernNavLabels := Map()
-        NavY := 92
+        NavY := 86
         This.S_Gui.SetFont("s10 w500 c" Foreground, "Segoe UI")
         for Entry in Navigation {
             PageKey := Entry[1], Label := Entry[2]
-            NavButton := This.S_Gui.Add("Button", "x12 y" NavY " w205 h42 Left", "    " Label)
+            NavButton := This.S_Gui.Add("Text", "x12 y" NavY " w213 h42 +0x100 +0x200 Background" Sidebar, "      " Label)
             NavButton.OnEvent("Click", ObjBindMethod(This, "ModernNavigate", PageKey))
             This.ModernNavButtons[PageKey] := NavButton
             This.ModernNavLabels[PageKey] := Label
@@ -194,23 +198,184 @@
         }
 
         This.S_Gui.SetFont("s9 w400 c" Muted, "Segoe UI")
-        This.ModernChrome.Push This.S_Gui.Add("Text", "x18 y595 w195 h20", Tr("global.interface_theme"))
-        This.ModernThemeSelector := This.S_Gui.Add("DDL", "x18 y618 w195 Choose" This.InterfaceThemeIndex(), This.InterfaceThemeLabels())
+        This.ModernChrome.Push This.S_Gui.Add("Text", "x18 y642 w195 h20 BackgroundTrans", Tr("global.interface_theme"))
+        This.ModernThemeSelector := This.S_Gui.Add("DDL", "x18 y665 w195 Choose" This.InterfaceThemeIndex(), This.InterfaceThemeLabels())
         This.ModernThemeSelector.OnEvent("Change", ObjBindMethod(This, "SwitchInterfaceTheme"))
         This.ModernChrome.Push This.ModernThemeSelector
-        This.S_Gui.SetFont("s9 w400 c" Muted, "Segoe UI")
-        This.ModernChrome.Push This.S_Gui.Add("Text", "x18 y670 w195 h20", "●  " Tr("theme.auto_saved"))
+        This.S_Gui.SetFont("s9 w600 c4AA568", "Segoe UI")
+        This.ModernChrome.Push This.S_Gui.Add("Text", "x18 y712 w195 h20 BackgroundTrans", "●  " Tr("theme.auto_saved"))
 
+        This.ConfigureModernPageLayouts(Card, Border, Foreground, Muted)
         This.StyleModernControls(IsDark, Foreground)
         if (IsDark)
             This.EnableDarkTitleBar()
     }
 
-    MoveControlArray(Controls, DeltaX) {
-        for Ctrl in Controls {
-            Ctrl.GetPos(&X, &Y, &Width, &Height)
-            Ctrl.Move(X + DeltaX, Y, Width, Height)
+    ConfigureModernPageLayouts(CardColor, BorderColor, Foreground, Muted) {
+        This.ModernPageExtras := Map()
+        Pages := ["Global Settings", "Client Settings", "Thumbnail Settings", "Custom Colors", "Hotkeys", "Hotkey Groups", "Thumbnail Visibility"]
+        for PageKey in Pages {
+            This.ModernPageExtras[PageKey] := []
         }
+
+        ; Allgemein: eine klare zweispaltige Karte statt verschobener Classic-Zeilen.
+        G := This.S_Gui.Controls.Global_Settings
+        G[1].Visible := false
+        This.AddModernCard("Global Settings", 260, 132, 830, 545, Tr("global.general_group"), CardColor, BorderColor, Foreground)
+        loop 9 {
+            Row := A_Index
+            G[Row + 1].Move(288, 210 + (Row - 1) * 50, 350, 22)
+        }
+        This.S_Gui["Language"].Move(700, 205, 300, 28)
+        This.S_Gui["InterfaceTheme"].Move(700, 255, 300, 28)
+        This.S_Gui["Suspend_Hotkeys_Hotkey"].Move(700, 305, 210, 28)
+        This.S_Gui["Hotkey_Scoope"].Move(700, 355, 300, 28)
+        This.S_Gui["ThumbnailBackgroundColor"].Move(700, 405, 145, 28)
+        G[16].Move(854, 403, 146, 30)
+        This.LayoutModernLocationRow(700, 455)
+        This.S_Gui["ThumbnailSnapOn"].Move(700, 505, 75, 24)
+        This.S_Gui["ThumbnailSnapOff"].Move(790, 505, 75, 24)
+        This.S_Gui["ThumbnailSnap_Distance"].Move(700, 555, 80, 28)
+        G[27].Move(788, 560, 100, 20)
+        This.S_Gui["Minimizeclients_Delay"].Move(700, 605, 90, 28)
+
+        ; Client-Verhalten.
+        C := This.S_Gui.Controls.Profile_Settings.PsDDL["Client Settings"]
+        C[1].Visible := false
+        This.AddModernCard("Client Settings", 260, 132, 830, 545, Tr("section.client_settings"), CardColor, BorderColor, Foreground)
+        C[2].Move(290, 210, 360, 24), C[5].Move(720, 208, 160, 24)
+        C[3].Move(290, 262, 360, 24), C[6].Move(720, 260, 160, 24)
+        C[4].Move(290, 324, 360, 24), C[7].Move(290, 358, 770, 250)
+
+        This.LayoutModernThumbnailPage(CardColor, BorderColor, Foreground)
+        This.LayoutModernColorPage(CardColor, BorderColor, Foreground)
+        This.LayoutModernHotkeysPage(CardColor, BorderColor, Foreground)
+        This.LayoutModernGroupsPage(CardColor, BorderColor, Foreground)
+        This.LayoutModernVisibilityPage(CardColor, BorderColor, Foreground)
+
+        for _, Extras in This.ModernPageExtras {
+            for _, Ctrl in Extras
+                Ctrl.Visible := false
+        }
+    }
+
+    AddModernCard(PageKey, X, Y, Width, Height, Heading, CardColor, BorderColor, Foreground) {
+        ; Use four thin border controls rather than an opaque panel. Native AHK
+        ; sibling controls otherwise repaint above edits and checkboxes after a
+        ; page is shown, which made the first implementation look empty.
+        Top := This.S_Gui.Add("Text", "x" X " y" Y " w" Width " h1 Background" BorderColor)
+        Bottom := This.S_Gui.Add("Text", "x" X " y" (Y + Height - 1) " w" Width " h1 Background" BorderColor)
+        Left := This.S_Gui.Add("Text", "x" X " y" Y " w1 h" Height " Background" BorderColor)
+        Right := This.S_Gui.Add("Text", "x" (X + Width - 1) " y" Y " w1 h" Height " Background" BorderColor)
+        This.S_Gui.SetFont("s12 w700 c" Foreground, "Segoe UI")
+        Title := This.S_Gui.Add("Text", "x" (X + 24) " y" (Y + 18) " w" (Width - 48) " h26 BackgroundTrans", Heading)
+        Line := This.S_Gui.Add("Text", "x" (X + 24) " y" (Y + 53) " w" (Width - 48) " h1 Background" BorderColor)
+        This.ModernPageExtras[PageKey].Push(Top, Bottom, Left, Right, Title, Line)
+    }
+
+    SendControlToBack(Ctrl) {
+        try DllCall("SetWindowPos", "ptr", Ctrl.Hwnd, "ptr", 1, "int", 0, "int", 0, "int", 0, "int", 0, "uint", 0x13)
+    }
+
+    LayoutModernLocationRow(X, Y) {
+        Names := ["ThumbnailStartLocationx", "ThumbnailStartLocationy", "ThumbnailStartLocationwidth", "ThumbnailStartLocationheight"]
+        Labels := ["x", "y", "w", "h"]
+        loop 4 {
+            This.S_Gui[Names[A_Index]].Move(X + (A_Index - 1) * 85 + 22, Y, 55, 28)
+        }
+        ; The four small x/y/w/h labels immediately precede the location edits.
+        G := This.S_Gui.Controls.Global_Settings
+        LabelIndexes := [17, 19, 21, 23]
+        loop 4
+            G[LabelIndexes[A_Index]].Move(X + (A_Index - 1) * 85, Y + 5, 18, 20)
+    }
+
+    LayoutModernThumbnailPage(CardColor, BorderColor, Foreground) {
+        T := This.S_Gui.Controls.Profile_Settings.PsDDL["Thumbnail Settings"]
+        T[1].Visible := false
+        This.AddModernCard("Thumbnail Settings", 260, 132, 400, 545, Tr("modern.text_layout"), CardColor, BorderColor, Foreground)
+        This.AddModernCard("Thumbnail Settings", 680, 132, 410, 545, Tr("modern.appearance"), CardColor, BorderColor, Foreground)
+
+        ; Linke Karte: Text und Anordnung.
+        RowsLeft := [[2,3], [4,5,6], [7,8], [9,10], [11,12,13,14,15]]
+        Y := 210
+        for Row in RowsLeft {
+            T[Row[1]].Move(284, Y, 340, 22)
+            This.MoveModernRowControls(T, Row, 284, Y + 28)
+            Y += 82
+        }
+
+        ; Rechte Karte: Rahmen und Verhalten.
+        RowsRight := [[16,17,18], [19,20,21], [22,23], [24,25], [26,27,28], [29,30], [31,32], [33,34], [35,36,37], [38,39,40]]
+        Y := 205
+        for Row in RowsRight {
+            T[Row[1]].Move(704, Y, 200, 22)
+            This.MoveModernRowControls(T, Row, 915, Y - 3)
+            Y += 42
+        }
+        ; Farbfeld und Palette bleiben auch beim hellen nativen Windows-Theme
+        ; vollständig innerhalb des sicher gerenderten Inhaltsbereichs.
+        T[16].Move(704, 205, 145, 22)
+        T[17].Move(855, 202, 72, 24), T[18].Move(935, 200, 85, 28)
+        T[38].Move(704, 583, 145, 22)
+        T[39].Move(855, 580, 72, 24), T[40].Move(935, 578, 85, 28)
+        T[18].Text := Tr("modern.palette_short")
+        T[40].Text := Tr("modern.palette_short")
+    }
+
+    MoveModernRowControls(Controls, Row, X, Y) {
+        Offset := 0
+        loop Row.Length - 1 {
+            Ctrl := Controls[Row[A_Index + 1]]
+            Width := Ctrl.Type = "Button" ? 105 : Ctrl.Type = "Edit" ? 75 : Ctrl.Type = "CheckBox" ? 130 : 60
+            if (Ctrl.Name = "ThumbnailTextFont")
+                Width := 150
+            else if (InStr(Ctrl.Name, "Color"))
+                Width := 105
+            Ctrl.Move(X + Offset, Y, Width, Ctrl.Type = "Button" ? 28 : 24)
+            Offset += Width + 7
+        }
+    }
+
+    LayoutModernColorPage(CardColor, BorderColor, Foreground) {
+        C := This.S_Gui.Controls.Profile_Settings.PsDDL["Custom Colors"]
+        C[1].Visible := false
+        This.AddModernCard("Custom Colors", 260, 132, 830, 545, Tr("section.custom_colors"), CardColor, BorderColor, Foreground)
+        C[2].Move(288, 210, 300, 22), C[7].Move(720, 207, 170, 24)
+        HeadersX := [288, 478, 668, 858]
+        loop 4 {
+            C[A_Index + 2].Move(HeadersX[A_Index], 270, 175, 24)
+            C[A_Index + 7].Move(HeadersX[A_Index], 300, 175, 280)
+        }
+        loop 3
+            C[A_Index + 11].Move(HeadersX[A_Index + 1], 590, 175, 30)
+    }
+
+    LayoutModernHotkeysPage(CardColor, BorderColor, Foreground) {
+        H := This.S_Gui.Controls.Profile_Settings.PsDDL["Hotkeys"]
+        H[1].Visible := false
+        This.AddModernCard("Hotkeys", 260, 132, 830, 545, Tr("section.hotkeys"), CardColor, BorderColor, Foreground)
+        H[2].Move(290, 205, 350, 24), H[3].Move(290, 240, 365, 385)
+        H[4].Move(690, 205, 350, 24), H[5].Move(690, 240, 365, 385)
+    }
+
+    LayoutModernGroupsPage(CardColor, BorderColor, Foreground) {
+        G := This.S_Gui.Controls.Profile_Settings.PsDDL["Hotkey Groups"]
+        G[1].Visible := false
+        This.AddModernCard("Hotkey Groups", 260, 132, 830, 545, Tr("section.hotkey_groups"), CardColor, BorderColor, Foreground)
+        G[2].Move(288, 205, 250, 22), G[3].Move(288, 235, 270, 30)
+        G[4].Move(870, 235, 85, 30), G[5].Move(965, 235, 85, 30)
+        G[6].Move(288, 280, 470, 330)
+        G[7].Move(790, 285, 240, 22), G[8].Move(790, 315, 240, 30)
+        G[9].Move(790, 385, 240, 22), G[10].Move(790, 415, 240, 30)
+    }
+
+    LayoutModernVisibilityPage(CardColor, BorderColor, Foreground) {
+        V := This.S_Gui.Controls.Profile_Settings.PsDDL["Thumbnail Visibility"]
+        V[1].Visible := false
+        This.AddModernCard("Thumbnail Visibility", 260, 132, 830, 545, Tr("section.thumbnail_visibility"), CardColor, BorderColor, Foreground)
+        V[2].Move(288, 205, 760, 40), V[3].Move(288, 260, 760, 365)
+        try V[3].ModifyCol(1, 700)
     }
 
     StyleModernControls(IsDark, Foreground) {
@@ -242,6 +407,12 @@
             for _, Ctrl in Controls
                 Ctrl.Visible := false
         }
+        if (This.HasProp("ModernPageExtras")) {
+            for _, Extras in This.ModernPageExtras {
+                for _, Ctrl in Extras
+                    Ctrl.Visible := false
+            }
+        }
 
         Header := This.S_Gui.Controls.Profile_Settings
         loop Min(4, Header.Length)
@@ -251,12 +422,12 @@
 
         if (PageKey = "Global Settings") {
             for _, Ctrl in This.S_Gui.Controls.Global_Settings
-                Ctrl.Visible := true
+                Ctrl.Visible := Ctrl.Type != "GroupBox"
             This.ModernPageTitle.Text := Tr("main.global_settings")
         }
         else if (This.S_Gui.Controls.Profile_Settings.PsDDL.Has(PageKey)) {
             for _, Ctrl in This.S_Gui.Controls.Profile_Settings.PsDDL[PageKey]
-                Ctrl.Visible := true
+                Ctrl.Visible := Ctrl.Type != "GroupBox"
             for Index, ProfileKey in This.ProfilePropKeys {
                 if (ProfileKey = PageKey) {
                     This.Seetings_DDL.Value := Index
@@ -268,8 +439,15 @@
                 ToolTip(Tr("profile.default_locked"), 270, 125)
         }
 
-        for Key, Button in This.ModernNavButtons
+        if (This.HasProp("ModernPageExtras") && This.ModernPageExtras.Has(PageKey)) {
+            for _, Ctrl in This.ModernPageExtras[PageKey]
+                Ctrl.Visible := true
+        }
+        for Key, Button in This.ModernNavButtons {
             Button.Text := (Key = PageKey ? "●  " : "    ") This.ModernNavLabels[Key]
+            Button.Opt("+Background" (Key = PageKey ? This.ModernAccentColor : This.ModernSidebarColor))
+            Button.SetFont("c" (Key = PageKey ? "17191C" : This.ModernForegroundColor), "Segoe UI")
+        }
     }
 
     ;This Function creates all Settings controls for the Global Settings Button

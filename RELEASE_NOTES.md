@@ -1,26 +1,26 @@
-## EVE-X-Preview Reloaded 2.1.0
+## EVE-X-Preview Reloaded 2.1.1
 
-### New
+### Corrected
 
-- Three selectable interfaces: **Classic**, **Modern Dark** and **Modern Light**.
-- The modern interfaces provide a wide settings window, permanent profile selection, left-hand navigation and clear saved-state feedback.
-- The selected design is stored globally and applied immediately without restarting the complete application.
+- **Modern Dark** and **Modern Light** now use a genuinely separate modern layout instead of shifted Classic controls.
+- The new shell follows the approved concept with a fixed top bar, persistent profile selector, styled sidebar navigation, card-based content and consistent spacing.
+- Thumbnail settings are divided into **Text and layout** and **Appearance and behavior** cards.
+- Global, client, color, hotkey, group and visibility pages have been individually reflowed for the wider interface.
+- **Classic** remains unchanged and selectable.
 
-### Changed
+### Still included from 2.1.0
 
-- The configurable minimum thumbnail size has been removed from the interface, defaults and resize logic.
-- Existing configuration files automatically discard the obsolete minimum-size entry.
-- Thumbnails can be reduced to any positive size that Windows can display.
-- All three interfaces share the same settings handlers, live profile application and automatic saving.
+- The design selection is stored globally and applied immediately.
+- The configurable thumbnail minimum size remains removed.
+- All profile settings continue to apply and save automatically.
 
 ### Automated verification
 
-- The project contract checks all three interface choices, persistent immediate switching and complete removal of minimum-size enforcement.
-- AutoHotkey regression tests, compilation, portable ZIP creation and ZIP content verification remain mandatory.
+- CI now launches the real compiled Windows application and captures both modern designs as PNG files for visual review.
+- AutoHotkey regression tests, compilation, portable ZIP creation and ZIP content verification remain mandatory before merging.
 
 ### Recommended practical check
 
-- Open **General / Allgemein**, select each of the three designs and confirm the settings window changes immediately.
-- Close and reopen the application and confirm the selected design is retained.
-- Reduce a thumbnail below the former 50 × 50 pixel limit and confirm the new size is saved.
+- Compare both modern interfaces with the approved concept: top bar, left navigation, two thumbnail-setting cards and aligned controls.
+- Switch among all three designs and confirm the selection is retained after reopening.
 - Change a profile value in each design and confirm it is applied immediately.
