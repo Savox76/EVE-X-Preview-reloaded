@@ -48,7 +48,7 @@ function Wait-ForProcessWindow {
             throw "Application exited before showing its GUI (exit code $($Process.ExitCode))."
         }
         if ($Process.MainWindowHandle -ne [IntPtr]::Zero) {
-            Write-Output "Found GUI window: $($Process.MainWindowTitle)"
+            Write-Host "Found GUI window: $($Process.MainWindowTitle)"
             return $Process.MainWindowHandle
         }
         Start-Sleep -Milliseconds 250
