@@ -1,0 +1,49 @@
+name: Capture GUI screenshots
+
+on:
+  push:
+    branches:
+      - capture/gui-screenshots
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    name: Build and capture settings windows
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download official AutoHotkey tools
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          New-Item build/tools -ItemType Directory -Force | Out-Null
+          Invoke-WebRequest "https://github.com/AutoHotkey/AutoHotkey/releases/download/v2.0.28/AutoHotkey_2.0.28.zip" -OutFile build/tools/autohotkey.zip
+          Invoke-WebRequest "https://github.com/AutoHotkey/Ahk2Exe/releases/download/Ahk2Exe1.1.37.02a2/Ahk2Exe1.1.37.02a2.zip" -OutFile build/tools/ahk2exe.zip
+          Expand-Archive build/tools/autohotkey.zip build/tools/autohotkey
+          Expand-Archive build/tools/ahk2exe.zip build/tools/ahk2exe
+
+      - name: Build portable application
+        shell: pwsh
+        run: |
+          ./scripts/build-portable.ps1 `
+            -AutoHotkeyRoot "$PWD/build/tools/autohotkey" `
+            -Ahk2ExePath "$PWD/build/tools/ahk2exe/Ahk2Exe.exe"
+
+      - name: Capture real GUI windows
+        shell: pwsh
+        run: |
+          $application = (Get-ChildItem dist -Recurse -Filter EVE-X-Preview-Reloaded.exe | Select-Object -First 1).FullName
+          if (-not $application) { throw "Compiled application was not found." }
+          ./scripts/capture-gui.ps1 -ApplicationPath $application -OutputDirectory "$PWD/gui-captures"
+
+      - name: Upload GUI screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: eve-x-preview-gui-screenshots
+          path: gui-captures/*.png
+          if-no-files-found: error
+          retention-days: 1
