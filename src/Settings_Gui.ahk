@@ -612,80 +612,100 @@
 
         ThumbnailSettings.Push This.S_Gui.Add("GroupBox", "x20 y80 h580 w565 Section", "")
 
-        ThumbnailSettings.Push This.S_Gui.Add("Text", "xp+15 yp+140 Section", Tr("thumbnail.show_text"))
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.text_color"))
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.text_size"))
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.text_font"))
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.text_margins"))
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.highlight_color"))
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.highlight_thickness"))
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.show_highlight"))
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.hide_lost_focus"))
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.opacity"))
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", Tr("thumbnail.always_on_top"))
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15", Tr("thumbnail.lock_positions"))
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15", Tr("thumbnail.show_all_borders"))
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15", Tr("thumbnail.inactive_thickness"))
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15", Tr("thumbnail.inactive_color"))
+        ; A fixed two-column grid keeps every choice aligned. The previous relative
+        ; placement shifted numeric fields behind their px/% labels and accumulated
+        ; vertical offsets from controls with different heights.
+        LabelX := 35
+        ControlX := 335
+        RowY := 220
+        RowStep := 28
 
-        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs+300 ys Section vShowThumbnailTextOverlay Checked" This.ShowThumbnailTextOverlay, Tr("common.on_off"))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" LabelX " y" RowY " w285", Tr("thumbnail.show_text"))
+        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "x" ControlX " y" RowY " vShowThumbnailTextOverlay Checked" This.ShowThumbnailTextOverlay, Tr("common.on_off"))
         This.S_Gui["ShowThumbnailTextOverlay"].OnEvent("Click", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("Edit", "xs y+11  w120 vThumbnailTextColor -Wrap", This.ThumbnailTextColor)
-        ThumbnailTextColorButton := This.S_Gui.Add("Button", "x+5 yp-3 w105", Tr("common.choose_color"))
+        RowY += RowStep
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" LabelX " y" RowY " w285", Tr("thumbnail.text_color"))
+        ThumbnailSettings.Push This.S_Gui.Add("Edit", "x" ControlX " y" RowY " w120 vThumbnailTextColor -Wrap", This.ThumbnailTextColor)
+        ThumbnailTextColorButton := This.S_Gui.Add("Button", "x" (ControlX + 125) " y" RowY " w105", Tr("common.choose_color"))
         ThumbnailTextColorButton.OnEvent("Click", (*) => This.ChooseSingleColor("ThumbnailTextColor"))
         ThumbnailSettings.Push ThumbnailTextColorButton
         This.S_Gui["ThumbnailTextColor"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("Edit", "xs y+10 w30 vThumbnailTextSize -Wrap", This.ThumbnailTextSize)
+        RowY += RowStep
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" LabelX " y" RowY " w285", Tr("thumbnail.text_size"))
+        ThumbnailSettings.Push This.S_Gui.Add("Edit", "x" ControlX " y" RowY " w40 vThumbnailTextSize -Wrap", This.ThumbnailTextSize)
         This.S_Gui["ThumbnailTextSize"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("Edit", "xs y+8 w120 vThumbnailTextFont -Wrap", This.ThumbnailTextFont)
+        RowY += RowStep
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" LabelX " y" RowY " w285", Tr("thumbnail.text_font"))
+        ThumbnailSettings.Push This.S_Gui.Add("Edit", "x" ControlX " y" RowY " w230 vThumbnailTextFont -Wrap", This.ThumbnailTextFont)
         This.S_Gui["ThumbnailTextFont"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+12", Tr("common.width") " px:")
-        ThumbnailSettings.Push This.S_Gui.Add("Edit", "x+5 yp-4  w40 vThumbnailTextMarginsx -Wrap", This.ThumbnailTextMargins["x"])
+        RowY += RowStep
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" LabelX " y" RowY " w285", Tr("thumbnail.text_margins"))
+        ThumbnailSettings.Push This.S_Gui.Add("Edit", "x" ControlX " y" RowY " w40 vThumbnailTextMarginsx -Wrap", This.ThumbnailTextMargins["x"])
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" (ControlX + 46) " y" RowY " w75", "px " Tr("common.width"))
         This.S_Gui["ThumbnailTextMarginsx"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
-
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs+110 yp+4 ", Tr("common.height") " px:")
-        ThumbnailSettings.Push This.S_Gui.Add("Edit", "xp+60 yp-4  w40 vThumbnailTextMarginsy -Wrap", This.ThumbnailTextMargins["y"])
+        ThumbnailSettings.Push This.S_Gui.Add("Edit", "x" (ControlX + 130) " y" RowY " w40 vThumbnailTextMarginsy -Wrap", This.ThumbnailTextMargins["y"])
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" (ControlX + 176) " y" RowY " w65", "px " Tr("common.height"))
         This.S_Gui["ThumbnailTextMarginsy"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("Edit", "xs y+7 w120 vClientHighligtColor -Wrap", This.ClientHighligtColor)
-        HighlightColorButton := This.S_Gui.Add("Button", "x+5 yp-3 w105", Tr("common.choose_color"))
+        RowY += RowStep
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" LabelX " y" RowY " w285", Tr("thumbnail.highlight_color"))
+        ThumbnailSettings.Push This.S_Gui.Add("Edit", "x" ControlX " y" RowY " w120 vClientHighligtColor -Wrap", This.ClientHighligtColor)
+        HighlightColorButton := This.S_Gui.Add("Button", "x" (ControlX + 125) " y" RowY " w105", Tr("common.choose_color"))
         HighlightColorButton.OnEvent("Click", (*) => This.ChooseSingleColor("ClientHighligtColor"))
         ThumbnailSettings.Push HighlightColorButton
         This.S_Gui["ClientHighligtColor"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", "px:")
-        ThumbnailSettings.Push This.S_Gui.Add("Edit", "x+5 yp-3  w30 vClientHighligtBorderthickness -Wrap", This.ClientHighligtBorderthickness)
+        RowY += RowStep
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" LabelX " y" RowY " w285", Tr("thumbnail.highlight_thickness"))
+        ThumbnailSettings.Push This.S_Gui.Add("Edit", "x" ControlX " y" RowY " w40 vClientHighligtBorderthickness -Wrap", This.ClientHighligtBorderthickness)
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" (ControlX + 46) " y" RowY, "px")
         This.S_Gui["ClientHighligtBorderthickness"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+10 vShowClientHighlightBorder Checked" This.ShowClientHighlightBorder, Tr("common.on_off"))
+        RowY += RowStep
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" LabelX " y" RowY " w285", Tr("thumbnail.show_highlight"))
+        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "x" ControlX " y" RowY " vShowClientHighlightBorder Checked" This.ShowClientHighlightBorder, Tr("common.on_off"))
         This.S_Gui["ShowClientHighlightBorder"].OnEvent("Click", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+16 vHideThumbnailsOnLostFocus Checked" This.HideThumbnailsOnLostFocus, Tr("common.on_off"))
+        RowY += RowStep
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" LabelX " y" RowY " w285", Tr("thumbnail.hide_lost_focus"))
+        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "x" ControlX " y" RowY " vHideThumbnailsOnLostFocus Checked" This.HideThumbnailsOnLostFocus, Tr("common.on_off"))
         This.S_Gui["HideThumbnailsOnLostFocus"].OnEvent("Click", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+15 ", "%")
-        ThumbnailSettings.Push This.S_Gui.Add("Edit", "x+4 yp-4  w40 vThumbnailOpacity -Wrap", IntegerToPercentage(This.ThumbnailOpacity))
+        RowY += RowStep
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" LabelX " y" RowY " w285", Tr("thumbnail.opacity"))
+        ThumbnailSettings.Push This.S_Gui.Add("Edit", "x" ControlX " y" RowY " w40 vThumbnailOpacity -Wrap", IntegerToPercentage(This.ThumbnailOpacity))
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" (ControlX + 46) " y" RowY, "%")
         This.S_Gui["ThumbnailOpacity"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+12 vShowThumbnailsAlwaysOnTop Checked" This.ShowThumbnailsAlwaysOnTop, Tr("common.on_off"))
+        RowY += RowStep
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" LabelX " y" RowY " w285", Tr("thumbnail.always_on_top"))
+        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "x" ControlX " y" RowY " vShowThumbnailsAlwaysOnTop Checked" This.ShowThumbnailsAlwaysOnTop, Tr("common.on_off"))
         This.S_Gui["ShowThumbnailsAlwaysOnTop"].OnEvent("Click", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+15 vLockThumbnailPositions Checked" This.LockThumbnailPositions, Tr("common.on_off"))
+        RowY += RowStep
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" LabelX " y" RowY " w285", Tr("thumbnail.lock_positions"))
+        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "x" ControlX " y" RowY " vLockThumbnailPositions Checked" This.LockThumbnailPositions, Tr("common.on_off"))
         This.S_Gui["LockThumbnailPositions"].OnEvent("Click", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "xs y+15 vShowAllBorders Checked" This.ShowAllColoredBorders, Tr("common.on_off"))
+        RowY += RowStep
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" LabelX " y" RowY " w285", Tr("thumbnail.show_all_borders"))
+        ThumbnailSettings.Push This.S_Gui.Add("CheckBox", "x" ControlX " y" RowY " vShowAllBorders Checked" This.ShowAllColoredBorders, Tr("common.on_off"))
         This.S_Gui["ShowAllBorders"].OnEvent("Click", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("Text", " xs y+12 ", "px:")
-        ThumbnailSettings.Push This.S_Gui.Add("Edit", "x+5 yp-3  w30 vInactiveClientBorderthickness -Wrap", This.InactiveClientBorderthickness)
+        RowY += RowStep
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" LabelX " y" RowY " w285", Tr("thumbnail.inactive_thickness"))
+        ThumbnailSettings.Push This.S_Gui.Add("Edit", "x" ControlX " y" RowY " w40 vInactiveClientBorderthickness -Wrap", This.InactiveClientBorderthickness)
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" (ControlX + 46) " y" RowY, "px")
         This.S_Gui["InactiveClientBorderthickness"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))
 
-        ThumbnailSettings.Push This.S_Gui.Add("Edit", "xs y+5 w120 vInactiveClientBorderColor -Wrap", This.InactiveClientBorderColor)
-        InactiveColorButton := This.S_Gui.Add("Button", "x+5 yp-3 w105 vInactiveClientBorderColorPicker", Tr("common.choose_color"))
+        RowY += RowStep
+        ThumbnailSettings.Push This.S_Gui.Add("Text", "x" LabelX " y" RowY " w285", Tr("thumbnail.inactive_color"))
+        ThumbnailSettings.Push This.S_Gui.Add("Edit", "x" ControlX " y" RowY " w120 vInactiveClientBorderColor -Wrap", This.InactiveClientBorderColor)
+        InactiveColorButton := This.S_Gui.Add("Button", "x" (ControlX + 125) " y" RowY " w105 vInactiveClientBorderColorPicker", Tr("common.choose_color"))
         InactiveColorButton.OnEvent("Click", (*) => This.ChooseSingleColor("InactiveClientBorderColor"))
         ThumbnailSettings.Push InactiveColorButton
         This.S_Gui["InactiveClientBorderColor"].OnEvent("Change", (obj, *) => ThumbnailSettings_EventHandler(obj))

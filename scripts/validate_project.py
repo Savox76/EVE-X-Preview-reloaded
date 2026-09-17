@@ -122,6 +122,47 @@ def validate_live_thumbnail_size() -> None:
         fail(f"Live thumbnail size update is incomplete: {missing}")
 
 
+def validate_thumbnail_settings_layout() -> None:
+    settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
+    start = settings_gui.index("    ThumbnailSettings_Ctrl() {")
+    end = settings_gui.index("    Thumbnail_visibilityCtrl() {", start)
+    section = settings_gui[start:end]
+
+    required_grid = ["LabelX := 35", "ControlX := 335", "RowY := 220", "RowStep := 28"]
+    missing = [entry for entry in required_grid if entry not in section]
+    if missing:
+        fail(f"Thumbnail settings fixed grid is incomplete: {missing}")
+    if section.count("RowY += RowStep") != 14:
+        fail("Thumbnail settings must use exactly one fixed row per setting")
+
+    primary_controls = [
+        "ShowThumbnailTextOverlay",
+        "ThumbnailTextColor",
+        "ThumbnailTextSize",
+        "ThumbnailTextFont",
+        "ThumbnailTextMarginsx",
+        "ClientHighligtColor",
+        "ClientHighligtBorderthickness",
+        "ShowClientHighlightBorder",
+        "HideThumbnailsOnLostFocus",
+        "ThumbnailOpacity",
+        "ShowThumbnailsAlwaysOnTop",
+        "LockThumbnailPositions",
+        "ShowAllBorders",
+        "InactiveClientBorderthickness",
+        "InactiveClientBorderColor",
+    ]
+    for name in primary_controls:
+        pattern = rf'Add\("(?:CheckBox|Edit)", "x" ControlX " y" RowY[^\n]*v{name}(?:\s|\b)'
+        if not re.search(pattern, section):
+            fail(f"Thumbnail setting is not aligned to the primary control column: {name}")
+
+    forbidden_relative_positions = ['"xs y+', '"xs+300', '"x+5 yp', '"x+4 yp']
+    found = [entry for entry in forbidden_relative_positions if entry in section]
+    if found:
+        fail(f"Thumbnail settings still contain drifting relative positions: {found}")
+
+
 def validate_group_cycle_reliability() -> None:
     main = (ROOT / "Main.ahk").read_text(encoding="utf-8-sig")
     main_class = (ROOT / "src" / "Main_Class.ahk").read_text(encoding="utf-8-sig")
@@ -194,6 +235,7 @@ def main() -> int:
         validate_client_discovery,
         validate_thumbnail_lock,
         validate_live_thumbnail_size,
+        validate_thumbnail_settings_layout,
         validate_group_cycle_reliability,
         validate_color_picker,
         validate_portable_contract,

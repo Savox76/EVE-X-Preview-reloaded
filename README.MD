@@ -15,7 +15,7 @@ The language can be changed under **Global Settings / Allgemeine Einstellungen**
 
 Color fields provide a native Windows color palette and still accept hexadecimal or RGB input. Character names from running EVE clients are saved automatically in the active profile for hotkeys and individual colors. The selectable next development packages are documented in the [`development master plan`](docs/MASTERPLAN.md); evaluated ideas and bug reports from the upstream project remain tracked in the [`original-repository backlog`](docs/ORIGINAL_REPO_BACKLOG.md).
 
-New profiles immediately receive all currently active character names without restarting. Thumbnail Settings also provides a per-profile lock that prevents accidental right-drag movement and mouse resizing. Stable version 2.0.0 also hardens forward and backward group cycling: unavailable clients are skipped with a bounded search, minimized targets are activated reliably, and stale minimize actions cannot interfere with a rapid switch.
+New profiles immediately receive all currently active character names without restarting. Thumbnail Settings also provides a per-profile lock that prevents accidental right-drag movement and mouse resizing. Stable version 2.0.0 also hardens forward and backward group cycling: unavailable clients are skipped with a bounded search, minimized targets are activated reliably, and stale minimize actions cannot interfere with a rapid switch. Version 2.0.1 aligns the complete Thumbnail Settings page on a consistent two-column grid.
 
 ---
 
