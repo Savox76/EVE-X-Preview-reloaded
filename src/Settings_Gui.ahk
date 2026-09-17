@@ -330,14 +330,17 @@
         This.ModernPageExtras["Thumbnail Settings"].Push(FooterLine)
         This.AddModernLabel("Thumbnail Settings", 253, 720, 390, "ⓘ  " Tr("modern.instant_apply"), This.ModernMutedColor, "s9 w400")
         ResetButton := This.CreateModernActionButton("Thumbnail Settings", 768, 702, 158, 48, Tr("modern.reset"), CardColor, Foreground, BorderColor)
+        ResetOutline := This.ModernPageExtras["Thumbnail Settings"][-2]
         ApplyButton := This.CreateModernActionButton("Thumbnail Settings", 936, 702, 158, 48, Tr("modern.apply"), This.ModernAccentColor, "151719", This.ModernAccentColor)
+        ApplyOutline := This.ModernPageExtras["Thumbnail Settings"][-2]
         ResetButton.OnEvent("Click", (*) => This.Refresh_ControlValues())
         ApplyButton.OnEvent("Click", (*) => This.Save_Settings())
 
-        This.ModernThumbnailModeButton := This.S_Gui.Add("Button", "x850 y82 w244 h32", Tr("modern.more_settings"))
+        This.ModernThumbnailModeButton := This.S_Gui.Add("Button", "x830 y82 w190 h32", Tr("modern.more_settings"))
         This.ModernThumbnailModeButton.OnEvent("Click", ObjBindMethod(This, "ToggleModernThumbnailMode"))
         This.ModernPageExtras["Thumbnail Settings"].Push(This.ModernThumbnailModeButton)
-        This.ModernPageExtras["Thumbnail Details"].Push(This.ModernThumbnailModeButton, FooterLine, ResetButton, ApplyButton)
+        This.AddModernLabel("Thumbnail Details", 253, 720, 390, "ⓘ  " Tr("modern.instant_apply"), This.ModernMutedColor, "s9 w400")
+        This.ModernPageExtras["Thumbnail Details"].Push(This.ModernThumbnailModeButton, FooterLine, ResetOutline, ResetButton, ApplyOutline, ApplyButton)
     }
 
     LayoutModernThumbnailDetails(CardColor, BorderColor, Foreground) {

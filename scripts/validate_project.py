@@ -187,6 +187,8 @@ def validate_interface_themes_and_free_resize() -> None:
         "Capture real modern settings windows",
         "-Theme ModernDark",
         "-Theme ModernLight",
+        "-View Details",
+        'A_Args[3] = "Details"',
         "actions/upload-artifact@v4",
         "settings-gui-review",
     ]

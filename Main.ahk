@@ -67,6 +67,8 @@ if (A_Args.Length >= 2 && A_Args[1] = "--ui-preview") {
         Call.LastUsedProfile := "Standard"
         Call.UIVisualPreview := true
         Call.MainGui()
+        if (A_Args.Length >= 3 && A_Args[3] = "Details")
+            Call.ModernThumbnailMode := "Details"
         Call.ModernNavigate("Thumbnail Settings")
     }
 }

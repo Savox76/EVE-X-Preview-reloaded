@@ -6,6 +6,9 @@ param(
     [ValidateSet("ModernDark", "ModernLight")]
     [string]$Theme,
 
+    [ValidateSet("Overview", "Details")]
+    [string]$View = "Overview",
+
     [Parameter(Mandatory = $true)]
     [string]$OutputPath
 )
@@ -43,7 +46,7 @@ if (Test-Path $settingsPath) {
 
 $process = Start-Process `
     -FilePath $exe `
-    -ArgumentList @("--ui-preview", $Theme) `
+    -ArgumentList @("--ui-preview", $Theme, $View) `
     -WorkingDirectory $workingDirectory `
     -PassThru
 
