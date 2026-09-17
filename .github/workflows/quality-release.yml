@@ -39,6 +39,13 @@ jobs:
           Expand-Archive build/tools/autohotkey.zip build/tools/autohotkey
           Expand-Archive build/tools/ahk2exe.zip build/tools/ahk2exe
 
+      - name: Test hotkey group cycling
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          & "$PWD/build/tools/autohotkey/AutoHotkey64.exe" /ErrorStdOut tests/group-cycle.ahk
+          if ($LASTEXITCODE -ne 0) { throw "Hotkey group regression tests failed with exit code $LASTEXITCODE" }
+
       - name: Compile and package portable version
         shell: pwsh
         run: |

@@ -122,6 +122,35 @@ def validate_live_thumbnail_size() -> None:
         fail(f"Live thumbnail size update is incomplete: {missing}")
 
 
+def validate_group_cycle_reliability() -> None:
+    main = (ROOT / "Main.ahk").read_text(encoding="utf-8-sig")
+    main_class = (ROOT / "src" / "Main_Class.ahk").read_text(encoding="utf-8-sig")
+    helper = (ROOT / "src" / "GroupCycle.ahk").read_text(encoding="utf-8-sig")
+    workflow = (ROOT / ".github" / "workflows" / "quality-release.yml").read_text(encoding="utf-8")
+    test_file = ROOT / "tests" / "group-cycle.ahk"
+
+    if "#Include <../src/GroupCycle>" not in main:
+        fail("GroupCycle helper is not included by the application")
+    if "GroupCycle.SelectIndex" not in main_class:
+        fail("Hotkey groups do not use the bounded selection helper")
+    if 'while (!(WinExist("EVE - "' in main_class:
+        fail("Hotkey group cycling still contains an unbounded window-search loop")
+    required_activation_guards = [
+        "SetTimer(This.timer, 0)",
+        "RequestEVEForeground(hwnd)",
+        'WinWaitActive("ahk_id " hwnd, , 0.35)',
+    ]
+    missing = [entry for entry in required_activation_guards if entry not in main_class]
+    if missing:
+        fail(f"Reliable client activation is incomplete: {missing}")
+    if "loop Characters.Length" not in helper:
+        fail("Group client selection must be bounded by the configured group size")
+    if not test_file.is_file():
+        fail("Group cycle regression test is missing")
+    if "Test hotkey group cycling" not in workflow or "tests/group-cycle.ahk" not in workflow:
+        fail("Windows CI does not execute the group cycle regression test")
+
+
 def validate_color_picker() -> None:
     main = (ROOT / "Main.ahk").read_text(encoding="utf-8-sig")
     settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
@@ -165,6 +194,7 @@ def main() -> int:
         validate_client_discovery,
         validate_thumbnail_lock,
         validate_live_thumbnail_size,
+        validate_group_cycle_reliability,
         validate_color_picker,
         validate_portable_contract,
     ]

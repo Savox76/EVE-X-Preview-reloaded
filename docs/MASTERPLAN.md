@@ -1,6 +1,6 @@
 # Entwicklungs-Masterplan
 
-Stand: 16. September 2026
+Stand: 17. September 2026
 
 Dieser Plan bündelt die nächsten möglichen Entwicklungsschritte für EVE-X-Preview Reloaded. Er ist eine Entscheidungshilfe, keine Zusage, alle Pakete umzusetzen. Ein Paket beginnt erst, wenn es ausdrücklich gewünscht wird.
 
@@ -12,7 +12,7 @@ Dieser Plan bündelt die nächsten möglichen Entwicklungsschritte für EVE-X-Pr
 - Jedes Paket bleibt möglichst klein und erhält einen eigenen Pull Request.
 - Zusammengeführt wird erst nach erfolgreicher Projektprüfung und grünem Windows-Build.
 - Eine neue Programmversion und ein GitHub-Release gibt es nur bei Änderungen am Programm. Reine Dokumentationsänderungen erhöhen die Version nicht.
-- `1.1.0-preview.4` ist die letzte geplante Preview. Wenn der abschließende Praxistest keinen schwerwiegenden Fehler zeigt, erhält die nächste Programmveröffentlichung die stabile Version `2.0.0` ohne Preview-Zusatz.
+- `1.1.0-preview.4` war die letzte Preview. Die erste stabile Reloaded-Veröffentlichung trägt die Version `2.0.0` ohne Preview-Zusatz.
 - Funktionen, die Eingaben an mehrere EVE-Clients senden, bleiben ausgeschlossen.
 
 ## Aktueller Stand
@@ -23,10 +23,11 @@ Dieser Plan bündelt die nächsten möglichen Entwicklungsschritte für EVE-X-Pr
 | 2 – Farben und Clientnamen | `1.1.0-preview.2` | Windows-Farbpalette mit HEX-/RGB-Übernahme, automatische Clientnamen, Entfernung der Beispielnamen, sichere Titelbereinigung | Erledigt |
 | 3 – Profile und Layout-Sperre | `1.1.0-preview.3` | Aktive Clients sofort in neuen Profilen, unabhängige Profilkopien, profilbezogene Sperre gegen versehentliches Verschieben und Skalieren | Erledigt |
 | Sofortkorrektur – Live-Größe | `1.1.0-preview.4` | Änderungen an Breite und Höhe werden ohne Neustart auf sichtbare Thumbnails angewendet und gespeichert | Erledigt |
+| Stabilitätsfix – Hotkey-/Gruppenwechsel | `2.0.0` | Begrenzte Gruppensuche, zuverlässige Aktivierung minimierter Clients, Schutz vor überholten Minimierungs-Timern und ausführbare Windows-Regressionstests | Erledigt |
 
 ## Freigabeweg zu Version 2.0.0
 
-Die Preview-Phase endet mit `1.1.0-preview.4`, sofern der reale Abschlusstest keine schwerwiegende Regression bestätigt. Offene Beobachtungen aus dem Originalprojekt gelten nicht automatisch als Fehler in Reloaded; reproduzierbare Probleme werden jedoch vor der stabilen Freigabe behoben oder als bekannte Einschränkung dokumentiert.
+Die Preview-Phase endet mit `1.1.0-preview.4`. Bei der Prüfung des Gruppenwechsels wurden drei konkrete Fehler bestätigt und für `2.0.0` korrigiert: eine unbegrenzte Fenstersuche, eine nicht verifizierte Aktivierung minimierter Zielclients und ein überholter Minimierungs-Timer bei schnellem Wechsel. Andere Beobachtungen aus dem Originalprojekt gelten weiterhin nicht automatisch als Fehler in Reloaded.
 
 Vor der stabilen Veröffentlichung werden mindestens diese Punkte praktisch geprüft:
 
@@ -36,7 +37,7 @@ Vor der stabilen Veröffentlichung werden mindestens diese Punkte praktisch gepr
 - Deutsche und englische Oberfläche lassen sich öffnen und bedienen; die vorhandene Konfigurationsdatei bleibt erhalten.
 - Bei Nutzung mehrerer Monitore werden Vorschau, Position und DPI-Skalierung mindestens in der tatsächlich verwendeten Monitoranordnung kontrolliert.
 
-Ist diese Teststrecke ohne schwerwiegenden Fehler bestanden, wird die nächste Programmänderung direkt als stabile `2.0.0` veröffentlicht. Ein weiterer Preview-Zusatz ist dafür nicht vorgesehen.
+Die Auswahl- und Namenslogik besitzt ab `2.0.0` ausführbare Windows-Regressionstests. Die reale Prüfung mit mehreren EVE-Clients bleibt zusätzlich Bestandteil der praktischen Abnahme.
 
 ## Empfehlung für das nächste Paket
 
@@ -68,7 +69,7 @@ Die Reihenfolge ist nicht fest. Abhängigkeiten und Risiko zeigen, welche Pakete
 | --- | --- | --- | --- | --- |
 | 5 | Positionen komfortabler verwalten | Optionales automatisches Speichern, Zurücksetzen des aktuellen Layouts und verständlichere Statusanzeige | Paket 4 empfohlen | Mittel |
 | 6 | Profilverwaltung | Profile umbenennen, duplizieren und sicher löschen; veraltete Clientnamen bereinigen | Keine | Niedrig bis mittel |
-| 7 | Zuverlässige Hotkeys und Gruppen | Hängenbleiben oder Überspringen beim Clientwechsel verhindern; Konflikte früh erkennen | Reale Mehrclient-Tests | Mittel bis hoch |
+| 7 | Hotkey-Konflikterkennung | Doppelte oder widersprüchliche Belegungen bereits beim Speichern verständlich melden | Gruppenwechsel in `2.0.0` stabilisiert | Niedrig bis mittel |
 | 8 | Konfigurierbare Mausaktionen | Klicks und Modifier profilbezogen zuordnen; sichere Standardbelegung beibehalten | Paket 3 | Mittel |
 | 9 | Erweiterte Thumbnail-Anzeige | Seitenverhältnis sperren, aktive Vorschau ausblenden, drei Always-on-top-Modi | Paket 4 empfohlen | Mittel |
 | 10 | Login- und Charakterauswahl | Noch nicht eingeloggte Fenster in Rotation und Positionierung berücksichtigen | Paket 7 empfohlen | Hoch |
@@ -95,15 +96,13 @@ Die Reihenfolge ist nicht fest. Abhängigkeiten und Risiko zeigen, welche Pakete
 - Nicht mehr verwendete Clientnamen kontrolliert aus Hotkeys und individuellen Farben entfernen.
 - Abnahme: Profilwechsel und Neustart erhalten sämtliche Daten; Namen und Profile dürfen nicht unbemerkt verloren gehen.
 
-### Paket 7 – Zuverlässige Hotkeys und Gruppen
+### Paket 7 – Hotkey-Konflikterkennung
 
-- Gruppenwechsel nur über tatsächlich vorhandene EVE-Fenster ausführen.
-- Vorwärts- und Rückwärtswechsel gegen Endlosschleifen und verschwundene Fenster absichern.
 - Doppelte oder widersprüchliche Hotkeys bereits beim Speichern verständlich melden.
-- Namen mit Leerzeichen, Komma und dem Wort „Eve“ als Regressionstests aufnehmen.
-- Abnahme: Mehrfaches schnelles Wechseln darf keinen Client überspringen oder den Wechsel dauerhaft blockieren.
+- Vor dem Überschreiben bestehender Einzel- oder Gruppenbelegungen eine eindeutige Rückmeldung anzeigen.
+- Abnahme: Eine ungültige oder doppelte Belegung kann nicht unbemerkt gespeichert werden.
 
-Bezug zum Originalprojekt: [#8](https://github.com/g0nzo83/EVE-X-Preview/issues/8), [#12](https://github.com/g0nzo83/EVE-X-Preview/issues/12), [#14](https://github.com/g0nzo83/EVE-X-Preview/issues/14), [#20](https://github.com/g0nzo83/EVE-X-Preview/issues/20) und [#25](https://github.com/g0nzo83/EVE-X-Preview/issues/25).
+Der eigentliche Gruppenwechsel, einschließlich der Fälle aus [#14](https://github.com/g0nzo83/EVE-X-Preview/issues/14), [#20](https://github.com/g0nzo83/EVE-X-Preview/issues/20) und [#25](https://github.com/g0nzo83/EVE-X-Preview/issues/25), wurde in `2.0.0` stabilisiert. Namen mit Leerzeichen, Komma und dem Wort „Eve“ bleiben Regressionstests.
 
 ### Paket 8 – Konfigurierbare Mausaktionen
 
