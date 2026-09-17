@@ -309,12 +309,14 @@
         RowsRight := [[16,17,18], [19,20,21], [22,23], [24,25], [26,27,28], [29,30], [31,32], [33,34], [35,36,37], [38,39,40]]
         Y := 205
         for Row in RowsRight {
-            T[Row[1]].Move(704, Y, 215, 22)
-            This.MoveModernRowControls(T, Row, 930, Y - 3)
+            T[Row[1]].Move(704, Y, 200, 22)
+            This.MoveModernRowControls(T, Row, 915, Y - 3)
             Y += 42
         }
-        T[17].Move(900, 202, 85, 24), T[18].Move(992, 200, 75, 28)
-        T[39].Move(900, 580, 85, 24), T[40].Move(992, 578, 75, 28)
+        ; Farbfeld und Paletten-Schaltfläche brauchen mehr Platz als die
+        ; übrigen Zeilen, insbesondere mit den deutschen Beschriftungen.
+        T[17].Move(890, 202, 72, 24), T[18].Move(970, 200, 105, 28)
+        T[39].Move(890, 580, 72, 24), T[40].Move(970, 578, 105, 28)
     }
 
     MoveModernRowControls(Controls, Row, X, Y) {
