@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Anleitung lesen
+    url: https://github.com/Savox76/EVE-X-Preview-reloaded/blob/main/README.MD
+    about: Prüfe zuerst die ausführliche Anleitung und bekannte Bedienhinweise.
+  - name: Entwicklungs-Masterplan
+    url: https://github.com/Savox76/EVE-X-Preview-reloaded/blob/main/docs/MASTERPLAN.md
+    about: Sieh nach, welche Verbesserungen bereits geplant oder bewertet sind.

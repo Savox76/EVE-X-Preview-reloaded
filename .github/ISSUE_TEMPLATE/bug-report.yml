@@ -1,0 +1,73 @@
+name: Fehler melden
+description: Melde ein reproduzierbares Problem in EVE-X-Preview Reloaded.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke für deine Meldung. Bitte entferne Charakternamen, persönliche Pfade oder andere private Daten aus Texten und Bildern.
+  - type: input
+    id: version
+    attributes:
+      label: Programmversion
+      description: Die Version steht im Tool oder im Namen des heruntergeladenen ZIPs.
+      placeholder: z. B. 1.1.0-preview.3
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows-Version
+      placeholder: z. B. Windows 11 25H2
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Sprache der Oberfläche
+      options:
+        - Deutsch
+        - English
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Fehlerbeschreibung
+      description: Was ist passiert und was hättest du erwartet?
+      placeholder: Beschreibe das Problem möglichst genau.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Schritte zum Nachstellen
+      description: Liste die einzelnen Schritte vom Programmstart bis zum Fehler auf.
+      placeholder: |
+        1. Tool starten
+        2. Profil ... öffnen
+        3. ... auswählen
+        4. Fehler tritt auf
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Zusätzliche Umgebung
+      description: Optional – Anzahl der EVE-Clients, Monitore, Skalierung/DPI und besondere Einstellungen.
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Screenshots oder weitere Hinweise
+      description: Bilder können hier hineingezogen werden. Bitte persönliche Informationen vorher unkenntlich machen.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Vor dem Absenden
+      options:
+        - label: Ich habe geprüft, ob derselbe Fehler bereits als Issue gemeldet wurde.
+          required: true
+        - label: Ich habe keine Zugangsdaten oder anderen privaten Informationen eingefügt.
+          required: true
