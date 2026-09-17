@@ -536,9 +536,10 @@
         if (!This.HasProp("ModernPreviewTiles"))
             return
         ShowNames := !!This.S_Gui["ShowThumbnailTextOverlay"].Value
+        PreviewVisible := This.HasProp("ModernCurrentPage") && This.ModernCurrentPage = "Thumbnail Settings" && This.ModernThumbnailMode = "Overview"
         Highlight := !!This.S_Gui["ShowClientHighlightBorder"].Value
         for Index, Tile in This.ModernPreviewTiles {
-            Tile["Caption"].Visible := ShowNames
+            Tile["Caption"].Visible := ShowNames && PreviewVisible
             Color := (Highlight && Index = 1) ? This.ModernAccentColor : This.ModernBorderColor
             for Border in Tile["Borders"]
                 Border.Opt("+Background" Color)
@@ -618,6 +619,7 @@
     }
 
     ModernNavigate(PageKey, *) {
+        This.ModernCurrentPage := PageKey
         for _, Ctrl in This.S_Gui.Controls.Global_Settings
             Ctrl.Visible := false
         for _, Controls in This.S_Gui.Controls.Profile_Settings.PsDDL {

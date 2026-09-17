@@ -148,6 +148,7 @@ def validate_interface_themes_and_free_resize() -> None:
         'LayoutModernThumbnailDetails(CardColor, BorderColor, Foreground)',
         'ToggleModernThumbnailMode(*)',
         'This.ModernPageExtras["Thumbnail Details"]',
+        'This.ModernCurrentPage = "Thumbnail Settings"',
         '"HideThumbnailsOnLostFocus"',
         '"ShowThumbnailsAlwaysOnTop"',
         '"LockThumbnailPositions"',
