@@ -511,8 +511,7 @@ class Propertys extends TrayMenu {
                 ;MsgBox(GuiCtrlObj.value)
             }
             This.Thumbnail_visibility := Obj
-            SetTimer(This.Save_Settings_Delay_Timer, -200)
-            This.NeedRestart := 1
+            This.ScheduleProfileApply()
             ;This.LV_Item := Item
             ; ddd := GuiCtrlObj.GetText(Item)
             ; ToolTip(Item ", " ddd " -, " Checked)
@@ -549,7 +548,8 @@ class Propertys extends TrayMenu {
             Return
         }
 
-        if (This.SelectProfile_DDL.Text = This.LastUsedProfile) {
+        DeletedActiveProfile := This.SelectProfile_DDL.Text = This.LastUsedProfile
+        if (DeletedActiveProfile) {
             This.LastUsedProfile := "Default"
         }
 
@@ -565,6 +565,12 @@ class Propertys extends TrayMenu {
         ;Index := This.SelectProfile_DDL.Value
         This.SelectProfile_DDL.Delete(This.SelectProfile_DDL.Value)
         This.SelectProfile_DDL.Redraw()
+
+        if (DeletedActiveProfile) {
+            ControlChooseString("Default", This.SelectProfile_DDL, This.SettingsWindowTitle)
+            This.Refresh_ControlValues()
+            This.ApplyProfileSettings(true, false)
+        }
 
         for k, v in This.S_Gui.Controls.Profile_Settings.PsDDL {
             for _, ob in v {
@@ -608,6 +614,7 @@ class Propertys extends TrayMenu {
         This.SelectProfile_DDL.Add(This.Profiles_to_Array())
         ControlChooseString(ProfileName, This.SelectProfile_DDL, This.SettingsWindowTitle)
         This._Button_Load()
+        This.ApplyProfileSettings(true, false)
         Return
     }
     Save_ThumbnailPossitions() {

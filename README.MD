@@ -15,7 +15,7 @@ The language can be changed under **Global Settings / Allgemeine Einstellungen**
 
 Color fields provide a native Windows color palette and still accept hexadecimal or RGB input. Character names from running EVE clients are saved automatically in the active profile for hotkeys and individual colors. The selectable next development packages are documented in the [`development master plan`](docs/MASTERPLAN.md); evaluated ideas and bug reports from the upstream project remain tracked in the [`original-repository backlog`](docs/ORIGINAL_REPO_BACKLOG.md).
 
-New profiles immediately receive all currently active character names without restarting. Thumbnail Settings also provides a per-profile lock that prevents accidental right-drag movement and mouse resizing. Stable version 2.0.0 also hardens forward and backward group cycling: unavailable clients are skipped with a bounded search, minimized targets are activated reliably, and stale minimize actions cannot interfere with a rapid switch. Version 2.0.1 aligns the complete Thumbnail Settings page on a consistent two-column grid.
+New profiles immediately receive all currently active character names without restarting. Thumbnail Settings also provides a per-profile lock that prevents accidental right-drag movement and mouse resizing. Stable version 2.0.0 also hardens forward and backward group cycling: unavailable clients are skipped with a bounded search, minimized targets are activated reliably, and stale minimize actions cannot interfere with a rapid switch. Version 2.0.1 aligns the complete Thumbnail Settings page on a consistent two-column grid. Version 2.0.2 automatically stores thumbnail and EVE-window layouts per profile and applies profile settings immediately without restarting.
 
 ---
 
@@ -57,7 +57,7 @@ It is possible to create multiple profiles to quickly change the hotkey assignme
 5. Right Click on the Tryicon and klick "Open" or double klick it and klick on "Profile Settings" create a new Profile.
 6. From here on you can adjust as you like
 
-`Important Note:`  <br> `Some settings require a restart of the tool. The settings window must be closed so that the settings made there are applied`
+`Important Note:`  <br> `Profile settings are applied immediately. Changing a global setting that affects the complete application can still trigger one automatic reload when the settings window is closed.`
 
 ## Run from Source
 
@@ -96,8 +96,8 @@ Mouse gestures are applied to the thumbnail window currently being hovered over.
 | Suspend Hotkeys | Deactivates the hotkeys |
 | Close all EVE clients | Closes all open EVE windows | 
 | Restore Client Positions | Toggles On/ Off <br> Restores the previously saved client positions automatically if activated  |
-| Save Client Positions | Saves the current position of all EVE clients so that they can be restored with Restore Client Positions <br> Positions are not saved automatically. If the position has been changed, it must be saved again |
-| Save Thumbnail Positions | Saves the current position of the thumbnails. Thumbnail positions are not saved automatically. If the position has been changed, it must be saved again |
+| Save Client Positions | Creates an immediate snapshot of all EVE client positions. Positions are also captured automatically in the active profile; **Restore Client Positions** controls whether they are restored. |
+| Save Thumbnail Positions | Creates an immediate snapshot of the thumbnail layout. Moving or resizing thumbnails is also saved automatically in the active profile. |
 | Reload | If problems occur with the tool, it can simply be restarted with this option |
 | Exit | Exits the program |
 

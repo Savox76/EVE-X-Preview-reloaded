@@ -192,6 +192,53 @@ def validate_group_cycle_reliability() -> None:
         fail("Windows CI does not execute the group cycle regression test")
 
 
+def validate_live_profile_settings() -> None:
+    main_class = (ROOT / "src" / "Main_Class.ahk").read_text(encoding="utf-8-sig")
+    settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
+    thumb_window = (ROOT / "src" / "ThumbWindow.ahk").read_text(encoding="utf-8-sig")
+    tray_menu = (ROOT / "src" / "TrayMenu.ahk").read_text(encoding="utf-8-sig")
+
+    required_position_capture = [
+        "AutoSaveClientPositions_Timer := ObjBindMethod",
+        "SetTimer(This.AutoSaveClientPositions_Timer, 750)",
+        "AutoSaveClientPositions(*)",
+        "Placement := This.GetWindowPlacement(Hwnd)",
+        "Placement.flags & 0x2",
+    ]
+    missing = [entry for entry in required_position_capture if entry not in main_class]
+    if missing:
+        fail(f"Automatic EVE window position capture is incomplete: {missing}")
+
+    if thumb_window.count("This.Save_Settings()") < 3:
+        fail("Thumbnail movement and resizing must persist the active profile layout")
+
+    required_live_apply = [
+        "ScheduleProfileApply(*)",
+        "ApplyProfileSettings(RestoreClientLayout := false, CaptureThumbnailLayout := true, *)",
+        "RebuildThumbnailsForProfile(RestoreClientLayout := false)",
+        "This.RefreshProfileHotkeys()",
+        "This.ApplyProfileSettings(true, false)",
+    ]
+    combined = settings_gui + thumb_window + tray_menu
+    missing = [entry for entry in required_live_apply if entry not in combined]
+    if missing:
+        fail(f"Restart-free profile application is incomplete: {missing}")
+
+    required_hotkey_lifecycle = [
+        "ProfileHotkeyRegistrations := []",
+        "RegisterManagedProfileHotkey(KeyName, Callback, Criterion)",
+        "ClearProfileHotkeys()",
+        'Hotkey(Registration["Key"], "Off")',
+    ]
+    missing = [entry for entry in required_hotkey_lifecycle if entry not in main_class]
+    if missing:
+        fail(f"Managed profile hotkey lifecycle is incomplete: {missing}")
+
+    profile_sections = settings_gui[settings_gui.index("    ClientSettings_Ctrl"):]
+    if "This.NeedRestart := 1" in profile_sections:
+        fail("Profile settings still request an application restart")
+
+
 def validate_color_picker() -> None:
     main = (ROOT / "Main.ahk").read_text(encoding="utf-8-sig")
     settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
@@ -294,6 +341,7 @@ def main() -> int:
         validate_live_thumbnail_size,
         validate_thumbnail_settings_layout,
         validate_group_cycle_reliability,
+        validate_live_profile_settings,
         validate_color_picker,
         validate_portable_contract,
         validate_site_desktop_grid,

@@ -54,10 +54,13 @@ Class TrayMenu extends Settings_Gui {
     }
 
     SelectTrayProfile(ProfileName, *) {
-        This.LastUsedProfile := ProfileName
+        if (ProfileName = This.LastUsedProfile)
+            return
+        This.Save_Settings()
+        This.AutoSaveClientPositions()
         This.SaveJsonToFile()
-        Sleep(250)
-        Reload()
+        This.LastUsedProfile := ProfileName
+        This.ApplyProfileSettings(true, false)
     }
 
     ToggleHotkeysFromTray(ItemLabel, *) {

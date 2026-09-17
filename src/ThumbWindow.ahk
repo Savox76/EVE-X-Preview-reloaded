@@ -243,6 +243,8 @@ Class ThumbWindow extends Propertys {
                 }
             }
         }
+        This.Window_Snap(hwnd, This.ThumbWindows)
+        This.Save_Settings()
     }
 
 
@@ -296,6 +298,52 @@ Class ThumbWindow extends Propertys {
                 }
                 This.Update_Thumb()
             }
+        }
+        This.Save_Settings()
+    }
+
+    ScheduleProfileApply(*) {
+        SetTimer(This.Apply_Profile_Settings_Delay_Timer, -450)
+        SetTimer(This.Save_Settings_Delay_Timer, -200)
+    }
+
+    ApplyProfileSettings(RestoreClientLayout := false, CaptureThumbnailLayout := true, *) {
+        if (This.ApplyingProfileSettings)
+            return false
+
+        if (CaptureThumbnailLayout)
+            This.Save_Settings()
+        This.ApplyingProfileSettings := true
+        Critical("On")
+        try {
+            This.RefreshProfileHotkeys()
+            This.RebuildThumbnailsForProfile(RestoreClientLayout)
+            This.TrayMenu()
+            This.SaveJsonToFile()
+        }
+        finally {
+            Critical("Off")
+            This.ApplyingProfileSettings := false
+        }
+        return true
+    }
+
+    RebuildThumbnailsForProfile(RestoreClientLayout := false) {
+        for EveHwnd in This.ThumbWindows.Clone().OwnProps()
+            This.EvEWindowDestroy(EveHwnd)
+        This.ThumbHwnd_EvEHwnd := Map()
+        This.BorderActive := 0
+
+        try EveWindows := WinGetList(This.EVEExe)
+        catch
+            return
+        for EveHwnd in EveWindows {
+            try Title := This.CleanTitle(WinGetTitle("ahk_id " EveHwnd))
+            catch
+                continue
+            This.EVE_WIN_Created(EveHwnd, Title, RestoreClientLayout)
+            if (!This.HideThumbnailsOnLostFocus || WinActive(This.EVEExe))
+                This.ShowThumb(EveHwnd, "Show")
         }
     }
 
