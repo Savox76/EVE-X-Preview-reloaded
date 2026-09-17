@@ -417,19 +417,38 @@
 
     CreateModernPreview(CardColor, BorderColor, Foreground) {
         This.ModernPreviewTiles := []
+        This.ModernLivePreviews := []
+        DetectedClients := []
+        for EVEHwnd in This.ThumbWindows.OwnProps()
+            DetectedClients.Push(EVEHwnd)
         Tiles := [[270, 452, "Client 1", "2B1C0F", "☼     ·     ✦"], [540, 452, "Client 2", "151C24", "·   ✦   ·   ✧"], [810, 452, "Client 3", "101820", "◐      ·    ✦"]]
-        for Tile in Tiles {
+        for Index, Tile in Tiles {
             X := Tile[1], Y := Tile[2]
+            CaptionText := Tile[3]
+            if (Index <= DetectedClients.Length) {
+                try CaptionText := This.CleanTitle(WinGetTitle("ahk_id " DetectedClients[Index]))
+            }
             ImagePanel := This.S_Gui.Add("Text", "x" X " y" Y " w260 h143 +Center +0x200 Background" Tile[4], Tile[5])
             ImagePanel.SetFont("s22 w400 cD9DEE4", "Segoe UI Symbol")
             CaptionPanel := This.S_Gui.Add("Text", "x" X " y" (Y + 143) " w260 h34 Background" CardColor)
-            Caption := This.AddModernLabel("Thumbnail Settings", X + 10, Y + 150, 230, Tile[3], Foreground, "s10 w400")
+            Caption := This.AddModernLabel("Thumbnail Settings", X + 10, Y + 150, 230, CaptionText, Foreground, "s10 w400")
             BorderTop := This.S_Gui.Add("Text", "x" X " y" Y " w260 h1 Background" BorderColor)
             BorderBottom := This.S_Gui.Add("Text", "x" X " y" (Y + 176) " w260 h1 Background" BorderColor)
             BorderLeft := This.S_Gui.Add("Text", "x" X " y" Y " w1 h177 Background" BorderColor)
             BorderRight := This.S_Gui.Add("Text", "x" (X + 259) " y" Y " w1 h177 Background" BorderColor)
             This.ModernPageExtras["Thumbnail Settings"].Push(ImagePanel, CaptionPanel, BorderTop, BorderBottom, BorderLeft, BorderRight)
             This.ModernPreviewTiles.Push(Map("Image", ImagePanel, "Caption", Caption, "Borders", [BorderTop, BorderBottom, BorderLeft, BorderRight]))
+            if (Index <= DetectedClients.Length) {
+                try {
+                    Preview := LiveThumb(DetectedClients[Index], This.S_Gui.Hwnd)
+                    Preview.Destination := [X + 1, Y + 1, X + 259, Y + 142]
+                    Preview.SourceClientAreaOnly := true
+                    Preview.Visible := true
+                    Preview.Opacity := 255
+                    Preview.Update()
+                    This.ModernLivePreviews.Push(Preview)
+                }
+            }
         }
     }
 
@@ -571,6 +590,12 @@
             for _, Surface in This.ModernCardSurfaces {
                 if (Surface.Visible)
                     This.SendControlToBack(Surface)
+            }
+        }
+        if (This.HasProp("ModernLivePreviews")) {
+            for _, Preview in This.ModernLivePreviews {
+                Preview.Visible := (PageKey = "Thumbnail Settings")
+                Preview.Update()
             }
         }
         for Key, Button in This.ModernNavButtons {
