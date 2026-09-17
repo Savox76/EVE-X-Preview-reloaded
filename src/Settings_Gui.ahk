@@ -265,9 +265,9 @@
     }
 
     AddModernCard(PageKey, X, Y, Width, Height, Heading, CardColor, BorderColor, Foreground) {
-        Surface := This.S_Gui.Add("Text", "x" X " y" Y " w" Width " h" Height " Background" CardColor)
-        This.ModernCardSurfaces.Push(Surface)
-        This.SendControlToBack(Surface)
+        ; Native AHK sibling windows do not keep an opaque panel behind edit
+        ; controls when a hidden page becomes visible again. Four independent
+        ; edges preserve the card shape without masking its interactive content.
         Top := This.S_Gui.Add("Text", "x" X " y" Y " w" Width " h1 Background" BorderColor)
         Bottom := This.S_Gui.Add("Text", "x" X " y" (Y + Height - 1) " w" Width " h1 Background" BorderColor)
         Left := This.S_Gui.Add("Text", "x" X " y" Y " w1 h" Height " Background" BorderColor)
@@ -275,7 +275,7 @@
         This.S_Gui.SetFont("s12 w700 c" Foreground, "Segoe UI")
         Title := This.S_Gui.Add("Text", "x" (X + 24) " y" (Y + 18) " w" (Width - 48) " h26 BackgroundTrans", Heading)
         Line := This.S_Gui.Add("Text", "x" (X + 24) " y" (Y + 53) " w" (Width - 48) " h1 Background" BorderColor)
-        This.ModernPageExtras[PageKey].Push(Surface, Top, Bottom, Left, Right, Title, Line)
+        This.ModernPageExtras[PageKey].Push(Top, Bottom, Left, Right, Title, Line)
     }
 
     SendControlToBack(Ctrl) {
