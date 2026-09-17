@@ -2,9 +2,10 @@
     MainGui() {
         ;if settings got chnaged which require a restart to apply
         This.NeedRestart := 0
+        IsModern := This.InterfaceTheme != "Classic"
 
         SetControlDelay(-1)
-        This.S_Gui := Gui("+OwnDialogs +MinimizeBox -Resize -MaximizeBox SysMenu +MinSize500x250")
+        This.S_Gui := Gui("+OwnDialogs +MinimizeBox -Resize -MaximizeBox SysMenu " (IsModern ? "+MinSize960x720" : "+MinSize500x250"))
         This.S_Gui.Title := This.SettingsWindowTitle
 
         ;Font options for the Buttons
@@ -12,8 +13,10 @@
 
         ;Sets Margins for the following Buttons
         This.S_Gui.MarginX := 80, This.S_Gui.MarginY := 20
-        This.S_Gui.Add("Button", " x110 y20 w160 h40 vGlobal_Settings", Tr("main.global_settings")).OnEvent("Click", (obj, *) => Button_Handler(obj))
-        This.S_Gui.Add("Button", "x+30 y+-40 wp hp vProfile_Settings", Tr("main.profile_settings")).OnEvent("Click", (obj, *) => Button_Handler(obj))
+        This.ClassicGlobalButton := This.S_Gui.Add("Button", " x110 y20 w160 h40 vGlobal_Settings", Tr("main.global_settings"))
+        This.ClassicGlobalButton.OnEvent("Click", (obj, *) => Button_Handler(obj))
+        This.ClassicProfileButton := This.S_Gui.Add("Button", "x+30 y+-40 wp hp vProfile_Settings", Tr("main.profile_settings"))
+        This.ClassicProfileButton.OnEvent("Click", (obj, *) => Button_Handler(obj))
 
         This.S_Gui.Show("hide")
 
@@ -29,8 +32,13 @@
         This.Global_Settings(), This.Profile_Settings(), This.ClientSettings_Ctrl(), This.Custom_ColorsCtrl()
         This.Hotkey_GroupsCtrl(), This.HotkeysCtrl(), This.ThumbnailSettings_Ctrl(), This.Thumbnail_visibilityCtrl()
 
-        This.S_Gui.Show("AutoSize Center")
+        if (IsModern)
+            This.ConfigureModernInterface()
+
+        This.S_Gui.Show(IsModern ? "w960 h720 Center" : "AutoSize Center")
         This._Button_Load()
+        if (IsModern)
+            This.ModernNavigate("Global Settings")
 
         This.Seetings_DDL.OnEvent("Change", (Obj, *) => SettingsDDL_Handler(Obj))
 
@@ -54,7 +62,8 @@
                         ob.Visible := 0
                 }                
             }
-            This.S_Gui.Show("AutoSize")
+            if (This.InterfaceTheme = "Classic")
+                This.S_Gui.Show("AutoSize")
         }
 
         Button_Handler(obj) {
@@ -101,27 +110,187 @@
                     MsgBox(Tr("profile.default_locked"), AppInfo.Name)
             }
 
-            This.S_Gui.Show("AutoSize")
+            if (This.InterfaceTheme = "Classic")
+                This.S_Gui.Show("AutoSize")
         }
+    }
+
+    InterfaceThemeLabels() {
+        return [Tr("theme.classic"), Tr("theme.modern_dark"), Tr("theme.modern_light")]
+    }
+
+    InterfaceThemeIndex() {
+        return This.InterfaceTheme = "ModernDark" ? 2 : This.InterfaceTheme = "ModernLight" ? 3 : 1
+    }
+
+    SwitchInterfaceTheme(ThemeControl, *) {
+        Themes := ["Classic", "ModernDark", "ModernLight"]
+        NewTheme := Themes[ThemeControl.Value]
+        if (NewTheme = This.InterfaceTheme)
+            return
+        This.InterfaceTheme := NewTheme
+        This.SaveJsonToFile()
+        This.S_Gui.Destroy()
+        SetTimer(ObjBindMethod(This, "MainGui"), -50)
+    }
+
+    ConfigureModernInterface() {
+        IsDark := This.InterfaceTheme = "ModernDark"
+        Background := IsDark ? "151719" : "F5F5F3"
+        Foreground := IsDark ? "F0F1F2" : "17191C"
+        Muted := IsDark ? "A7ABB0" : "60656C"
+
+        This.S_Gui.BackColor := Background
+        This.ClassicGlobalButton.Visible := false
+        This.ClassicProfileButton.Visible := false
+
+        ; Move the existing, proven controls into a spacious content column. The
+        ; setting handlers remain shared with Classic, so all three designs behave
+        ; identically and stay portable without a browser component.
+        This.MoveControlArray(This.S_Gui.Controls.Global_Settings, 245)
+        for _, Controls in This.S_Gui.Controls.Profile_Settings.PsDDL
+            This.MoveControlArray(Controls, 245)
+
+        Header := This.S_Gui.Controls.Profile_Settings
+        Header[1].Move(500, 17, 85, 20)
+        Header[2].Move(585, 12, 175, 28)
+        Header[3].Move(770, 12, 76, 28)
+        Header[4].Move(852, 12, 76, 28)
+        loop Header.Length - 4
+            Header[A_Index + 4].Visible := false
+
+        This.ModernChrome := []
+        This.S_Gui.SetFont("s15 w700 c" Foreground, "Segoe UI")
+        This.ModernChrome.Push This.S_Gui.Add("Text", "x18 y15 w360 h30", AppInfo.Name)
+        This.S_Gui.SetFont("s9 w400 c" Muted, "Segoe UI")
+        This.ModernChrome.Push This.S_Gui.Add("Text", "x365 y20 w120 h20 Right", "v" AppInfo.Version)
+        This.ModernChrome.Push This.S_Gui.Add("Text", "x18 y52 w920 h2 +0x10")
+        This.ModernChrome.Push This.S_Gui.Add("Text", "x229 y54 w2 h646 +0x10")
+
+        This.S_Gui.SetFont("s18 w700 c" Foreground, "Segoe UI")
+        This.ModernPageTitle := This.S_Gui.Add("Text", "x270 y82 w620 h36", Tr("main.global_settings"))
+        This.ModernChrome.Push This.ModernPageTitle
+
+        Navigation := [
+            ["Global Settings", Tr("nav.general")],
+            ["Client Settings", Tr("nav.client")],
+            ["Thumbnail Settings", Tr("nav.thumbnails")],
+            ["Custom Colors", Tr("nav.colors")],
+            ["Hotkeys", Tr("nav.hotkeys")],
+            ["Hotkey Groups", Tr("nav.hotkey_groups")],
+            ["Thumbnail Visibility", Tr("nav.visibility")]
+        ]
+        This.ModernNavButtons := Map()
+        This.ModernNavLabels := Map()
+        NavY := 92
+        This.S_Gui.SetFont("s10 w500 c" Foreground, "Segoe UI")
+        for Entry in Navigation {
+            PageKey := Entry[1], Label := Entry[2]
+            NavButton := This.S_Gui.Add("Button", "x12 y" NavY " w205 h42 Left", "    " Label)
+            NavButton.OnEvent("Click", ObjBindMethod(This, "ModernNavigate", PageKey))
+            This.ModernNavButtons[PageKey] := NavButton
+            This.ModernNavLabels[PageKey] := Label
+            NavY += 48
+        }
+
+        This.S_Gui.SetFont("s9 w400 c" Muted, "Segoe UI")
+        This.ModernChrome.Push This.S_Gui.Add("Text", "x18 y595 w195 h20", Tr("global.interface_theme"))
+        This.ModernThemeSelector := This.S_Gui.Add("DDL", "x18 y618 w195 Choose" This.InterfaceThemeIndex(), This.InterfaceThemeLabels())
+        This.ModernThemeSelector.OnEvent("Change", ObjBindMethod(This, "SwitchInterfaceTheme"))
+        This.ModernChrome.Push This.ModernThemeSelector
+        This.S_Gui.SetFont("s9 w400 c" Muted, "Segoe UI")
+        This.ModernChrome.Push This.S_Gui.Add("Text", "x18 y670 w195 h20", "●  " Tr("theme.auto_saved"))
+
+        This.StyleModernControls(IsDark, Foreground)
+        if (IsDark)
+            This.EnableDarkTitleBar()
+    }
+
+    MoveControlArray(Controls, DeltaX) {
+        for Ctrl in Controls {
+            Ctrl.GetPos(&X, &Y, &Width, &Height)
+            Ctrl.Move(X + DeltaX, Y, Width, Height)
+        }
+    }
+
+    StyleModernControls(IsDark, Foreground) {
+        Arrays := [This.S_Gui.Controls.Global_Settings]
+        for _, Controls in This.S_Gui.Controls.Profile_Settings.PsDDL
+            Arrays.Push(Controls)
+        Arrays.Push(This.S_Gui.Controls.Profile_Settings)
+        for Controls in Arrays {
+            for Ctrl in Controls {
+                try Ctrl.SetFont("c" Foreground, "Segoe UI")
+                try DllCall("uxtheme\SetWindowTheme", "ptr", Ctrl.Hwnd, "str", IsDark ? "DarkMode_Explorer" : "Explorer", "ptr", 0)
+            }
+        }
+        for _, Ctrl in This.ModernNavButtons
+            try DllCall("uxtheme\SetWindowTheme", "ptr", Ctrl.Hwnd, "str", IsDark ? "DarkMode_Explorer" : "Explorer", "ptr", 0)
+        try DllCall("uxtheme\SetWindowTheme", "ptr", This.ModernThemeSelector.Hwnd, "str", IsDark ? "DarkMode_Explorer" : "Explorer", "ptr", 0)
+    }
+
+    EnableDarkTitleBar() {
+        Value := Buffer(4, 0)
+        NumPut("Int", 1, Value)
+        try DllCall("dwmapi\DwmSetWindowAttribute", "ptr", This.S_Gui.Hwnd, "int", 20, "ptr", Value, "int", 4)
+    }
+
+    ModernNavigate(PageKey, *) {
+        for _, Ctrl in This.S_Gui.Controls.Global_Settings
+            Ctrl.Visible := false
+        for _, Controls in This.S_Gui.Controls.Profile_Settings.PsDDL {
+            for _, Ctrl in Controls
+                Ctrl.Visible := false
+        }
+
+        Header := This.S_Gui.Controls.Profile_Settings
+        loop Min(4, Header.Length)
+            Header[A_Index].Visible := true
+        loop Max(0, Header.Length - 4)
+            Header[A_Index + 4].Visible := false
+
+        if (PageKey = "Global Settings") {
+            for _, Ctrl in This.S_Gui.Controls.Global_Settings
+                Ctrl.Visible := true
+            This.ModernPageTitle.Text := Tr("main.global_settings")
+        }
+        else if (This.S_Gui.Controls.Profile_Settings.PsDDL.Has(PageKey)) {
+            for _, Ctrl in This.S_Gui.Controls.Profile_Settings.PsDDL[PageKey]
+                Ctrl.Visible := true
+            for Index, ProfileKey in This.ProfilePropKeys {
+                if (ProfileKey = PageKey) {
+                    This.Seetings_DDL.Value := Index
+                    break
+                }
+            }
+            This.ModernPageTitle.Text := This.ProfileSectionLabel(PageKey)
+            if (This.Profiles.Count = 1 && This.SelectProfile_DDL.Text = "Default")
+                ToolTip(Tr("profile.default_locked"), 270, 125)
+        }
+
+        for Key, Button in This.ModernNavButtons
+            Button.Text := (Key = PageKey ? "●  " : "    ") This.ModernNavLabels[Key]
     }
 
     ;This Function creates all Settings controls for the Global Settings Button
     Global_Settings(visible?) {
         This.S_Gui.Controls.Global_Settings := []
         This.S_Gui.SetFont("s10 w400")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("GroupBox", "x20 y80 h320 w560")
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("GroupBox", "x20 y80 h320 w560", Tr("global.general_group"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xp+15 yp+20 Section", Tr("common.language"))
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.interface_theme"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.suspend_hotkeys"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.hotkey_scope"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_background"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_location"))
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_minimum"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_snap"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_snap_distance"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.minimize_delay"))
 
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("DDL", "xs+290 ys-3 w180 Section vLanguage Choose" (This.Language = "de" ? 1 : 2), [Tr("common.german"), Tr("common.english")])
         This.S_Gui["Language"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("DDL", "xp y+5 w230 vInterfaceTheme Choose" This.InterfaceThemeIndex(), This.InterfaceThemeLabels())
+        This.S_Gui["InterfaceTheme"].OnEvent("Change", ObjBindMethod(This, "SwitchInterfaceTheme"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "xp y+5 w150 vSuspend_Hotkeys_Hotkey", This.Suspend_Hotkeys_Hotkey)
         This.S_Gui["Suspend_Hotkeys_Hotkey"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("DDL", "xp y+5 w230 vTTT vHotkey_Scoope Choose" (This.Global_Hotkeys ? 1 : 2), [Tr("global.scope_global"), Tr("global.scope_eve")])
@@ -148,14 +317,6 @@
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "x+8 ys ", "h:")
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "x+5 y+-18 w40 vThumbnailStartLocationheight", This.ThumbnailStartLocation["height"])
         This.S_Gui["ThumbnailStartLocationheight"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
-
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+10 section ", Tr("common.width") ":")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "x+5 y+-18 w40 vThumbnailMinimumSizewidth", This.ThumbnailMinimumSize["width"])
-        This.S_Gui["ThumbnailMinimumSizewidth"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
-
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "x+8 ys ", Tr("common.height") ":")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "x+5 y+-18 w40 vThumbnailMinimumSizeheight", This.ThumbnailMinimumSize["height"])
-        This.S_Gui["ThumbnailMinimumSizeheight"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
 
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Radio", "xs y+10 w50 vThumbnailSnapOn Checked" This.ThumbnailSnap, Tr("common.on"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Radio", " xp+65 yp w50 vThumbnailSnapOff Checked" (This.ThumbnailSnap ? 0 : 1), Tr("common.off"))
@@ -201,12 +362,6 @@
             else if (obj.name = "ThumbnailStartLocationheight") {
                 This.ThumbnailStartLocation["height"] := obj.value
                 SetTimer(This.ApplyThumbnailStartSize_Delay_Timer, -250)
-            }
-            else if (obj.name = "ThumbnailMinimumSizewidth") {
-                This.ThumbnailMinimumSize["width"] := obj.value
-            }
-            else if (obj.name = "ThumbnailMinimumSizeheight") {
-                This.ThumbnailMinimumSize["height"] := obj.value
             }
             else if (obj.name = "ThumbnailSnapOn") {
                 This.ThumbnailSnap := 1
@@ -870,6 +1025,7 @@
     Refresh_ControlValues() {
         ; Global Settings
         This.S_Gui["Language"].value := (This.Language = "de" ? 1 : 2)
+        This.S_Gui["InterfaceTheme"].value := This.InterfaceThemeIndex()
         This.S_Gui["Suspend_Hotkeys_Hotkey"].value := This.Suspend_Hotkeys_Hotkey
         This.S_Gui["Hotkey_Scoope"].value := (This.Global_Hotkeys ? 1 : 2)
         This.S_Gui["ThumbnailBackgroundColor"].value := This.ThumbnailBackgroundColor
@@ -877,8 +1033,6 @@
         This.S_Gui["ThumbnailStartLocationy"].value := This.ThumbnailStartLocation["y"]
         This.S_Gui["ThumbnailStartLocationwidth"].value := This.ThumbnailStartLocation["width"]
         This.S_Gui["ThumbnailStartLocationheight"].value := This.ThumbnailStartLocation["height"]
-        This.S_Gui["ThumbnailMinimumSizewidth"].value := This.ThumbnailMinimumSize["width"]
-        This.S_Gui["ThumbnailMinimumSizeheight"].value := This.ThumbnailMinimumSize["height"]
         This.S_Gui["ThumbnailSnapOn"].value := This.ThumbnailSnap
         This.S_Gui["ThumbnailSnapOff"].value := (This.ThumbnailSnap ? 0 : 1)
         This.S_Gui["ThumbnailSnap_Distance"].value := This.ThumbnailSnap_Distance

@@ -30,8 +30,8 @@ A_MaxHotKeysPerInterval := 10000
 TODO #########################
 */
 
-;@Ahk2Exe-SetVersion 2.0.2.0
-;@Ahk2Exe-SetFileVersion 2.0.2.0
+;@Ahk2Exe-SetVersion 2.1.0.0
+;@Ahk2Exe-SetFileVersion 2.1.0.0
 ;@Ahk2Exe-SetCopyright g0nzo83 and Savox76 contributors
 ;@Ahk2Exe-SetDescription EVE-X-Preview Reloaded
 ;@Ahk2Exe-SetProductName EVE-X-Preview Reloaded
@@ -72,6 +72,7 @@ Load_JSON() {
                                             DJSON,
                                             JSON.Load(FileRead("EVE-X-Preview.json"))
                                         )
+            RemoveDeprecatedSettings(_JSON)
             RemoveExampleClients(_JSON)
             FileDelete("EVE-X-Preview.json")   
             FileAppend(JSON.Dump(_JSON,,"    " ), "EVE-X-Preview.json")
@@ -87,6 +88,13 @@ Load_JSON() {
         }
     }
     return _JSON
+}
+
+; Removes settings that no longer have any effect. Thumbnail dimensions may now
+; be reduced freely down to the smallest positive size Windows can display.
+RemoveDeprecatedSettings(Settings) {
+    if (Settings.Has("global_Settings") && Settings["global_Settings"].Has("ThumbnailMinimumSize"))
+        Settings["global_Settings"].Delete("ThumbnailMinimumSize")
 }
 
 ; Removes placeholder clients from configurations created by older versions.

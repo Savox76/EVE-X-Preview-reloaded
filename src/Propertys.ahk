@@ -38,6 +38,14 @@ class Propertys extends TrayMenu {
         set => This._JSON["global_Settings"]["Language"] := value
     }
 
+    InterfaceTheme {
+        get {
+            Theme := This._JSON["global_Settings"]["InterfaceTheme"]
+            return (Theme = "ModernDark" || Theme = "ModernLight") ? Theme : "Classic"
+        }
+        set => This._JSON["global_Settings"]["InterfaceTheme"] := value
+    }
+
     LastNotifiedVersion {
         get => This._JSON["global_Settings"]["LastNotifiedVersion"]
         set => This._JSON["global_Settings"]["LastNotifiedVersion"] := value
@@ -80,12 +88,6 @@ class Propertys extends TrayMenu {
     ThumbnailSnap_Distance {
         get => This._JSON["global_Settings"]["ThumbnailSnap_Distance"]
         set => This._JSON["global_Settings"]["ThumbnailSnap_Distance"] := (value ? value : "20")
-    }
-
-
-    ThumbnailMinimumSize[key] {
-        get => This._JSON["global_Settings"]["ThumbnailMinimumSize"][key]
-        set => This._JSON["global_Settings"]["ThumbnailMinimumSize"][key] := value
     }
 
 

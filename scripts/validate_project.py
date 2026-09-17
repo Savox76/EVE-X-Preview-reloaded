@@ -122,6 +122,35 @@ def validate_live_thumbnail_size() -> None:
         fail(f"Live thumbnail size update is incomplete: {missing}")
 
 
+def validate_interface_themes_and_free_resize() -> None:
+    defaults = (ROOT / "Lib" / "DefaultJSON.ahk").read_text(encoding="utf-8-sig")
+    properties = (ROOT / "src" / "Propertys.ahk").read_text(encoding="utf-8-sig")
+    settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
+    thumb_window = (ROOT / "src" / "ThumbWindow.ahk").read_text(encoding="utf-8-sig")
+    main = (ROOT / "Main.ahk").read_text(encoding="utf-8-sig")
+
+    required_theme_contract = [
+        '"InterfaceTheme": "Classic"',
+        'This.InterfaceTheme != "Classic"',
+        '["Classic", "ModernDark", "ModernLight"]',
+        "ConfigureModernInterface()",
+        "ModernNavigate(PageKey, *)",
+        'This.SaveJsonToFile()',
+    ]
+    combined = defaults + properties + settings_gui
+    missing = [entry for entry in required_theme_contract if entry not in combined]
+    if missing:
+        fail(f"Selectable interface themes are incomplete: {missing}")
+
+    active_sources = defaults + properties + settings_gui + thumb_window
+    if "ThumbnailMinimumSize" in active_sources:
+        fail("The obsolete thumbnail minimum size is still active")
+    if 'Settings["global_Settings"].Delete("ThumbnailMinimumSize")' not in main:
+        fail("Existing configurations do not remove the obsolete thumbnail minimum size")
+    if 'if (Wn < 1 || Wh < 1)' not in thumb_window:
+        fail("Thumbnail resizing does not guard Windows against invalid non-positive dimensions")
+
+
 def validate_thumbnail_settings_layout() -> None:
     settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
     start = settings_gui.index("    ThumbnailSettings_Ctrl() {")
@@ -339,6 +368,7 @@ def main() -> int:
         validate_client_discovery,
         validate_thumbnail_lock,
         validate_live_thumbnail_size,
+        validate_interface_themes_and_free_resize,
         validate_thumbnail_settings_layout,
         validate_group_cycle_reliability,
         validate_live_profile_settings,

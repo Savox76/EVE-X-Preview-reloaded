@@ -3,6 +3,7 @@
 {
     "global_Settings": {
         "Language": "de",
+        "InterfaceTheme": "Classic",
         "LastNotifiedVersion": "",
         "Suspend_Hotkeys_Hotkey": "",
         "Global_Hotkeys": 1,
@@ -16,11 +17,7 @@
         },
         "ThumbnailBackgroundColor":"#57504E",
         "ThumbnailSnap": true,
-        "ThumbnailSnap_Distance": 20,
-        "ThumbnailMinimumSize": {
-            "width": 50,
-            "height": 50
-        }
+        "ThumbnailSnap_Distance": 20
     },
     "_Profiles": {
         "Default": {
