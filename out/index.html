@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#08131d">
+  <meta name="description" content="EVE-X-Preview Reloaded – portable Multi-Client-Übersicht für EVE Online mit Thumbnails, Hotkeys und Profilen.">
+  <title>EVE-X-Preview Reloaded</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="skip">Zum Inhalt springen</a>
+
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="EVE-X-Preview Reloaded Startseite" data-i18n-aria="homeLabel">
+      <span class="brand-mark" aria-hidden="true"><span>EX</span></span>
+      <span class="brand-copy"><strong>EVE-X-PREVIEW</strong><small>RELOADED</small></span>
+    </a>
+
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">
+      <span></span><span></span><span></span><span class="sr-only" data-i18n="menu">Menü</span>
+    </button>
+
+    <nav id="main-nav" class="main-nav" aria-label="Hauptnavigation" data-i18n-aria="navLabel">
+      <a href="#features" data-i18n="navFeatures">Funktionen</a>
+      <a href="#setup" data-i18n="navSetup">Anleitung</a>
+      <a href="#updates" data-i18n="navUpdates">Neuigkeiten</a>
+      <a href="#roadmap" data-i18n="navRoadmap">Roadmap</a>
+      <a href="#support" data-i18n="navSupport">Support</a>
+    </nav>
+
+    <button class="language-switch" type="button" aria-label="Switch language to English">
+      <span class="language-active">DE</span><span aria-hidden="true">/</span><span>EN</span>
+    </button>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="hero-grid" aria-hidden="true"></div>
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse"></span><span data-i18n="eyebrow">PORTABLE · WINDOWS · DE / EN</span></div>
+        <h1 data-i18n-html="heroTitle">Alle EVE-Clients.<br><span>Ein klarer Überblick.</span></h1>
+        <p class="hero-lead" data-i18n="heroLead">Behalte mehrere EVE-Online-Fenster als Live-Thumbnails im Blick und wechsle per Klick oder Hotkey sofort zum richtigen Charakter.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" id="release-link" href="https://github.com/Savox76/EVE-X-Preview-reloaded/releases" target="_blank" rel="noopener">
+            <span data-i18n="download">Portable Version laden</span><span aria-hidden="true">↗</span>
+          </a>
+          <a class="button button-secondary" href="#setup"><span data-i18n="quickStart">Schnellstart ansehen</span><span aria-hidden="true">↓</span></a>
+        </div>
+        <div class="release-line" aria-live="polite">
+          <span data-i18n="currentVersion">Aktueller Stand</span>
+          <strong id="hero-version">GitHub Release</strong>
+          <span class="separator">•</span>
+          <span data-i18n="noInstaller">Kein Installer</span>
+        </div>
+      </div>
+
+      <div class="command-visual" aria-label="Vorschau der Anwendung" data-i18n-aria="previewLabel">
+        <div class="visual-topbar">
+          <div class="visual-title"><span class="mini-mark">EX</span><span>EVE-X-Preview</span></div>
+          <div class="window-controls" aria-hidden="true"><i></i><i></i><i></i></div>
+        </div>
+        <div class="visual-body">
+          <div class="visual-toolbar">
+            <div><span class="status-dot"></span><span data-i18n="clientsOnline">4 Clients aktiv</span></div>
+            <div class="lock-state"><span aria-hidden="true">◆</span><span data-i18n="layoutLocked">Layout gesperrt</span></div>
+          </div>
+          <div class="client-grid">
+            <article class="client-card active">
+              <div class="scene scene-one"><span class="hud-reticle"></span><span class="hud-line"></span></div>
+              <footer><span>Nova Ardent</span><em data-i18n="active">AKTIV</em></footer>
+            </article>
+            <article class="client-card">
+              <div class="scene scene-two"><span class="hud-reticle"></span><span class="hud-line"></span></div>
+              <footer><span>Orion Vale</span><em>ALT + 2</em></footer>
+            </article>
+            <article class="client-card">
+              <div class="scene scene-three"><span class="hud-reticle"></span><span class="hud-line"></span></div>
+              <footer><span>Lyra Voss</span><em>ALT + 3</em></footer>
+            </article>
+            <article class="client-card">
+              <div class="scene scene-four"><span class="hud-reticle"></span><span class="hud-line"></span></div>
+              <footer><span>Cael Ryn</span><em>ALT + 4</em></footer>
+            </article>
+          </div>
+          <div class="visual-statusbar">
+            <span><i class="status-dot"></i><span data-i18n="hotkeysReady">Hotkeys bereit</span></span>
+            <span data-i18n="profileLabel">Profil: Flotte</span>
+            <span>DE</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust-strip" aria-label="Projektgrundsätze">
+      <div><strong data-i18n="portable">Portable</strong><span data-i18n="portableSub">Entpacken und starten</span></div>
+      <div><strong data-i18n="eulaAware">EULA-bewusst</strong><span data-i18n="eulaSub">Kein Input Broadcasting</span></div>
+      <div><strong data-i18n="local">Lokal</strong><span data-i18n="localSub">Einstellungen bleiben bei dir</span></div>
+      <div><strong data-i18n="openSource">Open Source</strong><span>MIT License</span></div>
+    </section>
+
+    <section class="section" id="features">
+      <div class="section-heading">
+        <div><span class="section-number">01</span><span class="kicker" data-i18n="featuresKicker">FUNKTIONEN</span></div>
+        <h2 data-i18n-html="featuresTitle">Für mehrere Clients gebaut.<br><span>Ohne Umwege.</span></h2>
+        <p data-i18n="featuresLead">Alles Wichtige für einen schnellen, kontrollierten Wechsel zwischen deinen aktiven EVE-Fenstern.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card feature-wide">
+          <div class="feature-icon" aria-hidden="true"><span class="icon-grid"></span></div>
+          <div><span class="feature-index">01</span><h3 data-i18n="f1Title">Live-Thumbnails</h3><p data-i18n="f1Text">Alle laufenden EVE-Clients als frei positionierbare Vorschauen – inklusive Name, Rahmen und eigener Größe.</p></div>
+          <div class="mini-thumbnails" aria-hidden="true"><i></i><i class="selected"></i><i></i></div>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">⌁</div>
+          <span class="feature-index">02</span><h3 data-i18n="f2Title">Sofortiger Wechsel</h3><p data-i18n="f2Text">Ein Klick oder frei gewählter Tastatur- und Maus-Hotkey bringt den gewünschten Client nach vorn.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">◎</div>
+          <span class="feature-index">03</span><h3 data-i18n="f3Title">Flexible Profile</h3><p data-i18n="f3Text">Getrennte Anordnungen, Hotkeys und Farben für Mining, Produktion, Flotte oder jeden anderen Einsatz.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">◈</div>
+          <span class="feature-index">04</span><h3 data-i18n="f4Title">Farben mit System</h3><p data-i18n="f4Text">Windows-Farbpalette, HEX- und RGB-Eingabe für Text, aktive Clients und individuelle Charakterrahmen.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">◇</div>
+          <span class="feature-index">05</span><h3 data-i18n="f5Title">Layout-Schutz</h3><p data-i18n="f5Text">Sperre Position und Größe pro Profil, damit ein versehentlicher Rechtsklick dein Layout nicht verschiebt.</p>
+        </article>
+        <article class="feature-card feature-accent">
+          <div class="feature-icon" aria-hidden="true">DE</div>
+          <span class="feature-index">06</span><h3 data-i18n="f6Title">Deutsch & Englisch</h3><p data-i18n="f6Text">Umschaltbare Oberfläche und automatische Hinweise, sobald eine neue GitHub-Version verfügbar ist.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section setup-section" id="setup">
+      <div class="section-heading compact">
+        <div><span class="section-number">02</span><span class="kicker" data-i18n="setupKicker">SCHNELLSTART</span></div>
+        <h2 data-i18n-html="setupTitle">In vier Schritten<br><span>einsatzbereit.</span></h2>
+      </div>
+      <ol class="steps">
+        <li><span class="step-number">01</span><div><h3 data-i18n="s1Title">ZIP herunterladen</h3><p data-i18n="s1Text">Öffne die GitHub-Releases und lade das aktuelle portable ZIP.</p></div></li>
+        <li><span class="step-number">02</span><div><h3 data-i18n="s2Title">Komplett entpacken</h3><p data-i18n="s2Text">Lege den vollständigen Ordner an einem beschreibbaren Ort ab, zum Beispiel unter Dokumente.</p></div></li>
+        <li><span class="step-number">03</span><div><h3 data-i18n="s3Title">EXE starten</h3><p data-i18n="s3Text">Starte EVE-X-Preview-Reloaded.exe. Deine Einstellungen werden direkt im Programmordner gespeichert.</p></div></li>
+        <li><span class="step-number">04</span><div><h3 data-i18n="s4Title">Profil anlegen</h3><p data-i18n="s4Text">Öffne das Tray-Menü, erstelle ein Profil und ordne Thumbnails sowie Hotkeys nach Wunsch an.</p></div></li>
+      </ol>
+      <div class="notice"><span aria-hidden="true">i</span><p data-i18n-html="setupNotice"><strong>Wichtig:</strong> Behalte den Ordner <code>locales</code> neben der EXE. Aktualisierungen ersetzen deine persönliche <code>EVE-X-Preview.json</code> nicht.</p></div>
+      <a class="text-link" href="https://github.com/Savox76/EVE-X-Preview-reloaded/blob/main/README.MD" target="_blank" rel="noopener"><span data-i18n="fullGuide">Vollständige Anleitung öffnen</span><span aria-hidden="true">↗</span></a>
+    </section>
+
+    <section class="section updates-section" id="updates">
+      <div class="section-heading compact">
+        <div><span class="section-number">03</span><span class="kicker" data-i18n="updatesKicker">NEUIGKEITEN</span></div>
+        <h2 data-i18n-html="updatesTitle">Der aktuelle<br><span>Release-Stand.</span></h2>
+        <p data-i18n="updatesLead">Version und Änderungen werden direkt aus GitHub geladen und bleiben dadurch automatisch aktuell.</p>
+      </div>
+      <article class="release-card" id="release-card" aria-live="polite">
+        <div class="release-meta"><span class="release-badge" data-i18n="latestRelease">NEUESTER RELEASE</span><time id="release-date">GitHub</time></div>
+        <h3 id="release-title" data-i18n="loadingRelease">Release wird geladen …</h3>
+        <ul id="release-notes">
+          <li data-i18n="releaseFallback1">Portable Nutzung ohne Installer</li>
+          <li data-i18n="releaseFallback2">Deutsche und englische Oberfläche</li>
+          <li data-i18n="releaseFallback3">Automatische Update-Hinweise</li>
+        </ul>
+        <a class="button button-secondary" id="release-notes-link" href="https://github.com/Savox76/EVE-X-Preview-reloaded/releases" target="_blank" rel="noopener"><span data-i18n="allReleaseNotes">Alle Release-Details</span><span aria-hidden="true">↗</span></a>
+      </article>
+    </section>
+
+    <section class="section roadmap-section" id="roadmap">
+      <div class="section-heading compact">
+        <div><span class="section-number">04</span><span class="kicker" data-i18n="roadmapKicker">ROADMAP</span></div>
+        <h2 data-i18n-html="roadmapTitle">Was als Nächstes<br><span>möglich ist.</span></h2>
+        <p data-i18n="roadmapLead">Die Planung ist transparent. Pakete starten erst nach einer bewussten Entscheidung und werden nur nach erfolgreichen Prüfungen veröffentlicht.</p>
+      </div>
+      <div class="roadmap-layout">
+        <article class="next-package">
+          <div class="package-label"><span class="pulse"></span><span data-i18n="recommendedNext">EMPFOHLENES NÄCHSTES PAKET</span></div>
+          <span class="package-number">04</span>
+          <h3 id="next-package-title" data-i18n="p4Title">Layout-Schnellsteuerung</h3>
+          <p id="next-package-description" data-i18n="p4Text">Direkte Layout-Sperre im Tray, klare Rückmeldungen beim Speichern und sicheres Zurückholen nicht sichtbarer Thumbnails.</p>
+          <div class="risk"><span data-i18n="risk">Risiko</span><strong data-i18n="lowMedium">Niedrig bis mittel</strong></div>
+        </article>
+        <div class="roadmap-list">
+          <article><span>05–06</span><div><h3 data-i18n="road1Title">Layout & Profile</h3><p data-i18n="road1Text">Positionen komfortabler verwalten, Profile duplizieren, umbenennen und bereinigen.</p></div></article>
+          <article><span>07–10</span><div><h3 data-i18n="road2Title">Steuerung & Anzeige</h3><p data-i18n="road2Text">Zuverlässigere Hotkeys, konfigurierbare Mausaktionen und erweiterte Thumbnail-Modi.</p></div></article>
+          <article><span>11–14</span><div><h3 data-i18n="road3Title">Stabilität & Support</h3><p data-i18n="road3Text">Multi-Monitor/DPI, DWM-Stabilität, sichere Konfigurationen und Diagnoseberichte.</p></div></article>
+          <article><span>15–16</span><div><h3 data-i18n="road4Title">Release-Härtung</h3><p data-i18n="road4Text">Prüfsummen, bessere Änderungsübersicht und Abschluss der Preview-Phase.</p></div></article>
+        </div>
+      </div>
+      <div class="roadmap-sync"><span class="sync-indicator" id="roadmap-status"></span><span data-i18n="roadmapSync">Der vollständige Masterplan wird im Repository gepflegt.</span></div>
+      <a class="text-link" href="https://github.com/Savox76/EVE-X-Preview-reloaded/blob/main/docs/MASTERPLAN.md" target="_blank" rel="noopener"><span data-i18n="openMasterplan">Masterplan öffnen</span><span aria-hidden="true">↗</span></a>
+    </section>
+
+    <section class="section support-section" id="support">
+      <div class="support-copy">
+        <span class="section-number">05</span><span class="kicker" data-i18n="supportKicker">FEEDBACK & SUPPORT</span>
+        <h2 data-i18n-html="supportTitle">Fehler gefunden?<br><span>Idee an Bord?</span></h2>
+        <p data-i18n="supportLead">Nutze die vorbereiteten GitHub-Formulare. Je genauer die Angaben sind, desto schneller lässt sich ein Problem nachvollziehen oder eine Idee bewerten.</p>
+      </div>
+      <div class="support-actions">
+        <a class="support-card bug" href="https://github.com/Savox76/EVE-X-Preview-reloaded/issues/new?template=bug-report.yml" target="_blank" rel="noopener">
+          <span class="support-icon" aria-hidden="true">!</span><div><small data-i18n="bugLabel">FEHLER MELDEN</small><h3 data-i18n="bugTitle">Bug-Report erstellen</h3><p data-i18n="bugText">Version, Windows-Stand und genaue Schritte erfassen.</p></div><span aria-hidden="true">↗</span>
+        </a>
+        <a class="support-card idea" href="https://github.com/Savox76/EVE-X-Preview-reloaded/issues/new?template=feature-request.yml" target="_blank" rel="noopener">
+          <span class="support-icon" aria-hidden="true">+</span><div><small data-i18n="ideaLabel">VERBESSERUNG</small><h3 data-i18n="ideaTitle">Vorschlag einreichen</h3><p data-i18n="ideaText">Nutzen, Wunschverhalten und mögliche Alternativen beschreiben.</p></div><span aria-hidden="true">↗</span>
+        </a>
+        <a class="issues-link" href="https://github.com/Savox76/EVE-X-Preview-reloaded/issues" target="_blank" rel="noopener"><span data-i18n="viewIssues">Offene Issues ansehen</span><span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-brand"><span class="brand-mark small" aria-hidden="true"><span>EX</span></span><div><strong>EVE-X-Preview Reloaded</strong><p data-i18n="footerTagline">Multi-Client-Übersicht für EVE Online.</p></div></div>
+    <div class="footer-links"><a href="https://github.com/Savox76/EVE-X-Preview-reloaded" target="_blank" rel="noopener">GitHub</a><a href="https://github.com/Savox76/EVE-X-Preview-reloaded/releases" target="_blank" rel="noopener">Releases</a><a href="https://github.com/Savox76/EVE-X-Preview-reloaded/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a></div>
+    <p class="legal" data-i18n="legal">EVE Online und alle zugehörigen Logos sind Eigentum von CCP hf. Dieses unabhängige Projekt ist nicht mit CCP hf verbunden. Nutzung auf eigene Verantwortung.</p>
+  </footer>
+</body>
+</html>

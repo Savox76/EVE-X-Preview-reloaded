@@ -1,0 +1,52 @@
+name: Verbesserung vorschlagen
+description: Schlage eine neue Funktion oder eine bessere Bedienung vor.
+title: "[Idee]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke für deine Idee. Das Projekt nimmt keine Funktionen auf, die Eingaben gleichzeitig an mehrere EVE-Clients senden oder absichtlich gegen die EVE-Online-Regeln verstoßen.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Welches Problem soll gelöst werden?
+      description: Beschreibe die Situation und warum die heutige Bedienung dafür nicht ausreicht.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Gewünschte Lösung
+      description: Wie sollte sich EVE-X-Preview Reloaded aus deiner Sicht verhalten?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Mögliche Alternativen
+      description: Optional – gibt es eine einfachere Lösung oder einen bisherigen Workaround?
+  - type: dropdown
+    id: area
+    attributes:
+      label: Bereich
+      options:
+        - Thumbnails und Layout
+        - Hotkeys und Maussteuerung
+        - Profile und Einstellungen
+        - Multi-Monitor und DPI
+        - Updates und portable Version
+        - Übersetzung und Anleitung
+        - Anderer Bereich
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Vor dem Absenden
+      options:
+        - label: Ich habe im Masterplan und in offenen Issues geprüft, ob der Vorschlag bereits enthalten ist.
+          required: true
+        - label: Der Vorschlag beinhaltet kein Input Broadcasting an mehrere EVE-Clients.
+          required: true

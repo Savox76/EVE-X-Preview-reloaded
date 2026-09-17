@@ -2,6 +2,8 @@
 
 > **EVE-X-Preview Reloaded** continues this MIT-licensed project with a German/English interface, GitHub update notifications, and portable ZIP releases.
 
+**Project website:** [Features, quick start, current releases, roadmap and support](https://savox76.github.io/EVE-X-Preview-reloaded/)
+
 ### Reloaded portable version
 
 1. Download `EVE-X-Preview-Reloaded-*-portable.zip` from the [Releases page](https://github.com/Savox76/EVE-X-Preview-reloaded/releases).
