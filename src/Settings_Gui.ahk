@@ -35,7 +35,8 @@
         if (IsModern)
             This.ConfigureModernInterface()
 
-        This.S_Gui.Show(IsModern ? "w1120 h760 Center" : "AutoSize Center")
+        ModernShowOptions := This.HasProp("UIVisualPreview") ? "w1120 h760 x0 y0" : "w1120 h760 Center"
+        This.S_Gui.Show(IsModern ? ModernShowOptions : "AutoSize Center")
         This._Button_Load()
         if (IsModern)
             This.ModernNavigate("Global Settings")
@@ -212,9 +213,12 @@
 
     ConfigureModernPageLayouts(CardColor, BorderColor, Foreground, Muted) {
         This.ModernPageExtras := Map()
+        This.ModernCardPanels := Map()
         Pages := ["Global Settings", "Client Settings", "Thumbnail Settings", "Custom Colors", "Hotkeys", "Hotkey Groups", "Thumbnail Visibility"]
-        for PageKey in Pages
+        for PageKey in Pages {
             This.ModernPageExtras[PageKey] := []
+            This.ModernCardPanels[PageKey] := []
+        }
 
         ; Allgemein: eine klare zweispaltige Karte statt verschobener Classic-Zeilen.
         G := This.S_Gui.Controls.Global_Settings
@@ -264,6 +268,7 @@
         Title := This.S_Gui.Add("Text", "x" (X + 24) " y" (Y + 18) " w" (Width - 48) " h26 BackgroundTrans", Heading)
         Line := This.S_Gui.Add("Text", "x" (X + 24) " y" (Y + 53) " w" (Width - 48) " h1 Background" BorderColor)
         This.ModernPageExtras[PageKey].Push(Panel, Title, Line)
+        This.ModernCardPanels[PageKey].Push(Panel)
     }
 
     SendControlToBack(Ctrl) {
@@ -429,6 +434,10 @@
         if (This.HasProp("ModernPageExtras") && This.ModernPageExtras.Has(PageKey)) {
             for _, Ctrl in This.ModernPageExtras[PageKey]
                 Ctrl.Visible := true
+        }
+        if (This.HasProp("ModernCardPanels") && This.ModernCardPanels.Has(PageKey)) {
+            for _, Panel in This.ModernCardPanels[PageKey]
+                This.SendControlToBack(Panel)
         }
 
         for Key, Button in This.ModernNavButtons {

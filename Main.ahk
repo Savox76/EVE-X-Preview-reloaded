@@ -65,6 +65,7 @@ if (A_Args.Length >= 2 && A_Args[1] = "--ui-preview") {
         if (!Call.Profiles.Has("Standard"))
             Call.Profiles["Standard"] := JSON.Load(JSON.Dump(Call.Profiles["Default"]))
         Call.LastUsedProfile := "Standard"
+        Call.UIVisualPreview := true
         Call.MainGui()
         Call.ModernNavigate("Thumbnail Settings")
     }
