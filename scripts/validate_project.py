@@ -238,6 +238,7 @@ def validate_site_desktop_grid() -> None:
         site / "styles.css",
         site / "app.js",
         site / "favicon.svg",
+        site / ".nojekyll",
         site / "images" / "global-settings.png",
         site / "images" / "profile-settings.png",
     ]
@@ -259,6 +260,28 @@ def validate_site_desktop_grid() -> None:
         fail(f"Project website desktop grid is incomplete: {missing}")
     if ".section { max-width: var(--max)" in css:
         fail("Project website sections still lose width through the old nested padding layout")
+
+    pages_url = "https://savox76.github.io/EVE-X-Preview-reloaded/"
+    readme = (ROOT / "README.MD").read_text(encoding="utf-8-sig")
+    html = (site / "index.html").read_text(encoding="utf-8")
+    if pages_url not in readme:
+        fail("README must link to the GitHub Pages website")
+    if f'<link rel="canonical" href="{pages_url}">' not in html:
+        fail("Project website must declare its GitHub Pages URL as canonical")
+
+    pages_workflow = (ROOT / ".github" / "workflows" / "pages.yml").read_text(encoding="utf-8")
+    required_pages_config = [
+        "actions/configure-pages@v5",
+        "actions/upload-pages-artifact@v4",
+        "actions/deploy-pages@v4",
+        "path: out",
+        "pages: write",
+        "id-token: write",
+        "name: github-pages",
+    ]
+    missing = [entry for entry in required_pages_config if entry not in pages_workflow]
+    if missing:
+        fail(f"GitHub Pages workflow is incomplete: {missing}")
 
 
 def main() -> int:
