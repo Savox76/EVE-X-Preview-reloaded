@@ -38,19 +38,24 @@ public static class WindowCaptureNative {
 }
 "@
 
-function Wait-ForWindow {
-    param([string]$Title, [int]$TimeoutSeconds = 20)
+function Wait-ForProcessWindow {
+    param([System.Diagnostics.Process]$Process, [int]$TimeoutSeconds = 20)
 
     $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
     do {
-        $handle = [WindowCaptureNative]::FindWindow($null, $Title)
-        if ($handle -ne [IntPtr]::Zero) {
-            return $handle
+        $Process.Refresh()
+        if ($Process.HasExited) {
+            throw "Application exited before showing its GUI (exit code $($Process.ExitCode))."
+        }
+        if ($Process.MainWindowHandle -ne [IntPtr]::Zero) {
+            Write-Output "Found GUI window: $($Process.MainWindowTitle)"
+            return $Process.MainWindowHandle
         }
         Start-Sleep -Milliseconds 250
     } while ((Get-Date) -lt $deadline)
 
-    throw "Window '$Title' did not appear."
+    $visibleWindows = Get-Process | Where-Object { $_.MainWindowTitle } | ForEach-Object { $_.MainWindowTitle }
+    throw "The application GUI did not appear. Visible windows: $($visibleWindows -join '; ')"
 }
 
 function Save-WindowImage {
@@ -85,19 +90,22 @@ function Save-WindowImage {
 }
 
 function Invoke-Button {
-    param([IntPtr]$WindowHandle, [string]$Name)
+    param([IntPtr]$WindowHandle, [string[]]$Names)
 
     $window = [System.Windows.Automation.AutomationElement]::FromHandle($WindowHandle)
-    $condition = New-Object System.Windows.Automation.PropertyCondition(
-        [System.Windows.Automation.AutomationElement]::NameProperty,
-        $Name
-    )
-    $button = $window.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
-    if ($null -eq $button) {
-        throw "Button '$Name' was not found."
+    foreach ($name in $Names) {
+        $condition = New-Object System.Windows.Automation.PropertyCondition(
+            [System.Windows.Automation.AutomationElement]::NameProperty,
+            $name
+        )
+        $button = $window.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
+        if ($null -ne $button) {
+            $pattern = $button.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
+            $pattern.Invoke()
+            return
+        }
     }
-    $pattern = $button.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
-    $pattern.Invoke()
+    throw "None of the buttons '$($Names -join ', ')' was found."
 }
 
 $application = (Resolve-Path $ApplicationPath).Path
@@ -122,14 +130,13 @@ $settings | ConvertTo-Json -Depth 100 | Set-Content $settingsPath -Encoding utf8
 
 $process = Start-Process $application -WorkingDirectory $applicationDirectory -ArgumentList "--capture-gui" -PassThru
 try {
-    $title = "EVE-X-Preview Reloaded - Einstellungen"
-    $windowHandle = Wait-ForWindow -Title $title
+    $windowHandle = Wait-ForProcessWindow -Process $process
     [WindowCaptureNative]::SetForegroundWindow($windowHandle) | Out-Null
     Start-Sleep -Milliseconds 750
 
     Save-WindowImage -WindowHandle $windowHandle -Path (Join-Path $OutputDirectory "global-settings.png")
 
-    Invoke-Button -WindowHandle $windowHandle -Name "Profileinstellungen"
+    Invoke-Button -WindowHandle $windowHandle -Names @("Profileinstellungen", "Profile Settings")
     Start-Sleep -Milliseconds 750
     Save-WindowImage -WindowHandle $windowHandle -Path (Join-Path $OutputDirectory "profile-settings.png")
 }

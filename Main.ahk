@@ -54,7 +54,7 @@ Call := Main_Class()
 
 ; Temporary capture hook used only by the unmerged GUI screenshot branch.
 if (A_Args.Length && A_Args[1] = "--capture-gui")
-    SetTimer((*) => Call.MainGui(), -500)
+    Call.MainGui()
 
 
 
