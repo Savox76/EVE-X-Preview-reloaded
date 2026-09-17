@@ -227,6 +227,40 @@ def validate_portable_contract() -> None:
         fail("Personal EVE-X-Preview.json must not be part of the repository")
 
 
+def validate_site_desktop_grid() -> None:
+    hosting = load_json(ROOT / ".openai" / "hosting.json")
+    if hosting.get("static", {}).get("directory") != "out":
+        fail("Project website must publish the validated out directory")
+
+    site = ROOT / "out"
+    required_assets = [
+        site / "index.html",
+        site / "styles.css",
+        site / "app.js",
+        site / "favicon.svg",
+        site / "images" / "global-settings.png",
+        site / "images" / "profile-settings.png",
+    ]
+    missing = [str(path.relative_to(ROOT)) for path in required_assets if not path.is_file()]
+    if missing:
+        fail(f"Project website assets are missing: {missing}")
+
+    css = (site / "styles.css").read_text(encoding="utf-8")
+    required_grid = [
+        "--gutter: clamp(",
+        "--heading-rail: 180px",
+        "--grid-gap: 2rem",
+        "calc(var(--max) + var(--gutter) + var(--gutter))",
+        "grid-template-columns: var(--heading-rail) minmax(0, 1fr) minmax(260px, 340px)",
+        "width: calc(100% - var(--heading-rail) - var(--grid-gap))",
+    ]
+    missing = [entry for entry in required_grid if entry not in css]
+    if missing:
+        fail(f"Project website desktop grid is incomplete: {missing}")
+    if ".section { max-width: var(--max)" in css:
+        fail("Project website sections still lose width through the old nested padding layout")
+
+
 def main() -> int:
     checks = [
         validate_version,
@@ -239,6 +273,7 @@ def main() -> int:
         validate_group_cycle_reliability,
         validate_color_picker,
         validate_portable_contract,
+        validate_site_desktop_grid,
     ]
     for check in checks:
         check()
