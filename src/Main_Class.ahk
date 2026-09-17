@@ -170,11 +170,11 @@ Class Main_Class extends ThumbWindow {
                 ;if HideThumbnailsOnLostFocus is selectet check if a eve window is still in foreground, runs a timer once with a delay to prevent stuck thumbnails
                 ActiveProcessName := WinGetProcessName("A")                
                 
-                if ((DllCall("IsIconic","UInt", WinActive("ahk_exe exefile.exe")) || ActiveProcessName != "exefile.exe") && !HideShowToggle && This.HideThumbnailsOnLostFocus) {
+                if ((DllCall("IsIconic","Ptr", WinActive("ahk_exe exefile.exe")) || ActiveProcessName != "exefile.exe") && !HideShowToggle && This.HideThumbnailsOnLostFocus) {
                     SetTimer(This.CheckforActiveWindow, -500)                    
                     HideShowToggle := 1
                 }
-                else if ( ActiveProcessName = "exefile.exe" && !DllCall("IsIconic","UInt", WinActive("ahk_exe exefile.exe"))) {
+                else if ( ActiveProcessName = "exefile.exe" && !DllCall("IsIconic","Ptr", WinActive("ahk_exe exefile.exe"))) {
                     Ahwnd := WinExist("A")
                     if HideShowToggle {                        
                         for EVEHWND in This.ThumbWindows.OwnProps() {
@@ -213,7 +213,7 @@ Class Main_Class extends ThumbWindow {
         Try {
             ForegroundPName := WinGetProcessName("A")
             if (ForegroundPName = "exefile.exe") {
-                if (DllCall("IsIconic", "UInt", WinActive("ahk_exe exefile.exe"))) {
+                if (DllCall("IsIconic", "Ptr", WinActive("ahk_exe exefile.exe"))) {
                     for EVEHWND in This.ThumbWindows.OwnProps() {
                         This.ShowThumb(EVEHWND, "Hide")
                     }
@@ -369,67 +369,49 @@ Class Main_Class extends ThumbWindow {
         }
     }
 
-    ; The method to make it possible to cycle throw the EVE Windows. Used with the Hotkey Groups
-     Cycle_Hotkey_Groups(Arr, direction,*) {
-        static Index := 0 
-        length := Arr.Length
+    ; Cycle through a stable snapshot of currently available EVE windows.
+    ; Selection is bounded to one pass over the configured group.
+    Cycle_Hotkey_Groups(Arr, Direction, *) {
+        Clients := This.GetAvailableEVEClients()
+        AvailableTitles := []
+        for Client in Clients
+            AvailableTitles.Push(Client["Title"])
 
-        if (direction == "ForwardsHotkey") {
-            Try
-                Index := (n := IsActiveWinInGroup(This.CleanTitle(WinGetTitle("A")), Arr)) ? n+1 : 1
-              
-            if (Index > length)
-                Index := 1
-
-            if (This.OnWinExist(Arr)) {
-                Try {
-                    if !(WinExist("EVE - " This.CleanTitle(Arr[Index]))) {
-                        while (!(WinExist("EVE - " This.CleanTitle(Arr[Index])))) {
-                            index += 1
-                            if (Index > length)
-                                Index := 1
-                        }
-                    }
-                This.ActivateEVEWindow(,,This.CleanTitle(Arr[Index]))
-                }
-            }
-        }
-
-        else if (direction == "BackwardsHotkey") {
-            Try
-                Index := (n := IsActiveWinInGroup(This.CleanTitle(WinGetTitle("A")), Arr)) ? n-1 : length
-            if (Index <= 0)
-                Index := length
-
-            if (This.OnWinExist(Arr)) {
-                if !(WinExist("EVE - " This.CleanTitle(Arr[Index]))) {
-                    while (!(WinExist("EVE - " This.CleanTitle(Arr[Index])))) {
-                        Index -= 1
-                        if (Index <= 0)
-                            Index := length
-                    }
-                }
-                This.ActivateEVEWindow(,,This.CleanTitle(Arr[Index]))
-            }
-        }
-
-        IsActiveWinInGroup(Title, Arr) {
-            for index, names in Arr {
-                if names = Title
-                    return index
-            }
+        ActiveTitle := ""
+        try ActiveTitle := This.CleanTitle(WinGetTitle("A"))
+        TargetIndex := GroupCycle.SelectIndex(Arr, ActiveTitle, AvailableTitles, Direction)
+        if (!TargetIndex)
             return false
+
+        TargetTitle := GroupCycle.NormalizeTitle(Arr[TargetIndex])
+        for Client in Clients {
+            if (Client["Title"] = TargetTitle)
+                return This.ActivateEVEWindow(Client["Hwnd"])
         }
+        return false
+    }
+
+    GetAvailableEVEClients() {
+        Clients := []
+        try {
+            for Hwnd in WinGetList(This.EVEExe) {
+                Title := This.CleanTitle(WinGetTitle("ahk_id " Hwnd))
+                if (Title != "")
+                    Clients.Push(Map("Title", Title, "Hwnd", Hwnd))
+            }
+        }
+        return Clients
     }
 
      ; To Check if atleast One Win stil Exist in the Array for the cycle groups hotkeys
     OnWinExist(Arr, *) {
-        for index, Name in Arr {
-            If ( WinExist("EVE - " Name " Ahk_Exe exefile.exe") && !WinActive(This.SettingsWindowTitle) ) {
-                return true
-            }
-        }
-        return false
+        if (WinActive(This.SettingsWindowTitle))
+            return false
+
+        AvailableTitles := []
+        for Client in This.GetAvailableEVEClients()
+            AvailableTitles.Push(Client["Title"])
+        return GroupCycle.SelectIndex(Arr, "", AvailableTitles, "ForwardsHotkey") != 0
     }
     OnWinActive(Arr, *) {        
         If (This.OnWinExist(Arr) && WinActive("Ahk_exe exefile.exe")) {
@@ -598,19 +580,31 @@ Class Main_Class extends ThumbWindow {
         ; If the user clicks the Thumbnail then hwnd stores the Thumbnail Hwnd. Here the Hwnd gets changed to the contiguous EVE window hwnd
         if (IsSet(hwnd) && This.ThumbHwnd_EvEHwnd.Has(hwnd)) {
             hwnd := WinExist(This.ThumbHwnd_EvEHwnd[hwnd])
-            title := This.CleanTitle(WinGetTitle("Ahk_id " Hwnd))
         }
         ;if the user presses the Hotkey 
         Else if (IsSet(title)) {
-            title := "EVE - " title
-            hwnd := WinExist(title " Ahk_exe exefile.exe")
+            hwnd := WinExist("EVE - " This.CleanTitle(title) " Ahk_exe exefile.exe")
         }
+
+        if (!IsSet(hwnd) || !hwnd || !WinExist("ahk_id " hwnd))
+            return false
+
+        try title := This.CleanTitle(WinGetTitle("ahk_id " hwnd))
+        catch
+            return false
+
         ;return when the user tries to bring a window to foreground which is already in foreground 
         if (WinActive("Ahk_id " hwnd))
-            Return
+            return true
 
-        If (DllCall("IsIconic", "UInt", hwnd)) {
-            if (This.AlwaysMaximize)  || ( This.TrackClientPossitions && This.ClientPossitions[This.CleanTitle(title)]["IsMaximized"] ) {
+        ; A pending minimize action from the previous switch must not race the
+        ; target window while it is being restored or activated.
+        if (This.MinimizeInactiveClients)
+            SetTimer(This.timer, 0)
+
+        If (DllCall("IsIconic", "Ptr", hwnd)) {
+            SavedPosition := This.TrackClientPossitions ? This.ClientPossitions[title] : 0
+            if (This.AlwaysMaximize || (SavedPosition && SavedPosition["IsMaximized"])) {
                 ; ; Maximize
                 This.ShowWindowAsync(hwnd, 3)
             }
@@ -619,24 +613,38 @@ Class Main_Class extends ThumbWindow {
                 This.ShowWindowAsync(hwnd)          
             }
         }
-        Else {    
-            ; Use the virtual key to trigger the internal Hotkey.        
-            This.ActivateHwnd := hwnd
-            SendEvent("{Blind}{" Main_Class.virtualKey "}")            
-        }
+
+        ; Restoring a minimized window is asynchronous and does not reliably
+        ; make it foreground. Always request focus and verify the result.
+        if (!This.RequestEVEForeground(hwnd))
+            return false
 
         ;Sets the timer to minimize client if the user enable this.
         if (This.MinimizeInactiveClients) {
             This.wHwnd := hwnd
             SetTimer(This.timer, -This.MinimizeDelay)
         }
+        return true
+    }
+
+    RequestEVEForeground(hwnd) {
+        if (WinActive("ahk_id " hwnd))
+            return true
+
+        loop 2 {
+            This.ActivateHwnd := hwnd
+            SendEvent("{Blind}{" Main_Class.virtualKey "}")
+            if (WinWaitActive("ahk_id " hwnd, , 0.35))
+                return true
+        }
+        return false
     }
     ;The function for the Internal Hotkey to bring a not minimized window in foreground 
     ActivateForgroundWindow(*) {
         ; 2 attempts for brining the window in foreground 
         try {
-            if !(DllCall("SetForegroundWindow", "UInt", This.ActivateHwnd)) {
-                DllCall("SetForegroundWindow", "UInt", This.ActivateHwnd)
+            if !(DllCall("SetForegroundWindow", "Ptr", This.ActivateHwnd)) {
+                DllCall("SetForegroundWindow", "Ptr", This.ActivateHwnd)
             }
 
                 ;If the user has selected to always maximize. this prevents wrong sized windows on heavy load.
@@ -698,14 +706,14 @@ Class Main_Class extends ThumbWindow {
             Title := This.CleanTitle(WinGetTitle("Ahk_id " v))
             if !(Title = "") {
                 ;If Minimzed then restore before saving the coords
-                if (DllCall("IsIconic", "UInt", v)) {
+                if (DllCall("IsIconic", "Ptr", v)) {
                     This.ShowWindowAsync(v)
                     ;wait for getting Active for maximum of 2 seconds
                     if (WinWaitActive("Ahk_Id " v, , 2)) {
                         Sleep(200)
                         WinGetPos(&X, &Y, &Width, &Height, "Ahk_Id " v)
                         ;If the Window is Maximized
-                        if (DllCall("IsZoomed", "UInt", v)) {
+                        if (DllCall("IsZoomed", "Ptr", v)) {
                             This.ClientPossitions[Title] := [X, Y, Width, Height, 1]
                         }
                         else {
@@ -718,7 +726,7 @@ Class Main_Class extends ThumbWindow {
                 else {
                     WinGetPos(&X, &Y, &Width, &Height, "Ahk_Id " v)
                     ;is the window Maximized?
-                    if (DllCall("IsZoomed", "UInt", v)) {
+                    if (DllCall("IsZoomed", "Ptr", v)) {
                         This.ClientPossitions[Title] := [X, Y, Width, Height, 1]
                     }
                     else
@@ -733,13 +741,13 @@ Class Main_Class extends ThumbWindow {
     RestoreClientPossitions(hwnd, title) {              
         if (This.TrackClientPossitions) {
             if ( This.TrackClientPossitions && This.ClientPossitions[title] ) {  
-                if (DllCall("IsIconic", "UInt", hwnd) && This.ClientPossitions[title]["IsMaximized"] || DllCall("IsZoomed", "UInt", hwnd) && This.ClientPossitions[title]["IsMaximized"])  {
+                if (DllCall("IsIconic", "Ptr", hwnd) && This.ClientPossitions[title]["IsMaximized"] || DllCall("IsZoomed", "Ptr", hwnd) && This.ClientPossitions[title]["IsMaximized"])  {
                     This.SetWindowPlacement(hwnd,This.ClientPossitions[title]["x"], This.ClientPossitions[title]["y"],
                     This.ClientPossitions[title]["width"], This.ClientPossitions[title]["height"], 9 )
                     This.ShowWindowAsync(hwnd, 3)
                     Return 
                 }
-                else if (DllCall("IsIconic", "UInt", hwnd) && !This.ClientPossitions[title]["IsMaximized"] || DllCall("IsZoomed", "UInt", hwnd) && !This.ClientPossitions[title]["IsMaximized"])  {
+                else if (DllCall("IsIconic", "Ptr", hwnd) && !This.ClientPossitions[title]["IsMaximized"] || DllCall("IsZoomed", "Ptr", hwnd) && !This.ClientPossitions[title]["IsMaximized"])  {
                     This.SetWindowPlacement(hwnd,This.ClientPossitions[title]["x"], This.ClientPossitions[title]["y"],
                     This.ClientPossitions[title]["width"], This.ClientPossitions[title]["height"], 9 )
                     This.ShowWindowAsync(hwnd, 4)
@@ -807,7 +815,7 @@ Class Main_Class extends ThumbWindow {
 
 
     ShowWindowAsync(hWnd, nCmdShow := 9) {
-        DllCall("ShowWindowAsync", "UInt", hWnd, "UInt", nCmdShow)
+        DllCall("ShowWindowAsync", "Ptr", hWnd, "UInt", nCmdShow)
     }
     GetActiveWindow() {
         Return DllCall("GetActiveWindow", "Ptr")

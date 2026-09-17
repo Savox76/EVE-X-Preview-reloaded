@@ -1,6 +1,6 @@
 # Backlog aus dem Originalprojekt
 
-Stand: 16. September 2026. Quelle: [Issues von g0nzo83/EVE-X-Preview](https://github.com/g0nzo83/EVE-X-Preview/issues).
+Stand: 17. September 2026. Quelle: [Issues von g0nzo83/EVE-X-Preview](https://github.com/g0nzo83/EVE-X-Preview/issues).
 
 Die Einträge sind zunächst gemeldete Beobachtungen. Vor einer Übernahme werden Ursache, Reproduzierbarkeit unter Windows 10/11 und mögliche Nebenwirkungen geprüft.
 
@@ -14,16 +14,16 @@ Die daraus abgeleiteten, einzeln wählbaren Entwicklungspakete und ihre Abhängi
 | [#19 – „Eve“ im Charakternamen](https://github.com/g0nzo83/EVE-X-Preview/issues/19) | Die Titelbereinigung ist ab `1.1.0-preview.2` wiederholbar, ohne Namen wie „Eve Valkyrie“ zu verändern. Das dürfte auch einen Teil von #25 beheben. |
 | [#4 – Rahmen inaktiver Clients](https://github.com/g0nzo83/EVE-X-Preview/issues/4) | Bereits im bestehenden Funktionsumfang vorhanden; ab `1.1.0-preview.2` zusätzlich über die Farbpalette auswählbar. |
 | [#28 – Versehentliches Verschieben](https://github.com/g0nzo83/EVE-X-Preview/issues/28) | Ab `1.1.0-preview.3` lassen sich Position und Größe profilbezogen sperren. Frei belegbare Mausaktionen bleiben als spätere Erweiterung offen. |
+| [#14 – Unzuverlässiger Wechsel nach Legion](https://github.com/g0nzo83/EVE-X-Preview/issues/14) und [#20 – Clientwechsel bleibt hängen](https://github.com/g0nzo83/EVE-X-Preview/issues/20) | In `2.0.0` arbeitet der Gruppenwechsel mit einer begrenzten Momentaufnahme vorhandener Fenster. Minimierte Ziele werden wiederhergestellt, ihre Aktivierung wird verifiziert und überholte Minimierungs-Timer werden abgebrochen. |
+| [#25 – Charakter wird übersprungen](https://github.com/g0nzo83/EVE-X-Preview/issues/25) | Namen wie „Eve Phillips“ bleiben vollständig erhalten. `2.0.0` prüft diesen Fall zusätzlich mit einem ausführbaren Windows-Regressionstest. |
 
 ## Priorität 1 – Fehler untersuchen
 
 | Issue | Beobachtung | Empfohlener nächster Schritt |
 | --- | --- | --- |
-| [#20 – Clientwechsel bleibt hängen](https://github.com/g0nzo83/EVE-X-Preview/issues/20) und [#25 – Charakter wird übersprungen](https://github.com/g0nzo83/EVE-X-Preview/issues/25) | Gruppenwechsel bleibt bei bestimmten Clients stehen oder überspringt sie. | Nach der Titelkorrektur mit mehreren Accounts testen; anschließend die Schleifen gegen Endlosschleifen absichern und nur tatsächlich vorhandene Fenster durchlaufen. |
 | [#26 – Windows-Oberfläche flackert](https://github.com/g0nzo83/EVE-X-Preview/issues/26) | Beim Erkennen neuer Clients werden Desktop und andere Fenster sichtbar neu gezeichnet. | DWM-/Thumbnail-Aufrufe und Fensteraktivierung protokollieren; Änderungen isoliert auf Windows 10 und 11 testen. |
 | [#22 – Schwarze Vorschau auf zweitem Monitor](https://github.com/g0nzo83/EVE-X-Preview/issues/22) | Vorschauen werden auf einem nicht primären Monitor schwarz; Minimieren beeinflusst das Verhalten. | Multi-Monitor-Testmatrix mit GPU, Vollbild-/Fenstermodus und „Immer im Vordergrund“ erstellen. |
 | [#17 – Gemischte 1080p-/4K-DPI-Skalierung](https://github.com/g0nzo83/EVE-X-Preview/issues/17) | Der Bildausschnitt stimmt bei unterschiedlichen DPI-Einstellungen nicht. | DPI-Kontext pro Fenster erfassen und Koordinaten zwischen physischer und logischer Auflösung umrechnen. |
-| [#14 – Unzuverlässiger Wechsel nach Legion](https://github.com/g0nzo83/EVE-X-Preview/issues/14) | Hotkeys reagieren verspätet oder zeigen kurz den Desktop. | Mit aktuellem EVE-Client reproduzieren und Fokus-/Minimierungsablauf instrumentieren. |
 | [#6 – Auswahlbildschirm bleibt sichtbar](https://github.com/g0nzo83/EVE-X-Preview/issues/6) | „Bei Fokusverlust ausblenden“ greift nicht zuverlässig am Charakterauswahlbildschirm. | Auswahlfenster über Handle statt Charaktername verwalten und zusammen mit #21 testen. |
 
 ## Priorität 2 – Sinnvolle Verbesserungen
