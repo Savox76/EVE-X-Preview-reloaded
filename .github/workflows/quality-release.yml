@@ -80,6 +80,21 @@ jobs:
             if (-not $match) { throw "Portable ZIP is missing $relativePath" }
           }
 
+      - name: Capture real modern settings windows
+        shell: pwsh
+        run: |
+          $version = (Get-Content VERSION -Raw).Trim()
+          $exe = "$PWD/dist/EVE-X-Preview-Reloaded-v$version-portable/EVE-X-Preview-Reloaded.exe"
+          ./scripts/capture-settings.ps1 -ExePath $exe -Theme ModernDark -OutputPath "$PWD/ui-captures/modern-dark.png"
+          ./scripts/capture-settings.ps1 -ExePath $exe -Theme ModernLight -OutputPath "$PWD/ui-captures/modern-light.png"
+
+      - name: Upload GUI review screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: settings-gui-review
+          path: ui-captures/*.png
+          retention-days: 7
+
   release:
     name: Publish portable release
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
