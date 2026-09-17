@@ -15,7 +15,7 @@ The language can be changed under **Global Settings / Allgemeine Einstellungen**
 
 Color fields provide a native Windows color palette and still accept hexadecimal or RGB input. Character names from running EVE clients are saved automatically in the active profile for hotkeys and individual colors. The selectable next development packages are documented in the [`development master plan`](docs/MASTERPLAN.md); evaluated ideas and bug reports from the upstream project remain tracked in the [`original-repository backlog`](docs/ORIGINAL_REPO_BACKLOG.md).
 
-New profiles immediately receive all currently active character names without restarting. Thumbnail Settings also provides a per-profile lock that prevents accidental right-drag movement and mouse resizing. Stable version 2.0.0 also hardens forward and backward group cycling: unavailable clients are skipped with a bounded search, minimized targets are activated reliably, and stale minimize actions cannot interfere with a rapid switch. Version 2.0.1 aligns the complete Thumbnail Settings page on a consistent two-column grid. Version 2.0.2 automatically stores thumbnail and EVE-window layouts per profile and applies profile settings immediately without restarting.
+New profiles immediately receive all currently active character names without restarting. Thumbnail Settings also provides a per-profile lock that prevents accidental right-drag movement and mouse resizing. Stable version 2.0.0 also hardens forward and backward group cycling: unavailable clients are skipped with a bounded search, minimized targets are activated reliably, and stale minimize actions cannot interfere with a rapid switch. Version 2.0.1 aligns the complete Thumbnail Settings page on a consistent two-column grid. Version 2.0.2 automatically stores thumbnail and EVE-window layouts per profile and applies profile settings immediately without restarting. Version 2.1.0 adds the selectable Classic, Modern Dark and Modern Light interfaces and removes the configurable thumbnail minimum size.
 
 ---
 
@@ -92,6 +92,7 @@ Mouse gestures are applied to the thumbnail window currently being hovered over.
 
 | Option | Description | 
 | --- | --- |
+| Design | Switches immediately between **Classic**, **Modern Dark** and **Modern Light**. The selected interface is retained for the next start. |
 | Open | Opens the settings window  |
 | Suspend Hotkeys | Deactivates the hotkeys |
 | Close all EVE clients | Closes all open EVE windows | 
@@ -110,7 +111,6 @@ Mouse gestures are applied to the thumbnail window currently being hovered over.
 | Hotkey activation Scope | **Global: ->** Allows you to activate an EVE client with a hotkey regardless of which window you are in. <br><br> **If an EVE window is Active: ->** Activates the hotkeys only when any EVE Window is in the foreground|
 | Thumbnail Background Color | Setting the background color of the thumbnail. This is only visible if the content of the thumbnail is not visible, such as when the EVE window is minimized and the thumbnail was created afterwards <br> **HEX: ->** 0xFFFFFF or #FFFFFF or FFFFFF <br> **RGB: ->** 	RGB(225,255,255) or (225,255,255) or 225,255,255|
 | Thumbnail Default Location | Setting the dafault thumbnail position such as the thumbnail of the character selection screen |
-| Thumbnail Minimum Size | Allows you to set a minimum size of the thumbnail to prevent it from becoming too small to edit |
 | Thumbnail Snap | Allows you to switch the automatic alignment of the thumbnails to each other to On or Off |
 | Thumbnail Snap Distance | Defines the range up to which the thumbnails automatically align with each other. <br> This only has an effect when Thumbnail Snap is activated |
 | Minimize EVE Window Delay | Sets the delay before an inactive client is minimized after another one has been activated. This option is only used if "Minimize Inactive Client" has been activated |

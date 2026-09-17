@@ -1,21 +1,26 @@
-## EVE-X-Preview Reloaded 2.0.2
+## EVE-X-Preview Reloaded 2.1.0
+
+### New
+
+- Three selectable interfaces: **Classic**, **Modern Dark** and **Modern Light**.
+- The modern interfaces provide a wide settings window, permanent profile selection, left-hand navigation and clear saved-state feedback.
+- The selected design is stored globally and applied immediately without restarting the complete application.
 
 ### Changed
 
-- Moving or resizing thumbnails now saves their coordinates and dimensions automatically in the active profile.
-- EVE client restore rectangles and maximized state are captured automatically without restoring or focusing minimized clients.
-- Switching profiles now applies the selected layout, colors, visibility, borders, client behavior and hotkeys immediately.
-- Editing any profile setting refreshes the active thumbnails and managed hotkeys without restarting the application.
-- Obsolete profile hotkeys are disabled before the current profile mappings are registered.
-- The existing **Restore Client Positions** switch continues to control whether captured EVE window positions are restored.
+- The configurable minimum thumbnail size has been removed from the interface, defaults and resize logic.
+- Existing configuration files automatically discard the obsolete minimum-size entry.
+- Thumbnails can be reduced to any positive size that Windows can display.
+- All three interfaces share the same settings handlers, live profile application and automatic saving.
 
 ### Automated verification
 
-- The project contract checks automatic position capture, live profile application, managed hotkey replacement and restart-free profile switching.
+- The project contract checks all three interface choices, persistent immediate switching and complete removal of minimum-size enforcement.
 - AutoHotkey regression tests, compilation, portable ZIP creation and ZIP content verification remain mandatory.
 
 ### Recommended practical check
 
-- Move and resize thumbnails, close the application and confirm the layout returns after reopening.
-- Move an EVE client, change profiles and confirm each profile restores its own saved layout when **Restore Client Positions** is enabled.
-- Change profile colors, borders, visibility and hotkeys while the application remains open and confirm every change takes effect without a restart.
+- Open **General / Allgemein**, select each of the three designs and confirm the settings window changes immediately.
+- Close and reopen the application and confirm the selected design is retained.
+- Reduce a thumbnail below the former 50 × 50 pixel limit and confirm the new size is saved.
+- Change a profile value in each design and confirm it is applied immediately.
