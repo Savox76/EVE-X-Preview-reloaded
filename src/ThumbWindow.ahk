@@ -408,6 +408,34 @@ Class ThumbWindow extends Propertys {
         }
     }
 
+    ; Applies the configured default size to every visible thumbnail immediately.
+    ; Positions stay unchanged and the new dimensions are persisted for the profile.
+    ApplyThumbnailStartSize(*) {
+        Width := Trim(This.ThumbnailStartLocation["width"])
+        Height := Trim(This.ThumbnailStartLocation["height"])
+        if (!RegExMatch(Width, "^\d+$") || !RegExMatch(Height, "^\d+$"))
+            return false
+
+        Width := Max(Width + 0, This.ThumbnailMinimumSize["width"] + 0)
+        Height := Max(Height + 0, This.ThumbnailMinimumSize["height"] + 0)
+        This.ThumbnailStartLocation["width"] := Width
+        This.ThumbnailStartLocation["height"] := Height
+
+        try This.S_Gui["ThumbnailStartLocationwidth"].Value := Width
+        try This.S_Gui["ThumbnailStartLocationheight"].Value := Height
+
+        for EvEHwnd, ThumbObj in This.ThumbWindows.OwnProps() {
+            WinGetPos(&X, &Y, , , ThumbObj["Window"].Hwnd)
+            This.ThumbMove(X, Y, Width, Height, ThumbObj)
+            try ThumbObj["TextOverlay"]["OverlayText"].Move(, , Width)
+            This.BorderSize(ThumbObj["Window"].Hwnd, ThumbObj["Border"].Hwnd)
+            This.Update_Thumb(false, ThumbObj["Window"].Hwnd)
+        }
+
+        This.Save_Settings()
+        return true
+    }
+
     ShowActiveBorder(EVEHwnd?, ThumbHwnd?) {
         If (IsSet(EVEHwnd) && This.ThumbWindows.HasProp(EVEHwnd)) {
             Win_Title := This.CleanTitle(WinGetTitle("Ahk_Id " EVEHwnd))

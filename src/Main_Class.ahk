@@ -84,6 +84,7 @@ Class Main_Class extends ThumbWindow {
         ;The Main Timer who checks for new EVE Windows or closes Windows 
         SetTimer(ObjBindMethod(This, "HandleMainTimer"), 50)
         This.Save_Settings_Delay_Timer := ObjBindMethod(This, "SaveJsonToFile")
+        This.ApplyThumbnailStartSize_Delay_Timer := ObjBindMethod(This, "ApplyThumbnailStartSize")
         ;Timer property to remove Thumbnails for closed EVE windows 
         This.DestroyThumbnails := ObjBindMethod(This, "EvEWindowDestroy")
         This.DestroyThumbnailsToggle := 1

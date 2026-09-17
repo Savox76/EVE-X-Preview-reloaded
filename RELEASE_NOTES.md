@@ -1,26 +1,22 @@
-## EVE-X-Preview Reloaded 1.1.0-preview.3
+## EVE-X-Preview Reloaded 1.1.0-preview.4
 
-Third Reloaded preview package.
-
-### New
-
-- New profiles immediately include every currently active EVE character in their hotkey and custom-color lists.
-- New profile contents refresh in the open settings window without restarting the application.
-- Per-profile option to lock thumbnail positions and sizes.
+Live thumbnail-size correction.
 
 ### Fixed
 
-- Profile creation now uses a deep copy, preventing later changes from leaking into the source or default profile.
-- Locked thumbnails ignore right-button dragging and combined right-/left-button resizing.
+- Changes to the configured thumbnail width and height are now visible immediately without restarting the application.
+- The live resize keeps every thumbnail at its current screen position and updates the DWM preview, text overlay, and border together.
+- The changed dimensions are stored with the active profile so they remain in effect after the next start.
 
-### Compatibility
+### Behaviour
 
-- Existing profiles receive the unlocked default and keep their current mouse behavior.
-- The lock setting is stored separately for each profile.
+- Width and height changes are debounced briefly while typing to avoid visible redraws for every individual keystroke.
+- Values smaller than the configured minimum thumbnail size are raised to that minimum.
+- The position-and-size lock still prevents accidental mouse resizing; an explicit size change in settings remains effective.
 
 ### Test focus
 
-- Keep several EVE clients open, create a profile, and confirm the names appear immediately under Hotkeys and Custom Colors.
-- Enable "Lock positions and size" and confirm right-drag and right+left resize no longer move thumbnails.
-- Confirm normal left-click client activation still works while locked.
-- Disable the lock and confirm moving and resizing work again.
+- Keep one or more EVE clients open and change the default thumbnail width or height under Global Settings.
+- Confirm all visible thumbnails resize without closing the settings window or restarting the application.
+- Confirm their screen positions do not change and that preview content, text overlay, and borders remain aligned.
+- Restart the portable application and confirm the new dimensions remain active.

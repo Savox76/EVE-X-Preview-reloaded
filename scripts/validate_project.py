@@ -101,6 +101,27 @@ def validate_thumbnail_lock() -> None:
         fail("Thumbnail position lock is missing from settings")
 
 
+def validate_live_thumbnail_size() -> None:
+    main_class = (ROOT / "src" / "Main_Class.ahk").read_text(encoding="utf-8-sig")
+    settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
+    thumb_window = (ROOT / "src" / "ThumbWindow.ahk").read_text(encoding="utf-8-sig")
+    if "ApplyThumbnailStartSize_Delay_Timer := ObjBindMethod" not in main_class:
+        fail("Live thumbnail size timer is missing")
+    if settings_gui.count("SetTimer(This.ApplyThumbnailStartSize_Delay_Timer, -250)") != 2:
+        fail("Thumbnail width and height must both trigger the live size update")
+    required_updates = [
+        "ApplyThumbnailStartSize(*)",
+        "This.ThumbMove(X, Y, Width, Height, ThumbObj)",
+        'ThumbObj["TextOverlay"]["OverlayText"].Move(, , Width)',
+        'This.BorderSize(ThumbObj["Window"].Hwnd, ThumbObj["Border"].Hwnd)',
+        'This.Update_Thumb(false, ThumbObj["Window"].Hwnd)',
+        "This.Save_Settings()",
+    ]
+    missing = [entry for entry in required_updates if entry not in thumb_window]
+    if missing:
+        fail(f"Live thumbnail size update is incomplete: {missing}")
+
+
 def validate_color_picker() -> None:
     main = (ROOT / "Main.ahk").read_text(encoding="utf-8-sig")
     settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
@@ -143,6 +164,7 @@ def main() -> int:
         validate_default_settings,
         validate_client_discovery,
         validate_thumbnail_lock,
+        validate_live_thumbnail_size,
         validate_color_picker,
         validate_portable_contract,
     ]

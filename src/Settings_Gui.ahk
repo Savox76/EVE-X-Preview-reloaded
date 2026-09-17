@@ -196,9 +196,11 @@
             }
             else if (obj.name = "ThumbnailStartLocationwidth") {
                 This.ThumbnailStartLocation["width"] := obj.value
+                SetTimer(This.ApplyThumbnailStartSize_Delay_Timer, -250)
             }
             else if (obj.name = "ThumbnailStartLocationheight") {
                 This.ThumbnailStartLocation["height"] := obj.value
+                SetTimer(This.ApplyThumbnailStartSize_Delay_Timer, -250)
             }
             else if (obj.name = "ThumbnailMinimumSizewidth") {
                 This.ThumbnailMinimumSize["width"] := obj.value
