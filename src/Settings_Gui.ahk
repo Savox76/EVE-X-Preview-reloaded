@@ -313,10 +313,14 @@
             This.MoveModernRowControls(T, Row, 915, Y - 3)
             Y += 42
         }
-        ; Farbfeld und Paletten-Schaltfläche brauchen mehr Platz als die
-        ; übrigen Zeilen, insbesondere mit den deutschen Beschriftungen.
-        T[17].Move(890, 202, 72, 24), T[18].Move(970, 200, 105, 28)
-        T[39].Move(890, 580, 72, 24), T[40].Move(970, 578, 105, 28)
+        ; Farbfeld und Palette bleiben auch beim hellen nativen Windows-Theme
+        ; vollständig innerhalb des sicher gerenderten Inhaltsbereichs.
+        T[16].Move(704, 205, 145, 22)
+        T[17].Move(855, 202, 72, 24), T[18].Move(935, 200, 85, 28)
+        T[38].Move(704, 583, 145, 22)
+        T[39].Move(855, 580, 72, 24), T[40].Move(935, 578, 85, 28)
+        T[18].Text := Tr("modern.palette_short")
+        T[40].Text := Tr("modern.palette_short")
     }
 
     MoveModernRowControls(Controls, Row, X, Y) {
