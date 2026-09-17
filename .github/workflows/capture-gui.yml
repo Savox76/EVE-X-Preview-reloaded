@@ -41,6 +41,7 @@ jobs:
           ./scripts/capture-gui.ps1 -ApplicationPath $application -OutputDirectory "$PWD/gui-captures"
 
       - name: Upload GUI screenshots
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: eve-x-preview-gui-screenshots

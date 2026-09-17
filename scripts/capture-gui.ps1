@@ -35,6 +35,9 @@ public static class WindowCaptureNative {
 
     [DllImport("user32.dll")]
     public static extern bool SetForegroundWindow(IntPtr windowHandle);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr SendMessage(IntPtr windowHandle, uint message, IntPtr wParam, IntPtr lParam);
 }
 "@
 
@@ -100,8 +103,11 @@ function Invoke-Button {
         )
         $button = $window.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
         if ($null -ne $button) {
-            $pattern = $button.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
-            $pattern.Invoke()
+            $buttonHandle = [IntPtr]$button.Current.NativeWindowHandle
+            if ($buttonHandle -eq [IntPtr]::Zero) {
+                throw "Button '$name' has no native window handle."
+            }
+            [WindowCaptureNative]::SendMessage($buttonHandle, 0x00F5, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
             return
         }
     }
