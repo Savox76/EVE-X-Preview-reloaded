@@ -38,14 +38,6 @@ class Propertys extends TrayMenu {
         set => This._JSON["global_Settings"]["Language"] := value
     }
 
-    InterfaceTheme {
-        get {
-            Theme := This._JSON["global_Settings"]["InterfaceTheme"]
-            return (Theme = "ModernDark" || Theme = "ModernLight") ? Theme : "Classic"
-        }
-        set => This._JSON["global_Settings"]["InterfaceTheme"] := value
-    }
-
     LastNotifiedVersion {
         get => This._JSON["global_Settings"]["LastNotifiedVersion"]
         set => This._JSON["global_Settings"]["LastNotifiedVersion"] := value
@@ -88,6 +80,12 @@ class Propertys extends TrayMenu {
     ThumbnailSnap_Distance {
         get => This._JSON["global_Settings"]["ThumbnailSnap_Distance"]
         set => This._JSON["global_Settings"]["ThumbnailSnap_Distance"] := (value ? value : "20")
+    }
+
+
+    ThumbnailMinimumSize[key] {
+        get => This._JSON["global_Settings"]["ThumbnailMinimumSize"][key]
+        set => This._JSON["global_Settings"]["ThumbnailMinimumSize"][key] := value
     }
 
 
@@ -158,26 +156,6 @@ class Propertys extends TrayMenu {
             return ThumbnailSettings["LockThumbnailPositions"]
         }
         set => This._JSON["_Profiles"][This.LastUsedProfile]["Thumbnail Settings"]["LockThumbnailPositions"] := value
-    }
-
-    KeepThumbnailAspectRatio {
-        get {
-            ThumbnailSettings := This._JSON["_Profiles"][This.LastUsedProfile]["Thumbnail Settings"]
-            if (!ThumbnailSettings.Has("KeepThumbnailAspectRatio"))
-                ThumbnailSettings["KeepThumbnailAspectRatio"] := true
-            return ThumbnailSettings["KeepThumbnailAspectRatio"]
-        }
-        set => This._JSON["_Profiles"][This.LastUsedProfile]["Thumbnail Settings"]["KeepThumbnailAspectRatio"] := value
-    }
-
-    DimInactiveClients {
-        get {
-            ThumbnailSettings := This._JSON["_Profiles"][This.LastUsedProfile]["Thumbnail Settings"]
-            if (!ThumbnailSettings.Has("DimInactiveClients"))
-                ThumbnailSettings["DimInactiveClients"] := false
-            return ThumbnailSettings["DimInactiveClients"]
-        }
-        set => This._JSON["_Profiles"][This.LastUsedProfile]["Thumbnail Settings"]["DimInactiveClients"] := value
     }
 
     ThumbnailOpacity {

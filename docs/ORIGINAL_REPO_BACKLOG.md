@@ -54,7 +54,7 @@ Die daraus abgeleiteten, einzeln wählbaren Entwicklungspakete und ihre Abhängi
 | [#18](https://github.com/g0nzo83/EVE-X-Preview/issues/18) und [#10](https://github.com/g0nzo83/EVE-X-Preview/issues/10) – Position am Auswahlbildschirm | Beim Ausloggen darf eine gespeicherte Vorschauposition nicht unbeabsichtigt verloren gehen. |
 | [#9 – Clients am Login-Bildschirm wechseln](https://github.com/g0nzo83/EVE-X-Preview/issues/9) | Zusammen mit #21 erneut prüfen, falls der Auswahlbildschirm erweitert wird. |
 | [#2 – Vorschauen verschieben und skalieren](https://github.com/g0nzo83/EVE-X-Preview/issues/2) | Mausinteraktion, Ausrichtung und Größenänderung müssen nach Gesten-/Seitenverhältnis-Änderungen weiter funktionieren. |
-| [#1 – Mindestgröße](https://github.com/g0nzo83/EVE-X-Preview/issues/1) | Durch die bewusste Produktentscheidung in `2.1.0` überholt: Es gibt keine konfigurierbare Mindestgröße mehr; jede positive, von Windows darstellbare Größe ist zulässig. |
+| [#1 – Mindestgröße](https://github.com/g0nzo83/EVE-X-Preview/issues/1) | Die konfigurierte Mindestgröße muss beim Erstellen und Skalieren jeder Vorschau gelten. |
 
 ## Nicht ungeprüft übernehmen
 

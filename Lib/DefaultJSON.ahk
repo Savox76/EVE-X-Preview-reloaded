@@ -3,7 +3,6 @@
 {
     "global_Settings": {
         "Language": "de",
-        "InterfaceTheme": "Classic",
         "LastNotifiedVersion": "",
         "Suspend_Hotkeys_Hotkey": "",
         "Global_Hotkeys": 1,
@@ -17,7 +16,11 @@
         },
         "ThumbnailBackgroundColor":"#57504E",
         "ThumbnailSnap": true,
-        "ThumbnailSnap_Distance": 20
+        "ThumbnailSnap_Distance": 20,
+        "ThumbnailMinimumSize": {
+            "width": 50,
+            "height": 50
+        }
     },
     "_Profiles": {
         "Default": {
@@ -43,8 +46,6 @@
                 "ThumbnailOpacity": 80,
                 "ShowThumbnailsAlwaysOnTop": true,
                 "LockThumbnailPositions": false,
-                "KeepThumbnailAspectRatio": true,
-                "DimInactiveClients": false,
                 "ShowAllColoredBorders":0,
                 "InactiveClientBorderthickness": 2,
                 "InactiveClientBorderColor": "#8A8A8A"

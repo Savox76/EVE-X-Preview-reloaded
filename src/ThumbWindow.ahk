@@ -261,18 +261,15 @@ Class ThumbWindow extends Propertys {
             MouseGetPos(&DragX, &DragY)
             x := DragX - Bx, Wn := Width + x
             y := DragY - BY, Wh := Height + y
-            if (This.KeepThumbnailAspectRatio && Width > 0 && Height > 0) {
-                AspectRatio := Width / Height
-                if (Abs(x) >= Abs(y))
-                    Wh := Round(Wn / AspectRatio)
-                else
-                    Wn := Round(Wh * AspectRatio)
+
+
+            ;ensures that the minimum size cannot be undershot
+            if (Wn < This.ThumbnailMinimumSize["width"]) {
+                Wn := This.ThumbnailMinimumSize["width"]
             }
-            ; Windows needs positive dimensions, but the app no longer imposes a
-            ; configurable minimum. Keep the last valid size while the pointer
-            ; crosses the opposite edge of the thumbnail.
-            if (Wn < 1 || Wh < 1)
-                continue
+            if (Wh < This.ThumbnailMinimumSize["height"]) {
+                Wh := This.ThumbnailMinimumSize["height"]
+            }
 
             for k, v in This.ThumbWindows.%This.ThumbHwnd_EvEHwnd[hwnd]% {
                 WinMove(, , Wn, Wh, v.hwnd)
@@ -464,11 +461,11 @@ Class ThumbWindow extends Propertys {
     ApplyThumbnailStartSize(*) {
         Width := Trim(This.ThumbnailStartLocation["width"])
         Height := Trim(This.ThumbnailStartLocation["height"])
-        if (!RegExMatch(Width, "^[1-9]\d*$") || !RegExMatch(Height, "^[1-9]\d*$"))
+        if (!RegExMatch(Width, "^\d+$") || !RegExMatch(Height, "^\d+$"))
             return false
 
-        Width += 0
-        Height += 0
+        Width := Max(Width + 0, This.ThumbnailMinimumSize["width"] + 0)
+        Height := Max(Height + 0, This.ThumbnailMinimumSize["height"] + 0)
         This.ThumbnailStartLocation["width"] := Width
         This.ThumbnailStartLocation["height"] := Height
 
@@ -492,12 +489,6 @@ Class ThumbWindow extends Propertys {
             Win_Title := This.CleanTitle(WinGetTitle("Ahk_Id " EVEHwnd))
 
             for EW_Hwnd, Objs in This.ThumbWindows.OwnProps() {
-                IsActiveClient := (EW_Hwnd = EVEHwnd)
-                ClientOpacity := (This.DimInactiveClients && !IsActiveClient) ? Round(This.ThumbnailOpacity * 0.55) : This.ThumbnailOpacity
-                for ObjectName in ["Window", "TextOverlay", "Border"] {
-                    if (Objs.Has(ObjectName))
-                        try WinSetTransparent(ClientOpacity, "ahk_id " Objs[ObjectName].Hwnd)
-                }
                 for names, GuiObj in Objs {
                     if (names = "Border") {
                         if ((!This.ShowAllColoredBorders && !This.ShowClientHighlightBorder) || (!This.ShowAllColoredBorders && This.ShowClientHighlightBorder)) {

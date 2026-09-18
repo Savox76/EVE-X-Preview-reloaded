@@ -1,21 +1,21 @@
-## EVE-X-Preview Reloaded 2.2.0
+## EVE-X-Preview Reloaded 2.0.2
 
-### Modern interface completed
+### Changed
 
-- **Modern Dark** and **Modern Light** now match the approved desktop concept with a fixed top bar, sidebar navigation, consistent cards, spacing and modern switches.
-- The thumbnail overview provides size, spacing, aspect-ratio locking, border, character-name and inactive-client controls at a glance.
-- A live preview uses running EVE clients when available and immediately reflects relevant setting changes.
-- A separate detail view keeps all advanced text, frame, opacity and window-behaviour settings accessible without cluttering the overview.
-- **Classic** remains available as an independent interface option.
+- Moving or resizing thumbnails now saves their coordinates and dimensions automatically in the active profile.
+- EVE client restore rectangles and maximized state are captured automatically without restoring or focusing minimized clients.
+- Switching profiles now applies the selected layout, colors, visibility, borders, client behavior and hotkeys immediately.
+- Editing any profile setting refreshes the active thumbnails and managed hotkeys without restarting the application.
+- Obsolete profile hotkeys are disabled before the current profile mappings are registered.
+- The existing **Restore Client Positions** switch continues to control whether captured EVE window positions are restored.
 
-### Behaviour improvements
+### Automated verification
 
-- The configurable thumbnail minimum size has been removed completely.
-- Thumbnail size and profile settings take effect immediately without requiring an application restart.
-- Window and thumbnail positions continue to be stored per profile.
-- Inactive clients can optionally be dimmed, and thumbnail resizing can preserve the selected aspect ratio.
+- The project contract checks automatic position capture, live profile application, managed hotkey replacement and restart-free profile switching.
+- AutoHotkey regression tests, compilation, portable ZIP creation and ZIP content verification remain mandatory.
 
-### Verification
+### Recommended practical check
 
-- The real compiled Windows application is automatically captured in dark and light mode for both the overview and detail view.
-- Regression checks, AutoHotkey compilation, portable ZIP creation and ZIP-content verification passed before release.
+- Move and resize thumbnails, close the application and confirm the layout returns after reopening.
+- Move an EVE client, change profiles and confirm each profile restores its own saved layout when **Restore Client Positions** is enabled.
+- Change profile colors, borders, visibility and hotkeys while the application remains open and confirm every change takes effect without a restart.

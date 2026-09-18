@@ -122,83 +122,6 @@ def validate_live_thumbnail_size() -> None:
         fail(f"Live thumbnail size update is incomplete: {missing}")
 
 
-def validate_interface_themes_and_free_resize() -> None:
-    defaults = (ROOT / "Lib" / "DefaultJSON.ahk").read_text(encoding="utf-8-sig")
-    properties = (ROOT / "src" / "Propertys.ahk").read_text(encoding="utf-8-sig")
-    settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
-    thumb_window = (ROOT / "src" / "ThumbWindow.ahk").read_text(encoding="utf-8-sig")
-    main = (ROOT / "Main.ahk").read_text(encoding="utf-8-sig")
-    workflow = (ROOT / ".github" / "workflows" / "quality-release.yml").read_text(encoding="utf-8")
-    capture_script = ROOT / "scripts" / "capture-settings.ps1"
-
-    required_theme_contract = [
-        '"InterfaceTheme": "Classic"',
-        'This.InterfaceTheme != "Classic"',
-        '["Classic", "ModernDark", "ModernLight"]',
-        "ConfigureModernInterface()",
-        "ModernNavigate(PageKey, *)",
-        "ConfigureModernPageLayouts(CardColor, BorderColor, Foreground, Muted)",
-        "LayoutModernThumbnailPage(CardColor, BorderColor, Foreground)",
-        'This.AddModernCard("Thumbnail Settings"',
-        'Tr("modern.size_layout")',
-        'Tr("modern.display")',
-        'Tr("modern.live_preview")',
-        'CreateModernToggle(PageKey, ControlName',
-        'CreateModernPreview(CardColor, BorderColor, Foreground)',
-        'LayoutModernThumbnailDetails(CardColor, BorderColor, Foreground)',
-        'ToggleModernThumbnailMode(*)',
-        'This.ModernPageExtras["Thumbnail Details"]',
-        'This.ModernCurrentPage = "Thumbnail Settings"',
-        '"HideThumbnailsOnLostFocus"',
-        '"ShowThumbnailsAlwaysOnTop"',
-        '"LockThumbnailPositions"',
-        '"ShowAllBorders"',
-        '"w1120 h800',
-        'This.SaveJsonToFile()',
-    ]
-    combined = defaults + properties + settings_gui
-    missing = [entry for entry in required_theme_contract if entry not in combined]
-    if missing:
-        fail(f"Selectable interface themes are incomplete: {missing}")
-
-    active_sources = defaults + properties + settings_gui + thumb_window
-    if "ThumbnailMinimumSize" in active_sources:
-        fail("The obsolete thumbnail minimum size is still active")
-    if 'Settings["global_Settings"].Delete("ThumbnailMinimumSize")' not in main:
-        fail("Existing configurations do not remove the obsolete thumbnail minimum size")
-    if 'if (Wn < 1 || Wh < 1)' not in thumb_window:
-        fail("Thumbnail resizing does not guard Windows against invalid non-positive dimensions")
-
-    modern_behavior_contract = [
-        '"KeepThumbnailAspectRatio": true',
-        '"DimInactiveClients": false',
-        "KeepThumbnailAspectRatio {",
-        "DimInactiveClients {",
-        "This.KeepThumbnailAspectRatio && Width > 0 && Height > 0",
-        "This.DimInactiveClients && !IsActiveClient",
-    ]
-    missing = [entry for entry in modern_behavior_contract if entry not in active_sources]
-    if missing:
-        fail(f"Modern thumbnail controls are not connected to live behavior: {missing}")
-
-    if not capture_script.is_file():
-        fail("The compiled GUI screenshot script is missing")
-    required_visual_review = [
-        'A_Args[1] = "--ui-preview"',
-        "Capture real modern settings windows",
-        "-Theme ModernDark",
-        "-Theme ModernLight",
-        "-View Details",
-        'A_Args[3] = "Details"',
-        "actions/upload-artifact@v4",
-        "settings-gui-review",
-    ]
-    visual_sources = main + workflow
-    missing = [entry for entry in required_visual_review if entry not in visual_sources]
-    if missing:
-        fail(f"Compiled GUI visual review is incomplete: {missing}")
-
-
 def validate_thumbnail_settings_layout() -> None:
     settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
     start = settings_gui.index("    ThumbnailSettings_Ctrl() {")
@@ -416,7 +339,6 @@ def main() -> int:
         validate_client_discovery,
         validate_thumbnail_lock,
         validate_live_thumbnail_size,
-        validate_interface_themes_and_free_resize,
         validate_thumbnail_settings_layout,
         validate_group_cycle_reliability,
         validate_live_profile_settings,

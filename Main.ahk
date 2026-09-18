@@ -30,8 +30,8 @@ A_MaxHotKeysPerInterval := 10000
 TODO #########################
 */
 
-;@Ahk2Exe-SetVersion 2.2.0.0
-;@Ahk2Exe-SetFileVersion 2.2.0.0
+;@Ahk2Exe-SetVersion 2.0.2.0
+;@Ahk2Exe-SetFileVersion 2.0.2.0
 ;@Ahk2Exe-SetCopyright g0nzo83 and Savox76 contributors
 ;@Ahk2Exe-SetDescription EVE-X-Preview Reloaded
 ;@Ahk2Exe-SetProductName EVE-X-Preview Reloaded
@@ -53,26 +53,6 @@ OnError(Error_Handler)
 I18n.Initialize("en")
 Call := Main_Class()
 
-; CI-only visual preview mode. It creates a temporary editable profile, opens
-; the requested modern design and navigates to Thumbnail Settings so the real
-; compiled Windows GUI can be captured and reviewed before release.
-if (A_Args.Length >= 2 && A_Args[1] = "--ui-preview") {
-    PreviewTheme := A_Args[2]
-    if (PreviewTheme = "ModernDark" || PreviewTheme = "ModernLight") {
-        Call.InterfaceTheme := PreviewTheme
-        Call.Language := "de"
-        I18n.SetLanguage("de")
-        if (!Call.Profiles.Has("Standard"))
-            Call.Profiles["Standard"] := JSON.Load(JSON.Dump(Call.Profiles["Default"]))
-        Call.LastUsedProfile := "Standard"
-        Call.UIVisualPreview := true
-        Call.MainGui()
-        if (A_Args.Length >= 3 && A_Args[3] = "Details")
-            Call.ModernThumbnailMode := "Details"
-        Call.ModernNavigate("Thumbnail Settings")
-    }
-}
-
 
 
 Load_JSON() {
@@ -92,7 +72,6 @@ Load_JSON() {
                                             DJSON,
                                             JSON.Load(FileRead("EVE-X-Preview.json"))
                                         )
-            RemoveDeprecatedSettings(_JSON)
             RemoveExampleClients(_JSON)
             FileDelete("EVE-X-Preview.json")   
             FileAppend(JSON.Dump(_JSON,,"    " ), "EVE-X-Preview.json")
@@ -108,13 +87,6 @@ Load_JSON() {
         }
     }
     return _JSON
-}
-
-; Removes settings that no longer have any effect. Thumbnail dimensions may now
-; be reduced freely down to the smallest positive size Windows can display.
-RemoveDeprecatedSettings(Settings) {
-    if (Settings.Has("global_Settings") && Settings["global_Settings"].Has("ThumbnailMinimumSize"))
-        Settings["global_Settings"].Delete("ThumbnailMinimumSize")
 }
 
 ; Removes placeholder clients from configurations created by older versions.
