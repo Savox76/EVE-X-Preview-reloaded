@@ -87,6 +87,8 @@ jobs:
           $exe = "$PWD/dist/EVE-X-Preview-Reloaded-v$version-portable/EVE-X-Preview-Reloaded.exe"
           ./scripts/capture-settings.ps1 -ExePath $exe -Theme ModernDark -OutputPath "$PWD/ui-captures/modern-dark.png"
           ./scripts/capture-settings.ps1 -ExePath $exe -Theme ModernLight -OutputPath "$PWD/ui-captures/modern-light.png"
+          ./scripts/capture-settings.ps1 -ExePath $exe -Theme ModernDark -View Details -OutputPath "$PWD/ui-captures/modern-dark-details.png"
+          ./scripts/capture-settings.ps1 -ExePath $exe -Theme ModernLight -View Details -OutputPath "$PWD/ui-captures/modern-light-details.png"
 
       - name: Upload GUI review screenshots
         uses: actions/upload-artifact@v4

@@ -43,6 +43,8 @@
                 "ThumbnailOpacity": 80,
                 "ShowThumbnailsAlwaysOnTop": true,
                 "LockThumbnailPositions": false,
+                "KeepThumbnailAspectRatio": true,
+                "DimInactiveClients": false,
                 "ShowAllColoredBorders":0,
                 "InactiveClientBorderthickness": 2,
                 "InactiveClientBorderColor": "#8A8A8A"

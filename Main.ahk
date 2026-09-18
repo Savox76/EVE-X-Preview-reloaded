@@ -30,8 +30,8 @@ A_MaxHotKeysPerInterval := 10000
 TODO #########################
 */
 
-;@Ahk2Exe-SetVersion 2.1.1.0
-;@Ahk2Exe-SetFileVersion 2.1.1.0
+;@Ahk2Exe-SetVersion 2.2.0.0
+;@Ahk2Exe-SetFileVersion 2.2.0.0
 ;@Ahk2Exe-SetCopyright g0nzo83 and Savox76 contributors
 ;@Ahk2Exe-SetDescription EVE-X-Preview Reloaded
 ;@Ahk2Exe-SetProductName EVE-X-Preview Reloaded
@@ -67,6 +67,8 @@ if (A_Args.Length >= 2 && A_Args[1] = "--ui-preview") {
         Call.LastUsedProfile := "Standard"
         Call.UIVisualPreview := true
         Call.MainGui()
+        if (A_Args.Length >= 3 && A_Args[3] = "Details")
+            Call.ModernThumbnailMode := "Details"
         Call.ModernNavigate("Thumbnail Settings")
     }
 }

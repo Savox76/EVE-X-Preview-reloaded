@@ -140,6 +140,20 @@ def validate_interface_themes_and_free_resize() -> None:
         "ConfigureModernPageLayouts(CardColor, BorderColor, Foreground, Muted)",
         "LayoutModernThumbnailPage(CardColor, BorderColor, Foreground)",
         'This.AddModernCard("Thumbnail Settings"',
+        'Tr("modern.size_layout")',
+        'Tr("modern.display")',
+        'Tr("modern.live_preview")',
+        'CreateModernToggle(PageKey, ControlName',
+        'CreateModernPreview(CardColor, BorderColor, Foreground)',
+        'LayoutModernThumbnailDetails(CardColor, BorderColor, Foreground)',
+        'ToggleModernThumbnailMode(*)',
+        'This.ModernPageExtras["Thumbnail Details"]',
+        'This.ModernCurrentPage = "Thumbnail Settings"',
+        '"HideThumbnailsOnLostFocus"',
+        '"ShowThumbnailsAlwaysOnTop"',
+        '"LockThumbnailPositions"',
+        '"ShowAllBorders"',
+        '"w1120 h800',
         'This.SaveJsonToFile()',
     ]
     combined = defaults + properties + settings_gui
@@ -155,6 +169,18 @@ def validate_interface_themes_and_free_resize() -> None:
     if 'if (Wn < 1 || Wh < 1)' not in thumb_window:
         fail("Thumbnail resizing does not guard Windows against invalid non-positive dimensions")
 
+    modern_behavior_contract = [
+        '"KeepThumbnailAspectRatio": true',
+        '"DimInactiveClients": false',
+        "KeepThumbnailAspectRatio {",
+        "DimInactiveClients {",
+        "This.KeepThumbnailAspectRatio && Width > 0 && Height > 0",
+        "This.DimInactiveClients && !IsActiveClient",
+    ]
+    missing = [entry for entry in modern_behavior_contract if entry not in active_sources]
+    if missing:
+        fail(f"Modern thumbnail controls are not connected to live behavior: {missing}")
+
     if not capture_script.is_file():
         fail("The compiled GUI screenshot script is missing")
     required_visual_review = [
@@ -162,6 +188,8 @@ def validate_interface_themes_and_free_resize() -> None:
         "Capture real modern settings windows",
         "-Theme ModernDark",
         "-Theme ModernLight",
+        "-View Details",
+        'A_Args[3] = "Details"',
         "actions/upload-artifact@v4",
         "settings-gui-review",
     ]
