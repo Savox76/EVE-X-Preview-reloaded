@@ -1,26 +1,21 @@
-## EVE-X-Preview Reloaded 2.1.1
+## EVE-X-Preview Reloaded 2.2.0
 
-### Corrected
+### Modern interface completed
 
-- **Modern Dark** and **Modern Light** now use a genuinely separate modern layout instead of shifted Classic controls.
-- The new shell follows the approved concept with a fixed top bar, persistent profile selector, styled sidebar navigation, card-based content and consistent spacing.
-- Thumbnail settings are divided into **Text and layout** and **Appearance and behavior** cards.
-- Global, client, color, hotkey, group and visibility pages have been individually reflowed for the wider interface.
-- **Classic** remains unchanged and selectable.
+- **Modern Dark** and **Modern Light** now match the approved desktop concept with a fixed top bar, sidebar navigation, consistent cards, spacing and modern switches.
+- The thumbnail overview provides size, spacing, aspect-ratio locking, border, character-name and inactive-client controls at a glance.
+- A live preview uses running EVE clients when available and immediately reflects relevant setting changes.
+- A separate detail view keeps all advanced text, frame, opacity and window-behaviour settings accessible without cluttering the overview.
+- **Classic** remains available as an independent interface option.
 
-### Still included from 2.1.0
+### Behaviour improvements
 
-- The design selection is stored globally and applied immediately.
-- The configurable thumbnail minimum size remains removed.
-- All profile settings continue to apply and save automatically.
+- The configurable thumbnail minimum size has been removed completely.
+- Thumbnail size and profile settings take effect immediately without requiring an application restart.
+- Window and thumbnail positions continue to be stored per profile.
+- Inactive clients can optionally be dimmed, and thumbnail resizing can preserve the selected aspect ratio.
 
-### Automated verification
+### Verification
 
-- CI now launches the real compiled Windows application and captures both modern designs as PNG files for visual review.
-- AutoHotkey regression tests, compilation, portable ZIP creation and ZIP content verification remain mandatory before merging.
-
-### Recommended practical check
-
-- Compare both modern interfaces with the approved concept: top bar, left navigation, two thumbnail-setting cards and aligned controls.
-- Switch among all three designs and confirm the selection is retained after reopening.
-- Change a profile value in each design and confirm it is applied immediately.
+- The real compiled Windows application is automatically captured in dark and light mode for both the overview and detail view.
+- Regression checks, AutoHotkey compilation, portable ZIP creation and ZIP-content verification passed before release.
