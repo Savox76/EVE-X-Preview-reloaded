@@ -27,6 +27,7 @@ Dieser Plan bündelt die nächsten möglichen Entwicklungsschritte für EVE-X-Pr
 | Bedienkorrektur – Thumbnail-Einstellungen | `2.0.1` | Einheitliche zweispaltige Ausrichtung der Vorschaubild-Einstellungen | Erledigt |
 | Profil-Liveanwendung | `2.0.2` | Layouts automatisch speichern und Profiländerungen ohne Neustart anwenden | Erledigt |
 | Freie Thumbnail-Größe | `2.0.3` | Konfigurierbare Mindestgröße vollständig entfernen; bestehende JSON-Dateien automatisch bereinigen | Erledigt |
+| Direkte Farbzuordnung | `2.0.4` | Eine übersichtliche Tabellenzeile je Charakter; Farbauswahl direkt per Klick auf das jeweilige Farbfeld | Erledigt |
 
 ## Freigabeweg zu Version 2.0.0
 

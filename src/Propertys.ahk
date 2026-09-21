@@ -219,129 +219,155 @@ class Propertys extends TrayMenu {
     ;## Profile ClientSettings
 
 
+    EnsureCustomColorData(ProfileName := "") {
+        if (ProfileName = "")
+            ProfileName := This.LastUsedProfile
+        if (!This._JSON["_Profiles"].Has(ProfileName))
+            return false
+
+        Profile := This._JSON["_Profiles"][ProfileName]
+        Changed := false
+        if (!Profile.Has("Custom Colors") || Type(Profile["Custom Colors"]) != "Map") {
+            Profile["Custom Colors"] := Map("cColorActive", "0", "cColors", Map())
+            Changed := true
+        }
+        if (!Profile["Custom Colors"].Has("cColorActive")) {
+            Profile["Custom Colors"]["cColorActive"] := "0"
+            Changed := true
+        }
+        if (!Profile["Custom Colors"].Has("cColors") || Type(Profile["Custom Colors"]["cColors"]) != "Map") {
+            Profile["Custom Colors"]["cColors"] := Map()
+            Changed := true
+        }
+
+        Colors := Profile["Custom Colors"]["cColors"]
+        for ColorKey in ["CharNames", "TextColor", "Bordercolor", "IABordercolor"] {
+            if (!Colors.Has(ColorKey) || Type(Colors[ColorKey]) != "Array") {
+                Colors[ColorKey] := []
+                Changed := true
+            }
+        }
+
+        ThumbnailSettings := Profile["Thumbnail Settings"]
+        Defaults := Map(
+            "TextColor", convertToHex(ThumbnailSettings.Has("ThumbnailTextColor") ? ThumbnailSettings["ThumbnailTextColor"] : "FFFFFF"),
+            "Bordercolor", convertToHex(ThumbnailSettings.Has("ClientHighligtColor") ? ThumbnailSettings["ClientHighligtColor"] : "FFFFFF"),
+            "IABordercolor", convertToHex(ThumbnailSettings.Has("InactiveClientBorderColor") ? ThumbnailSettings["InactiveClientBorderColor"] : "FFFFFF")
+        )
+        TargetLength := Colors["CharNames"].Length
+        for ColorKey in ["TextColor", "Bordercolor", "IABordercolor"] {
+            while (Colors[ColorKey].Length < TargetLength) {
+                Colors[ColorKey].Push(Defaults[ColorKey])
+                Changed := true
+            }
+            while (Colors[ColorKey].Length > TargetLength) {
+                Colors[ColorKey].Pop()
+                Changed := true
+            }
+        }
+
+        if (Changed && This.HasProp("Save_Settings_Delay_Timer"))
+            SetTimer(This.Save_Settings_Delay_Timer, -200)
+        return Colors
+    }
+
+    CustomColorRows(ProfileName := "") {
+        Colors := This.EnsureCustomColorData(ProfileName)
+        Rows := []
+        if (!Colors)
+            return Rows
+
+        for Index, ClientName in Colors["CharNames"] {
+            Rows.Push(Map(
+                "Char", ClientName,
+                "Border", Colors["Bordercolor"][Index],
+                "Text", Colors["TextColor"][Index],
+                "IABorder", Colors["IABordercolor"][Index]
+            ))
+        }
+        return Rows
+    }
+
+    SetCustomColorValue(ClientName, ColorKey, ColorValue, ProfileName := "") {
+        if (ColorKey != "Bordercolor" && ColorKey != "TextColor" && ColorKey != "IABordercolor")
+            return false
+        ColorHex := convertToHex(ColorValue)
+        if (!RegExMatch(ColorHex, "i)^[0-9a-f]{6}$"))
+            return false
+
+        Colors := This.EnsureCustomColorData(ProfileName)
+        if (!Colors)
+            return false
+        for Index, StoredName in Colors["CharNames"] {
+            if (StoredName = ClientName) {
+                Colors[ColorKey][Index] := StrLower(ColorHex)
+                SetTimer(This.Save_Settings_Delay_Timer, -200)
+                return true
+            }
+        }
+        return false
+    }
+
+    AddCustomColorCharacter(ClientName, ProfileName := "") {
+        ClientName := Trim(This.CleanTitle(ClientName))
+        if (ClientName = "")
+            return false
+        if (ProfileName = "")
+            ProfileName := This.LastUsedProfile
+
+        Colors := This.EnsureCustomColorData(ProfileName)
+        if (!Colors)
+            return false
+        for StoredName in Colors["CharNames"] {
+            if (StoredName = ClientName)
+                return false
+        }
+
+        ThumbnailSettings := This._JSON["_Profiles"][ProfileName]["Thumbnail Settings"]
+        Colors["CharNames"].Push(ClientName)
+        Colors["TextColor"].Push(convertToHex(ThumbnailSettings["ThumbnailTextColor"]))
+        Colors["Bordercolor"].Push(convertToHex(ThumbnailSettings["ClientHighligtColor"]))
+        Colors["IABordercolor"].Push(convertToHex(ThumbnailSettings["InactiveClientBorderColor"]))
+        SetTimer(This.Save_Settings_Delay_Timer, -200)
+        return true
+    }
+
+    RemoveCustomColorCharacter(ClientName, ProfileName := "") {
+        Colors := This.EnsureCustomColorData(ProfileName)
+        if (!Colors)
+            return false
+        for Index, StoredName in Colors["CharNames"] {
+            if (StoredName = ClientName) {
+                Colors["CharNames"].RemoveAt(Index)
+                Colors["TextColor"].RemoveAt(Index)
+                Colors["Bordercolor"].RemoveAt(Index)
+                Colors["IABordercolor"].RemoveAt(Index)
+                SetTimer(This.Save_Settings_Delay_Timer, -200)
+                return true
+            }
+        }
+        return false
+    }
+
     CustomColorsGet[CName?] {
         get {
-            name := "", nameIndex := 0, ctext := "", cBorder := "", cIABorder := ""
-            for index, names in This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["CharNames"] {
-                if (names = CName) {
-                    nameIndex := index
-                    name := names
-                    break
+            Colors := This.EnsureCustomColorData()
+            TargetName := IsSet(CName) ? CName : ""
+            if (Colors) {
+                for Index, StoredName in Colors["CharNames"] {
+                    if (StoredName = TargetName) {
+                        return Map(
+                            "Char", StoredName,
+                            "Border", Colors["Bordercolor"][Index],
+                            "Text", Colors["TextColor"][Index],
+                            "IABorder", Colors["IABordercolor"][Index]
+                        )
+                    }
                 }
-                else
-                    nameIndex := index
-
             }
-            if (nameIndex) {
-                if (This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["Bordercolor"].Length >= nameIndex) {
-                    cBorder := This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["Bordercolor"][nameIndex]
-                }
-                if (This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["TextColor"].Length >= nameIndex)
-                    ctext := This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["TextColor"][nameIndex]
-                if (This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["IABordercolor"].Length >= nameIndex)
-                    cIABorder := This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["IABordercolor"][nameIndex]
-            }
-            return Map("Char", name, "Border", cBorder, "Text", ctext, "IABorder", cIABorder)
+            return Map("Char", "", "Border", "", "Text", "", "IABorder", "")
         }
     }
-
-
-    IndexcChars => This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["CharNames"].Length
-    IndexcBorder => This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["Bordercolor"].Length
-    IndexcText => This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["TextColor"].Length
-    IndexcIABorders => This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["IABordercolor"].Length
-
-    CustomColors_AllCharNames {
-        get {
-            names := ""
-            for k, v in This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["CharNames"] {
-                if (A_Index < This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["CharNames"].Length)
-                    names .= k ": " v "`n"
-                else
-                    names .= k ": " v
-            }
-            return names
-        }
-        set {
-            tempvar := []
-            ListChars := StrSplit(value, "`n")
-            for k, v in ListChars {
-                chars := RegExReplace(This.CleanTitle(Trim(v, "`n ")), ".*:\s*", "")
-                tempvar.Push(chars)
-            }
-            This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["CharNames"] := tempvar
-        }
-    }
-    CustomColors_AllBColors {
-        get {
-            names := ""
-            for k, v in This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["Bordercolor"] {
-                if (A_Index < This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["Bordercolor"].Length)
-                    names .= k ": " v "`n"
-                else
-                    names .= k ": " v
-            }
-            return names
-        }
-        set {
-            tempvar := []
-            ListChars := StrSplit(value, "`n")
-            for k, v in ListChars {
-                chars := RegExReplace(Trim(v, "`n "), ".*:\s*", "")
-                tempvar.Push(convertToHex(chars))
-            }
-            This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["Bordercolor"] := tempvar
-        }
-    }
-    CustomColors_AllTColors {
-        get {
-            names := ""
-            for k, v in This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["TextColor"] {
-                if (A_Index < This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["TextColor"].Length)
-                    names .= k ": " v "`n"
-                else
-                    names .= k ": " v
-            }
-            return names
-        }
-        set {
-            tempvar := []
-            ListChars := StrSplit(value, "`n")
-            for k, v in ListChars {
-                chars := RegExReplace(Trim(v, "`n "), ".*:\s*", "")
-                tempvar.Push(convertToHex(chars))
-            }
-            This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["TextColor"] := tempvar
-        }
-    }
-
-    CustomColors_IABorder_Colors {
-        get {
-            names := ""
-            if (!This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"].Has("IABordercolor")) {
-                This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["IABordercolor"] := ["FFFFFF"]
-                SetTimer(This.Save_Settings_Delay_Timer, -200)
-            }
-            for k, v in This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["IABordercolor"] {
-                if (A_Index < This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["IABordercolor"].Length)
-                    names .= k ": " v "`n"
-                else
-                    names .= k ": " v
-            }
-            return names
-        }
-        set {
-            tempvar := []
-            ListChars := StrSplit(value, "`n")
-            for k, v in ListChars {
-                chars := RegExReplace(Trim(v, "`n "), ".*:\s*", "")
-                tempvar.Push(convertToHex(chars))
-            }
-            This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColors"]["IABordercolor"] := tempvar
-        }
-    }
-
-
     CustomColorsActive {
         get => This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColorActive"]
         set => This._JSON["_Profiles"][This.LastUsedProfile]["Custom Colors"]["cColorActive"] := Value

@@ -234,39 +234,99 @@
         SetTimer(This.Save_Settings_Delay_Timer, -200)
     }
 
-    ChooseListColor(ControlName) {
-        ColorControl := This.S_Gui[ControlName]
-        if (Trim(ColorControl.Value) = "") {
-            MsgBox(Tr("colors.no_client"), AppInfo.Name, "Iconi")
+    ChooseCustomColorCell(ColorList, RowNumber, *) {
+        if (RowNumber < 1)
             return
-        }
 
-        Rows := StrSplit(ColorControl.Value, "`n")
-        SelectedRow := SendMessage(0xC9, -1, 0, ColorControl.Hwnd) + 1
-        if (SelectedRow < 1 || SelectedRow > Rows.Length)
-            SelectedRow := 1
-        InitialColor := RegExReplace(Trim(Rows[SelectedRow], "`r`n "), "^\d+\s*:\s*", "")
-        SelectedColor := ColorPicker.Choose(This.S_Gui.Hwnd, InitialColor)
+        ColumnNumber := This.CustomColorColumnAtCursor(ColorList)
+        if (ColumnNumber < 2 || ColumnNumber > 4)
+            return
+
+        ColorKeys := Map(2, "Bordercolor", 3, "TextColor", 4, "IABordercolor")
+        SelectedColor := ColorPicker.Choose(This.S_Gui.Hwnd, ColorList.GetText(RowNumber, ColumnNumber))
         if (SelectedColor = "")
             return
 
-        Rows[SelectedRow] := SelectedRow ": " SelectedColor
-        NewValue := ""
-        for Index, Row in Rows
-            NewValue .= (Index > 1 ? "`n" : "") Row
-
-        switch ControlName {
-            case "CBorderColor":
-                This.CustomColors_AllBColors := NewValue
-                ColorControl.Value := This.CustomColors_AllBColors
-            case "CTextColor":
-                This.CustomColors_AllTColors := NewValue
-                ColorControl.Value := This.CustomColors_AllTColors
-            case "IABorderColor":
-                This.CustomColors_IABorder_Colors := NewValue
-                ColorControl.Value := This.CustomColors_IABorder_Colors
+        ClientName := ColorList.GetText(RowNumber, 1)
+        if (This.SetCustomColorValue(ClientName, ColorKeys[ColumnNumber], SelectedColor)) {
+            This.RefreshCustomColorRows(ClientName)
+            This.ScheduleProfileApply()
         }
-        This.ScheduleProfileApply()
+    }
+
+    CustomColorColumnAtCursor(ColorList) {
+        Point := Buffer(8, 0)
+        if (!DllCall("GetCursorPos", "Ptr", Point.Ptr, "Int"))
+            return 0
+        if (!DllCall("ScreenToClient", "Ptr", ColorList.Hwnd, "Ptr", Point.Ptr, "Int"))
+            return 0
+
+        HitTest := Buffer(24, 0)
+        NumPut("Int", NumGet(Point, 0, "Int"), HitTest, 0)
+        NumPut("Int", NumGet(Point, 4, "Int"), HitTest, 4)
+        if (SendMessage(0x1039, 0, HitTest.Ptr, ColorList.Hwnd) < 0) ; LVM_SUBITEMHITTEST
+            return 0
+        return NumGet(HitTest, 16, "Int") + 1
+    }
+
+    FormatCustomColor(ColorValue) {
+        ColorHex := convertToHex(ColorValue)
+        return RegExMatch(ColorHex, "i)^[0-9a-f]{6}$") ? "#" StrUpper(ColorHex) : ColorValue
+    }
+
+    RefreshCustomColorRows(SelectedClient := "") {
+        if (!This.HasProp("CustomColorList"))
+            return
+
+        This.CustomColorList.Delete()
+        SelectedRow := 0
+        for ColorRow in This.CustomColorRows() {
+            RowNumber := This.CustomColorList.Add(
+                "",
+                ColorRow["Char"],
+                This.FormatCustomColor(ColorRow["Border"]),
+                This.FormatCustomColor(ColorRow["Text"]),
+                This.FormatCustomColor(ColorRow["IABorder"])
+            )
+            if (ColorRow["Char"] = SelectedClient)
+                SelectedRow := RowNumber
+        }
+        This.CustomColorList.ModifyCol(1, 155)
+        This.CustomColorList.ModifyCol(2, 110)
+        This.CustomColorList.ModifyCol(3, 90)
+        This.CustomColorList.ModifyCol(4, 150)
+        if (SelectedRow)
+            This.CustomColorList.Modify(SelectedRow, "+Focus +Select +Vis")
+    }
+
+    AddCustomColorRow(*) {
+        Dialog := InputBox(Tr("dialog.char_name"), Tr("dialog.char_add"), "w260 h110")
+        if (Dialog.Result != "OK")
+            return
+
+        ClientName := Trim(This.CleanTitle(Dialog.Value))
+        if (ClientName = "")
+            return
+        if (This.AddCustomColorCharacter(ClientName)) {
+            This.RefreshCustomColorRows(ClientName)
+            This.ScheduleProfileApply()
+        }
+        else
+            This.RefreshCustomColorRows(ClientName)
+    }
+
+    RemoveCustomColorRow(*) {
+        RowNumber := This.CustomColorList.GetNext(0, "F")
+        if (!RowNumber)
+            RowNumber := This.CustomColorList.GetNext()
+        if (!RowNumber)
+            return
+
+        ClientName := This.CustomColorList.GetText(RowNumber, 1)
+        if (This.RemoveCustomColorCharacter(ClientName)) {
+            This.RefreshCustomColorRows()
+            This.ScheduleProfileApply()
+        }
     }
 
     ;This Function creates all Settings controls for the Profile Settings Button
@@ -358,35 +418,25 @@
         CustomColors.Push This.S_Gui.Add("GroupBox", "x20 y80 h480 w565 Section", "")
 
         CustomColors.Push This.S_Gui.Add("Text", " xp+25 yp+140 Section ", Tr("colors.active"))
-        CustomColors.Push This.S_Gui.Add("Text", " x35 yp+40  ", Tr("colors.character"))
-        CustomColors.Push This.S_Gui.Add("Text", " xp+155 yp ", Tr("colors.active_border"))
-        CustomColors.Push This.S_Gui.Add("Text", " xp+135 yp ", Tr("colors.text"))
-        CustomColors.Push This.S_Gui.Add("Text", " xp+125 yp ", Tr("colors.inactive_border"))
-
         CustomColors.Push This.S_Gui.Add("CheckBox", " xs+230 ys vCcoloractive Checked" This.CustomColorsActive, Tr("common.on_off"))
         This.S_Gui["Ccoloractive"].OnEvent("Click", (obj, *) => Cclors_Eventhandler(obj))
 
-        CustomColors.Push This.S_Gui.Add("Edit", " x30 yp+60 w150 h250 -Wrap vCchars", This.CustomColors_AllCharNames)
-        This.S_Gui["Cchars"].OnEvent("Change", (obj, *) => Cclors_Eventhandler(obj))
+        CustomColors.Push This.S_Gui.Add("Text", "x35 y255 w530", Tr("colors.table_help"))
+        This.CustomColorList := This.S_Gui.Add(
+            "ListView",
+            "x30 y280 w540 h215 Grid NoSortHdr -Multi vCustomColorList",
+            [Tr("colors.character"), Tr("colors.active_border"), Tr("colors.text"), Tr("colors.inactive_border")]
+        )
+        This.CustomColorList.OnEvent("Click", ObjBindMethod(This, "ChooseCustomColorCell"))
+        CustomColors.Push This.CustomColorList
 
-        CustomColors.Push This.S_Gui.Add("Edit", " x+10 yp w120 hp -Wrap vCBorderColor", This.CustomColors_AllBColors)
-        This.S_Gui["CBorderColor"].OnEvent("Change", (obj, *) => Cclors_Eventhandler(obj))
-
-        CustomColors.Push This.S_Gui.Add("Edit", " x+10 yp wp hp -Wrap vCTextColor", This.CustomColors_AllTColors)
-        This.S_Gui["CTextColor"].OnEvent("Change", (obj, *) => Cclors_Eventhandler(obj))
-
-        CustomColors.Push This.S_Gui.Add("Edit", " x+10 yp wp hp -Wrap vIABorderColor", This.CustomColors_IABorder_Colors)
-        This.S_Gui["IABorderColor"].OnEvent("Change", (obj, *) => Cclors_Eventhandler(obj))
-
-        BorderPaletteButton := This.S_Gui.Add("Button", "x190 y+5 w120 h25", Tr("colors.choose_row"))
-        BorderPaletteButton.OnEvent("Click", (*) => This.ChooseListColor("CBorderColor"))
-        CustomColors.Push BorderPaletteButton
-        TextPaletteButton := This.S_Gui.Add("Button", "x+10 yp wp hp", Tr("colors.choose_row"))
-        TextPaletteButton.OnEvent("Click", (*) => This.ChooseListColor("CTextColor"))
-        CustomColors.Push TextPaletteButton
-        InactivePaletteButton := This.S_Gui.Add("Button", "x+10 yp wp hp", Tr("colors.choose_row"))
-        InactivePaletteButton.OnEvent("Click", (*) => This.ChooseListColor("IABorderColor"))
-        CustomColors.Push InactivePaletteButton
+        AddColorRowButton := This.S_Gui.Add("Button", "x390 y505 w85 h28", Tr("common.new"))
+        AddColorRowButton.OnEvent("Click", ObjBindMethod(This, "AddCustomColorRow"))
+        CustomColors.Push AddColorRowButton
+        RemoveColorRowButton := This.S_Gui.Add("Button", "x+8 yp wp hp", Tr("common.delete"))
+        RemoveColorRowButton.OnEvent("Click", ObjBindMethod(This, "RemoveCustomColorRow"))
+        CustomColors.Push RemoveColorRowButton
+        This.RefreshCustomColorRows()
 
         This.S_Gui.Controls.Profile_Settings.PsDDL["Custom Colors"] := CustomColors
         for k, v in This.S_Gui.Controls.Profile_Settings.PsDDL["Custom Colors"]
@@ -395,40 +445,8 @@
         Cclors_Eventhandler(obj) {
             if (obj.Name = "Ccoloractive") {
                 This.CustomColorsActive := obj.value
+                This.ScheduleProfileApply()
             }
-            else if (obj.Name = "Cchars") {
-                indexOld := This.IndexcChars
-                This.CustomColors_AllCharNames := obj.value
-                if (indexOld < This.IndexcChars) {
-                    obj.value := This.CustomColors_AllCharNames
-                    ControlSend("^{End}", obj.Hwnd)
-                }
-            }
-            else if (obj.Name = "CBorderColor") {
-                indexOld := This.IndexcBorder
-                This.CustomColors_AllBColors := obj.value
-                if (indexOld < This.IndexcBorder) {
-                    obj.value := This.CustomColors_AllBColors
-                    ControlSend("^{End}", obj.Hwnd)
-                }
-            }
-            else if (obj.Name = "CTextColor") {
-                indexOld := This.IndexcText
-                This.CustomColors_AllTColors := obj.value
-                if (indexOld < This.IndexcText) {
-                    obj.value := This.CustomColors_AllTColors
-                    ControlSend("^{End}", obj.Hwnd)
-                }
-            }            
-            else if (obj.Name = "IABorderColor") {
-                indexOld := This.IndexcText
-                This.CustomColors_IABorder_Colors := obj.value
-                if (indexOld < This.IndexcText) {
-                    obj.value := This.CustomColors_IABorder_Colors
-                    ControlSend("^{End}", obj.Hwnd)
-                }
-            }            
-            This.ScheduleProfileApply()
         }
     }
 
@@ -874,10 +892,7 @@
 
         ;Custom Colors
         This.S_Gui["Ccoloractive"].value := This.CustomColorsActive
-        This.S_Gui["Cchars"].value := This.CustomColors_AllCharNames
-        This.S_Gui["CBorderColor"].value := This.CustomColors_AllBColors
-        This.S_Gui["CTextColor"].value := This.CustomColors_AllTColors
-        This.S_Gui["IABorderColor"].value := This.CustomColors_IABorder_Colors
+        This.RefreshCustomColorRows()
 
         ;Hotkey Groups
         This.S_Gui["HotkeyGroupDDL"].Delete()
