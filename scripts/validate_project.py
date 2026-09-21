@@ -269,6 +269,8 @@ def validate_live_profile_settings() -> None:
 def validate_color_picker() -> None:
     main = (ROOT / "Main.ahk").read_text(encoding="utf-8-sig")
     settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
+    properties = (ROOT / "src" / "Propertys.ahk").read_text(encoding="utf-8-sig")
+    main_class = (ROOT / "src" / "Main_Class.ahk").read_text(encoding="utf-8-sig")
     if "#Include <../src/ColorPicker>" not in main:
         fail("ColorPicker is not included")
     required_controls = [
@@ -276,13 +278,48 @@ def validate_color_picker() -> None:
         "ThumbnailTextColor",
         "ClientHighligtColor",
         "InactiveClientBorderColor",
-        "CBorderColor",
-        "CTextColor",
-        "IABorderColor",
     ]
-    missing = [name for name in required_controls if f'ChooseSingleColor("{name}")' not in settings_gui and f'ChooseListColor("{name}")' not in settings_gui]
+    missing = [name for name in required_controls if f'ChooseSingleColor("{name}")' not in settings_gui]
     if missing:
         fail(f"Color palette is missing for: {missing}")
+
+    required_custom_color_table = [
+        "vCustomColorList",
+        "Grid NoSortHdr -Multi",
+        "ChooseCustomColorCell(ColorList, RowNumber, *)",
+        "CustomColorColumnAtCursor(ColorList)",
+        "ColorPicker.Choose(This.S_Gui.Hwnd, ColorList.GetText(RowNumber, ColumnNumber))",
+        "This.SetCustomColorValue(ClientName, ColorKeys[ColumnNumber], SelectedColor)",
+        "This.RefreshCustomColorRows(ClientName)",
+    ]
+    missing = [entry for entry in required_custom_color_table if entry not in settings_gui]
+    if missing:
+        fail(f"Direct custom-color table interaction is incomplete: {missing}")
+
+    required_custom_color_data = [
+        "EnsureCustomColorData(ProfileName := \"\")",
+        "CustomColorRows(ProfileName := \"\")",
+        "SetCustomColorValue(ClientName, ColorKey, ColorValue, ProfileName := \"\")",
+        "AddCustomColorCharacter(ClientName, ProfileName := \"\")",
+        "RemoveCustomColorCharacter(ClientName, ProfileName := \"\")",
+    ]
+    missing = [entry for entry in required_custom_color_data if entry not in properties]
+    if missing:
+        fail(f"Custom-color row data handling is incomplete: {missing}")
+    if "try This.RefreshCustomColorRows(ClientName)" not in main_class:
+        fail("Newly detected clients do not refresh the custom-color table")
+
+    obsolete_custom_color_ui = [
+        "ChooseListColor(",
+        "vCchars",
+        "vCBorderColor",
+        "vCTextColor",
+        "vIABorderColor",
+        "colors.choose_row",
+    ]
+    remaining = [entry for entry in obsolete_custom_color_ui if entry in settings_gui]
+    if remaining:
+        fail(f"Obsolete row-selection color UI is still present: {remaining}")
 
 
 def validate_portable_contract() -> None:

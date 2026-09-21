@@ -15,7 +15,7 @@ The language can be changed under **Global Settings / Allgemeine Einstellungen**
 
 Color fields provide a native Windows color palette and still accept hexadecimal or RGB input. Character names from running EVE clients are saved automatically in the active profile for hotkeys and individual colors. The selectable next development packages are documented in the [`development master plan`](docs/MASTERPLAN.md); evaluated ideas and bug reports from the upstream project remain tracked in the [`original-repository backlog`](docs/ORIGINAL_REPO_BACKLOG.md).
 
-New profiles immediately receive all currently active character names without restarting. Thumbnail Settings also provides a per-profile lock that prevents accidental right-drag movement and mouse resizing. Stable version 2.0.0 also hardens forward and backward group cycling: unavailable clients are skipped with a bounded search, minimized targets are activated reliably, and stale minimize actions cannot interfere with a rapid switch. Version 2.0.1 aligns the complete Thumbnail Settings page on a consistent two-column grid. Version 2.0.2 automatically stores thumbnail and EVE-window layouts per profile and applies profile settings immediately without restarting. Version 2.0.3 removes the configurable minimum thumbnail size so previews can be scaled freely down to the smallest positive size Windows supports.
+New profiles immediately receive all currently active character names without restarting. Thumbnail Settings also provides a per-profile lock that prevents accidental right-drag movement and mouse resizing. Stable version 2.0.0 also hardens forward and backward group cycling: unavailable clients are skipped with a bounded search, minimized targets are activated reliably, and stale minimize actions cannot interfere with a rapid switch. Version 2.0.1 aligns the complete Thumbnail Settings page on a consistent two-column grid. Version 2.0.2 automatically stores thumbnail and EVE-window layouts per profile and applies profile settings immediately without restarting. Version 2.0.3 removes the configurable minimum thumbnail size so previews can be scaled freely down to the smallest positive size Windows supports. Version 2.0.4 replaces the parallel custom-color text lists with one scrollable row per character; clicking a color field opens the Windows palette directly.
 
 ---
 
@@ -125,9 +125,8 @@ Mouse gestures are applied to the thumbnail window currently being hovered over.
 | Dont Minimize CLients| All EVE character names entered here are exempt from minimization. This is useful if you always need a current preview image of the client. Since a preview image of a minimized client can only be shown frozen  |
 
 ### **Profile Settings - Custom Colors**
-| Allows you to set custom colors for the font and borders|
-| --- |
-| The supported syntax is: <br>HEX: -> 0xFFFFFF or #FFFFFF or FFFFFF <br> RGB: -> RGB(225,255,255) or (225,255,255) or 225,255,255|
+
+Each detected character has one row with separate fields for the active border, text and inactive border colors. Click a color field directly to open the native Windows color palette. New and Delete allow manual maintenance; detected EVE clients are still added automatically.
 
 **Inactive Border Color will only take effect if the settings "Show All Borders" is selected in "Thumbnail Settings" <br> This overwrites the color in "Inactive Client Border Color" for the specified characters.**
 

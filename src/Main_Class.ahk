@@ -316,20 +316,10 @@ Class Main_Class extends ThumbWindow {
             Changed := true
         }
 
-        Colors := Profile["Custom Colors"]["cColors"]
-        FoundColor := false
-        for StoredName in Colors["CharNames"] {
-            if (StoredName = ClientName) {
-                FoundColor := true
-                break
-            }
-        }
-        if (!FoundColor) {
-            Colors["CharNames"].Push(ClientName)
-            Colors["TextColor"].Push(This.ThumbnailTextColor)
-            Colors["Bordercolor"].Push(This.ClientHighligtColor)
-            Colors["IABordercolor"].Push(This.InactiveClientBorderColor)
+        if (This.AddCustomColorCharacter(ClientName, ProfileName)) {
             Changed := true
+            if (ProfileName = This.LastUsedProfile)
+                try This.RefreshCustomColorRows(ClientName)
         }
 
         if (Changed)
