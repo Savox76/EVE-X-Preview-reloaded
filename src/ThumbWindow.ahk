@@ -263,13 +263,10 @@ Class ThumbWindow extends Propertys {
             y := DragY - BY, Wh := Height + y
 
 
-            ;ensures that the minimum size cannot be undershot
-            if (Wn < This.ThumbnailMinimumSize["width"]) {
-                Wn := This.ThumbnailMinimumSize["width"]
-            }
-            if (Wh < This.ThumbnailMinimumSize["height"]) {
-                Wh := This.ThumbnailMinimumSize["height"]
-            }
+            ; Windows requires positive dimensions. Keep the last valid size if
+            ; the pointer crosses the opposite edge of the thumbnail.
+            if (Wn < 1 || Wh < 1)
+                continue
 
             for k, v in This.ThumbWindows.%This.ThumbHwnd_EvEHwnd[hwnd]% {
                 WinMove(, , Wn, Wh, v.hwnd)
@@ -461,11 +458,11 @@ Class ThumbWindow extends Propertys {
     ApplyThumbnailStartSize(*) {
         Width := Trim(This.ThumbnailStartLocation["width"])
         Height := Trim(This.ThumbnailStartLocation["height"])
-        if (!RegExMatch(Width, "^\d+$") || !RegExMatch(Height, "^\d+$"))
+        if (!RegExMatch(Width, "^[1-9]\d*$") || !RegExMatch(Height, "^[1-9]\d*$"))
             return false
 
-        Width := Max(Width + 0, This.ThumbnailMinimumSize["width"] + 0)
-        Height := Max(Height + 0, This.ThumbnailMinimumSize["height"] + 0)
+        Width += 0
+        Height += 0
         This.ThumbnailStartLocation["width"] := Width
         This.ThumbnailStartLocation["height"] := Height
 

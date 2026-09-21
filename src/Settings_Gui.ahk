@@ -109,13 +109,12 @@
     Global_Settings(visible?) {
         This.S_Gui.Controls.Global_Settings := []
         This.S_Gui.SetFont("s10 w400")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("GroupBox", "x20 y80 h320 w560")
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("GroupBox", "x20 y80 h290 w560")
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xp+15 yp+20 Section", Tr("common.language"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.suspend_hotkeys"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.hotkey_scope"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_background"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_location"))
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_minimum"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_snap"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.thumbnail_snap_distance"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+15", Tr("global.minimize_delay"))
@@ -148,14 +147,6 @@
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "x+8 ys ", "h:")
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "x+5 y+-18 w40 vThumbnailStartLocationheight", This.ThumbnailStartLocation["height"])
         This.S_Gui["ThumbnailStartLocationheight"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
-
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+10 section ", Tr("common.width") ":")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "x+5 y+-18 w40 vThumbnailMinimumSizewidth", This.ThumbnailMinimumSize["width"])
-        This.S_Gui["ThumbnailMinimumSizewidth"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
-
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "x+8 ys ", Tr("common.height") ":")
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "x+5 y+-18 w40 vThumbnailMinimumSizeheight", This.ThumbnailMinimumSize["height"])
-        This.S_Gui["ThumbnailMinimumSizeheight"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
 
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Radio", "xs y+10 w50 vThumbnailSnapOn Checked" This.ThumbnailSnap, Tr("common.on"))
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Radio", " xp+65 yp w50 vThumbnailSnapOff Checked" (This.ThumbnailSnap ? 0 : 1), Tr("common.off"))
@@ -201,12 +192,6 @@
             else if (obj.name = "ThumbnailStartLocationheight") {
                 This.ThumbnailStartLocation["height"] := obj.value
                 SetTimer(This.ApplyThumbnailStartSize_Delay_Timer, -250)
-            }
-            else if (obj.name = "ThumbnailMinimumSizewidth") {
-                This.ThumbnailMinimumSize["width"] := obj.value
-            }
-            else if (obj.name = "ThumbnailMinimumSizeheight") {
-                This.ThumbnailMinimumSize["height"] := obj.value
             }
             else if (obj.name = "ThumbnailSnapOn") {
                 This.ThumbnailSnap := 1
@@ -877,8 +862,6 @@
         This.S_Gui["ThumbnailStartLocationy"].value := This.ThumbnailStartLocation["y"]
         This.S_Gui["ThumbnailStartLocationwidth"].value := This.ThumbnailStartLocation["width"]
         This.S_Gui["ThumbnailStartLocationheight"].value := This.ThumbnailStartLocation["height"]
-        This.S_Gui["ThumbnailMinimumSizewidth"].value := This.ThumbnailMinimumSize["width"]
-        This.S_Gui["ThumbnailMinimumSizeheight"].value := This.ThumbnailMinimumSize["height"]
         This.S_Gui["ThumbnailSnapOn"].value := This.ThumbnailSnap
         This.S_Gui["ThumbnailSnapOff"].value := (This.ThumbnailSnap ? 0 : 1)
         This.S_Gui["ThumbnailSnap_Distance"].value := This.ThumbnailSnap_Distance

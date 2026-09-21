@@ -1,6 +1,6 @@
 # Entwicklungs-Masterplan
 
-Stand: 17. September 2026
+Stand: 21. September 2026
 
 Dieser Plan bündelt die nächsten möglichen Entwicklungsschritte für EVE-X-Preview Reloaded. Er ist eine Entscheidungshilfe, keine Zusage, alle Pakete umzusetzen. Ein Paket beginnt erst, wenn es ausdrücklich gewünscht wird.
 
@@ -24,6 +24,9 @@ Dieser Plan bündelt die nächsten möglichen Entwicklungsschritte für EVE-X-Pr
 | 3 – Profile und Layout-Sperre | `1.1.0-preview.3` | Aktive Clients sofort in neuen Profilen, unabhängige Profilkopien, profilbezogene Sperre gegen versehentliches Verschieben und Skalieren | Erledigt |
 | Sofortkorrektur – Live-Größe | `1.1.0-preview.4` | Änderungen an Breite und Höhe werden ohne Neustart auf sichtbare Thumbnails angewendet und gespeichert | Erledigt |
 | Stabilitätsfix – Hotkey-/Gruppenwechsel | `2.0.0` | Begrenzte Gruppensuche, zuverlässige Aktivierung minimierter Clients, Schutz vor überholten Minimierungs-Timern und ausführbare Windows-Regressionstests | Erledigt |
+| Bedienkorrektur – Thumbnail-Einstellungen | `2.0.1` | Einheitliche zweispaltige Ausrichtung der Vorschaubild-Einstellungen | Erledigt |
+| Profil-Liveanwendung | `2.0.2` | Layouts automatisch speichern und Profiländerungen ohne Neustart anwenden | Erledigt |
+| Freie Thumbnail-Größe | `2.0.3` | Konfigurierbare Mindestgröße vollständig entfernen; bestehende JSON-Dateien automatisch bereinigen | Erledigt |
 
 ## Freigabeweg zu Version 2.0.0
 

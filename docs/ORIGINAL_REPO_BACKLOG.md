@@ -37,6 +37,8 @@ Die daraus abgeleiteten, einzeln wählbaren Entwicklungspakete und ihre Abhängi
 | [#5 – Immer im Vordergrund nur bei EVE](https://github.com/g0nzo83/EVE-X-Preview/issues/5) | Vorschauen stören andere Anwendungen nicht. | Drei Modi: immer, nur bei aktivem EVE, nie. |
 | [#24 – Speichern der Positionen verständlicher machen](https://github.com/g0nzo83/EVE-X-Preview/issues/24) | Der vorhandene manuelle Speichervorgang wird leicht übersehen. | Deutliches „Positionen gespeichert“-Feedback oder optional automatisches Speichern. |
 
+Die im Originalprojekt unter [#1](https://github.com/g0nzo83/EVE-X-Preview/issues/1) geforderte konfigurierbare Mindestgröße wurde in Reloaded bewusst entfernt. Ab `2.0.3` lassen sich Vorschaubilder frei bis zur kleinsten technisch gültigen Größe skalieren.
+
 ## Priorität 3 – Später bewerten
 
 | Issue | Einordnung |
@@ -54,7 +56,6 @@ Die daraus abgeleiteten, einzeln wählbaren Entwicklungspakete und ihre Abhängi
 | [#18](https://github.com/g0nzo83/EVE-X-Preview/issues/18) und [#10](https://github.com/g0nzo83/EVE-X-Preview/issues/10) – Position am Auswahlbildschirm | Beim Ausloggen darf eine gespeicherte Vorschauposition nicht unbeabsichtigt verloren gehen. |
 | [#9 – Clients am Login-Bildschirm wechseln](https://github.com/g0nzo83/EVE-X-Preview/issues/9) | Zusammen mit #21 erneut prüfen, falls der Auswahlbildschirm erweitert wird. |
 | [#2 – Vorschauen verschieben und skalieren](https://github.com/g0nzo83/EVE-X-Preview/issues/2) | Mausinteraktion, Ausrichtung und Größenänderung müssen nach Gesten-/Seitenverhältnis-Änderungen weiter funktionieren. |
-| [#1 – Mindestgröße](https://github.com/g0nzo83/EVE-X-Preview/issues/1) | Die konfigurierte Mindestgröße muss beim Erstellen und Skalieren jeder Vorschau gelten. |
 
 ## Nicht ungeprüft übernehmen
 
