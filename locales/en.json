@@ -24,7 +24,6 @@
   "global.scope_eve": "Only while an EVE window is active",
   "global.thumbnail_background": "Thumbnail background color:",
   "global.thumbnail_location": "Default thumbnail position:",
-  "global.thumbnail_minimum": "Minimum thumbnail size:",
   "global.thumbnail_snap": "Thumbnail snapping:",
   "global.thumbnail_snap_distance": "Thumbnail snap distance:",
   "global.minimize_delay": "Delay before minimizing EVE window:",

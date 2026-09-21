@@ -1,21 +1,20 @@
-## EVE-X-Preview Reloaded 2.0.2
+## EVE-X-Preview Reloaded 2.0.3
 
 ### Changed
 
-- Moving or resizing thumbnails now saves their coordinates and dimensions automatically in the active profile.
-- EVE client restore rectangles and maximized state are captured automatically without restoring or focusing minimized clients.
-- Switching profiles now applies the selected layout, colors, visibility, borders, client behavior and hotkeys immediately.
-- Editing any profile setting refreshes the active thumbnails and managed hotkeys without restarting the application.
-- Obsolete profile hotkeys are disabled before the current profile mappings are registered.
-- The existing **Restore Client Positions** switch continues to control whether captured EVE window positions are restored.
+- The configurable minimum thumbnail size has been removed completely.
+- Thumbnails can now be resized freely down to the smallest positive size Windows supports.
+- The separate default thumbnail width and height remain available and continue to update visible thumbnails immediately.
+- Existing `EVE-X-Preview.json` files are cleaned automatically; the obsolete `ThumbnailMinimumSize` entry is removed without affecting profiles, positions, colors or hotkeys.
 
 ### Automated verification
 
-- The project contract checks automatic position capture, live profile application, managed hotkey replacement and restart-free profile switching.
+- The project contract rejects any active minimum-size setting or scaling clamp.
+- The resize path remains protected against invalid zero or negative Windows dimensions.
 - AutoHotkey regression tests, compilation, portable ZIP creation and ZIP content verification remain mandatory.
 
 ### Recommended practical check
 
-- Move and resize thumbnails, close the application and confirm the layout returns after reopening.
-- Move an EVE client, change profiles and confirm each profile restores its own saved layout when **Restore Client Positions** is enabled.
-- Change profile colors, borders, visibility and hotkeys while the application remains open and confirm every change takes effect without a restart.
+- Open **Global Settings** and confirm the minimum-size fields are gone in both German and English.
+- Resize one or all thumbnails below the former 50 × 50 pixel limit and confirm they remain usable and keep their new dimensions after restarting.
+- Change the default thumbnail width and height to small positive values and confirm visible thumbnails update without restarting.

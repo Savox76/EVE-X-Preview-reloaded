@@ -16,11 +16,7 @@
         },
         "ThumbnailBackgroundColor":"#57504E",
         "ThumbnailSnap": true,
-        "ThumbnailSnap_Distance": 20,
-        "ThumbnailMinimumSize": {
-            "width": 50,
-            "height": 50
-        }
+        "ThumbnailSnap_Distance": 20
     },
     "_Profiles": {
         "Default": {

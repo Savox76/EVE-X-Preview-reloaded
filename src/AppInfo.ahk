@@ -1,6 +1,6 @@
 class AppInfo {
     static Name := "EVE-X-Preview Reloaded"
-    static Version := "2.0.2"
+    static Version := "2.0.3"
     static Repository := "Savox76/EVE-X-Preview-reloaded"
     static ReleasesUrl := "https://github.com/" AppInfo.Repository "/releases"
     static ReleasesApiUrl := "https://api.github.com/repos/" AppInfo.Repository "/releases?per_page=10"

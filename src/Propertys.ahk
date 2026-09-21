@@ -83,12 +83,6 @@ class Propertys extends TrayMenu {
     }
 
 
-    ThumbnailMinimumSize[key] {
-        get => This._JSON["global_Settings"]["ThumbnailMinimumSize"][key]
-        set => This._JSON["global_Settings"]["ThumbnailMinimumSize"][key] := value
-    }
-
-
     ;########################
     ;## Profile ThumbnailSettings
 

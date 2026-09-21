@@ -122,6 +122,33 @@ def validate_live_thumbnail_size() -> None:
         fail(f"Live thumbnail size update is incomplete: {missing}")
 
 
+def validate_removed_thumbnail_minimum() -> None:
+    main = (ROOT / "Main.ahk").read_text(encoding="utf-8-sig")
+    active_paths = [
+        ROOT / "Lib" / "DefaultJSON.ahk",
+        ROOT / "src" / "Propertys.ahk",
+        ROOT / "src" / "Settings_Gui.ahk",
+        ROOT / "src" / "ThumbWindow.ahk",
+        ROOT / "locales" / "de.json",
+        ROOT / "locales" / "en.json",
+    ]
+    active_sources = "\n".join(path.read_text(encoding="utf-8-sig") for path in active_paths)
+    if "ThumbnailMinimumSize" in active_sources or "global.thumbnail_minimum" in active_sources:
+        fail("The obsolete thumbnail minimum size is still active")
+    if 'Settings["global_Settings"].Delete("ThumbnailMinimumSize")' not in main:
+        fail("Existing configurations do not remove the obsolete thumbnail minimum size")
+
+    thumb_window = (ROOT / "src" / "ThumbWindow.ahk").read_text(encoding="utf-8-sig")
+    required_guards = [
+        'if (Wn < 1 || Wh < 1)',
+        'RegExMatch(Width, "^[1-9]\\d*$")',
+        'RegExMatch(Height, "^[1-9]\\d*$")',
+    ]
+    missing = [entry for entry in required_guards if entry not in thumb_window]
+    if missing:
+        fail(f"Free thumbnail sizing lacks positive-dimension guards: {missing}")
+
+
 def validate_thumbnail_settings_layout() -> None:
     settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
     start = settings_gui.index("    ThumbnailSettings_Ctrl() {")
@@ -339,6 +366,7 @@ def main() -> int:
         validate_client_discovery,
         validate_thumbnail_lock,
         validate_live_thumbnail_size,
+        validate_removed_thumbnail_minimum,
         validate_thumbnail_settings_layout,
         validate_group_cycle_reliability,
         validate_live_profile_settings,
