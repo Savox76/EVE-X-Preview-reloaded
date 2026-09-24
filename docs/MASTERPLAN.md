@@ -28,6 +28,7 @@ Dieser Plan bündelt die nächsten möglichen Entwicklungsschritte für EVE-X-Pr
 | Profil-Liveanwendung | `2.0.2` | Layouts automatisch speichern und Profiländerungen ohne Neustart anwenden | Erledigt |
 | Freie Thumbnail-Größe | `2.0.3` | Konfigurierbare Mindestgröße vollständig entfernen; bestehende JSON-Dateien automatisch bereinigen | Erledigt |
 | Direkte Farbzuordnung | `2.0.4` | Eine übersichtliche Tabellenzeile je Charakter; Farbauswahl direkt per Klick auf das jeweilige Farbfeld | Erledigt |
+| Verständliche Hotkey-Bereiche | `2.0.5` | Direkte Charakter-Hotkeys und optionale Durchschaltgruppen eindeutig benennen und direkt in der Oberfläche erklären | Erledigt |
 
 ## Freigabeweg zu Version 2.0.0
 
