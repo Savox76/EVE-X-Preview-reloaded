@@ -454,13 +454,13 @@
         This.S_Gui.Controls.Profile_Settings.PsDDL["Hotkey Groups"] := [], Hotkey_Groups := []
 
         Hotkey_Groups.Push This.S_Gui.Add("GroupBox", "x20 y80 h440 w500 Section", "")
-        Hotkey_Groups.Push This.S_Gui.Add("Text", "x35 y205 w450 h36", Tr("groups.help"))
-        Hotkey_Groups.Push This.S_Gui.Add("Text", "x58 y245", Tr("groups.select"))
-        ddl := This.S_Gui.Add("DropDownList", "x28 y263 w180 vHotkeyGroupDDL", This.GetGroupList())
+        Hotkey_Groups.Push This.S_Gui.Add("Text", "x35 y195 w450 h50", Tr("groups.help"))
+        Hotkey_Groups.Push This.S_Gui.Add("Text", "x58 y255", Tr("groups.select"))
+        ddl := This.S_Gui.Add("DropDownList", "x28 y273 w180 vHotkeyGroupDDL", This.GetGroupList())
         Hotkey_Groups.Push ddl
-        This.S_Gui["HotkeyGroupDDL"].OnEvent("Change", (*) => SetEditText(ddl, EditBox, HKForwards, HKBackwards))
+        This.S_Gui["HotkeyGroupDDL"].OnEvent("Change", (*) => SetEditText(ddl, EditBox, HKForwards, HKBackwards, DeleteButton))
 
-        DeleteButton := This.S_Gui.Add("Button", "x360 y262 w80", Tr("common.delete"))
+        DeleteButton := This.S_Gui.Add("Button", "x360 y272 w80 vHotkeyGroupDelete", Tr("common.delete"))
         NewButton := This.S_Gui.Add("Button", "x+5 yp w80", Tr("common.new"))
         DeleteButton.OnEvent("Click", (*) => Delete_Group(ddl, HKForwards, HKBackwards, EditBox))
         NewButton.OnEvent("Click", (*) => CreateNewGroup(ddl, HKForwards, HKBackwards, EditBox))
@@ -468,18 +468,18 @@
         Hotkey_Groups.Push DeleteButton
         Hotkey_Groups.Push NewButton
 
-        Hotkey_Groups.Push This.S_Gui.Add("Text", "x28 y298", Tr("groups.characters"))
-        EditBox := This.S_Gui.Add("Edit", "x28 y318 w250 h180 -Wrap +HScroll Disabled vHKCharlist")
+        Hotkey_Groups.Push This.S_Gui.Add("Text", "x28 y308", Tr("groups.characters"))
+        EditBox := This.S_Gui.Add("Edit", "x28 y328 w250 h170 -Wrap +HScroll Disabled vHKCharlist")
         Hotkey_Groups.Push EditBox
         This.S_Gui["HKCharlist"].OnEvent("Change", (obj, *) => SaveHKGroupList(obj))
 
-        Hotkey_Groups.Push This.S_Gui.Add("Text", "x320 y318", Tr("groups.forward"))
-        HKForwards := This.S_Gui.Add("Edit", "x320 y338 w150 Disabled vForwardsKey")
+        Hotkey_Groups.Push This.S_Gui.Add("Text", "x320 y328", Tr("groups.forward"))
+        HKForwards := This.S_Gui.Add("Edit", "x320 y348 w150 Disabled vForwardsKey")
         Hotkey_Groups.Push HKForwards
         This.S_Gui["ForwardsKey"].OnEvent("Change", (obj, *) => SaveHKGroupList(obj))
 
-        Hotkey_Groups.Push This.S_Gui.Add("Text", "x320 y390", Tr("groups.backward"))
-        HKBackwards := This.S_Gui.Add("Edit", "x320 y410 w150 Disabled vBackwardsdKey")
+        Hotkey_Groups.Push This.S_Gui.Add("Text", "x320 y400", Tr("groups.backward"))
+        HKBackwards := This.S_Gui.Add("Edit", "x320 y420 w150 Disabled vBackwardsdKey")
         Hotkey_Groups.Push HKBackwards
         This.S_Gui["BackwardsdKey"].OnEvent("Change", (obj, *) => SaveHKGroupList(obj))
 
@@ -504,13 +504,20 @@
             }
             EditObj.value := "", ForwardHKObj.value := "", BackwardHKObj.value := ""
             ForwardHKObj.Enabled := 1, BackwardHKObj.Enabled := 1, EditObj.Enabled := 1
+            DeleteButton.Enabled := 1
             ddlObj.Choose(ArrayIndex)
             This.ScheduleProfileApply()
         }
 
         Delete_Group(ddlObj, ForwardHKObj, BackwardHKObj, EditObj) {
-            if (ddlObj.Text != "" && This.Hotkey_Groups.Has(ddlObj.Text))
+            if (ddlObj.Text != "" && This.Hotkey_Groups.Has(ddlObj.Text)) {
+                SelectedGroup := This.Hotkey_Groups[ddlObj.Text]
+                if (SelectedGroup.Has("AutoIncludeDetectedClients") && SelectedGroup["AutoIncludeDetectedClients"]) {
+                    MsgBox(Tr("groups.default_protected"), AppInfo.Name, "Iconi")
+                    return
+                }
                 This.Hotkey_Groups.Delete(ddlObj.Text)
+            }
 
             ddlObj.Delete()
             ddlObj.Add(This.GetGroupList())
@@ -519,15 +526,19 @@
             This.ScheduleProfileApply()
         }
 
-        SetEditText(ddlObj, EditObj, ForwardHKObj?, BackwardHKObj?) {
+        SetEditText(ddlObj, EditObj, ForwardHKObj?, BackwardHKObj?, DeleteButtonObj?) {
             text := ""
             if (ddlObj.Text != "" && This.Hotkey_Groups.Has(ddlObj.Text)) {
-                for index, Names in This.Hotkey_Groups[ddlObj.Text]["Characters"] {
+                SelectedGroup := This.Hotkey_Groups[ddlObj.Text]
+                for index, Names in SelectedGroup["Characters"] {
                     text .= Names "`n"
                 }
-                EditObj.value := text, EditObj.Enabled := 1
-                ForwardHKObj.value := This.Hotkey_Groups[ddlObj.Text]["ForwardsHotkey"], ForwardHKObj.Enabled := 1
-                BackwardHKObj.value := This.Hotkey_Groups[ddlObj.Text]["BackwardsHotkey"], BackwardHKObj.Enabled := 1
+                IsAutoGroup := SelectedGroup.Has("AutoIncludeDetectedClients") && SelectedGroup["AutoIncludeDetectedClients"]
+                EditObj.value := text, EditObj.Enabled := !IsAutoGroup
+                ForwardHKObj.value := SelectedGroup["ForwardsHotkey"], ForwardHKObj.Enabled := 1
+                BackwardHKObj.value := SelectedGroup["BackwardsHotkey"], BackwardHKObj.Enabled := 1
+                if (IsSet(DeleteButtonObj))
+                    DeleteButtonObj.Enabled := !IsAutoGroup
             }
         }
 
@@ -550,6 +561,41 @@
             }
             This.ScheduleProfileApply()
         }
+    }
+
+    RefreshAutoHotkeyGroupEditor(GroupName := "", SelectGroup := false) {
+        if (!This.HasProp("S_Gui"))
+            return
+        if (GroupName = "")
+            GroupName := This.EnsureDefaultHotkeyGroup()
+        if (GroupName = "" || !This.Hotkey_Groups.Has(GroupName))
+            return
+
+        try GroupDDL := This.S_Gui["HotkeyGroupDDL"]
+        catch
+            return
+        if (SelectGroup) {
+            for Index, StoredGroupName in This.GetGroupList() {
+                if (StoredGroupName = GroupName) {
+                    GroupDDL.Choose(Index)
+                    break
+                }
+            }
+        }
+        else if (GroupDDL.Text != GroupName)
+            return
+
+        SelectedGroup := This.Hotkey_Groups[GroupName]
+        CharacterText := ""
+        for ClientName in SelectedGroup["Characters"]
+            CharacterText .= ClientName "`n"
+        This.S_Gui["HKCharlist"].Value := CharacterText
+        This.S_Gui["HKCharlist"].Enabled := 0
+        This.S_Gui["ForwardsKey"].Value := SelectedGroup["ForwardsHotkey"]
+        This.S_Gui["ForwardsKey"].Enabled := 1
+        This.S_Gui["BackwardsdKey"].Value := SelectedGroup["BackwardsHotkey"]
+        This.S_Gui["BackwardsdKey"].Enabled := 1
+        This.S_Gui["HotkeyGroupDelete"].Enabled := 0
     }
 
 
@@ -955,6 +1001,7 @@
         This.S_Gui["InactiveClientBorderthickness"].Enabled := This.ShowAllColoredBorders
         This.S_Gui["InactiveClientBorderColor"].Enabled := This.ShowAllColoredBorders
         This.S_Gui["InactiveClientBorderColorPicker"].Enabled := This.ShowAllColoredBorders
+        This.RefreshAutoHotkeyGroupEditor("", true)
     }
 
 

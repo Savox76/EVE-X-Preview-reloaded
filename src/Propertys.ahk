@@ -439,6 +439,110 @@ class Propertys extends TrayMenu {
 
     ;########################
     ;## Profile Hotkeys
+    EnsureDefaultHotkeyGroup(ProfileName := "") {
+        if (ProfileName = "")
+            ProfileName := This.LastUsedProfile
+        if (!This._JSON["_Profiles"].Has(ProfileName))
+            return ""
+
+        Profile := This._JSON["_Profiles"][ProfileName]
+        Changed := false
+        if (!Profile.Has("Hotkey Groups") || Type(Profile["Hotkey Groups"]) != "Map") {
+            Profile["Hotkey Groups"] := Map()
+            Changed := true
+        }
+        Groups := Profile["Hotkey Groups"]
+
+        AutoGroupName := ""
+        for GroupName, Group in Groups {
+            if (Type(Group) = "Map" && Group.Has("AutoIncludeDetectedClients") && Group["AutoIncludeDetectedClients"]) {
+                AutoGroupName := GroupName
+                break
+            }
+        }
+
+        if (AutoGroupName = "") {
+            AutoGroupName := "Default"
+            if (Groups.Has(AutoGroupName)) {
+                AutoGroupName := "Default (Auto)"
+                Suffix := 2
+                while (Groups.Has(AutoGroupName)) {
+                    AutoGroupName := "Default (Auto " Suffix ")"
+                    Suffix += 1
+                }
+            }
+            Groups[AutoGroupName] := Map(
+                "Characters", [],
+                "ForwardsHotkey", "",
+                "BackwardsHotkey", "",
+                "AutoIncludeDetectedClients", true
+            )
+            Changed := true
+        }
+
+        AutoGroup := Groups[AutoGroupName]
+        if (!AutoGroup.Has("Characters") || Type(AutoGroup["Characters"]) != "Array") {
+            AutoGroup["Characters"] := []
+            Changed := true
+        }
+        for HotkeyName in ["ForwardsHotkey", "BackwardsHotkey"] {
+            if (!AutoGroup.Has(HotkeyName)) {
+                AutoGroup[HotkeyName] := ""
+                Changed := true
+            }
+        }
+
+        if (Profile.Has("Hotkeys") && Type(Profile["Hotkeys"]) = "Array") {
+            for HotkeyEntry in Profile["Hotkeys"] {
+                if (Type(HotkeyEntry) != "Map")
+                    continue
+                for ClientName, _ in HotkeyEntry {
+                    FoundClient := false
+                    for StoredName in AutoGroup["Characters"] {
+                        if (StoredName = ClientName) {
+                            FoundClient := true
+                            break
+                        }
+                    }
+                    if (!FoundClient && ClientName != "") {
+                        AutoGroup["Characters"].Push(ClientName)
+                        Changed := true
+                    }
+                }
+            }
+        }
+
+        if (Changed && This.HasProp("Save_Settings_Delay_Timer"))
+            SetTimer(This.Save_Settings_Delay_Timer, -200)
+        return AutoGroupName
+    }
+
+    EnsureDefaultHotkeyGroups() {
+        for ProfileName in This._JSON["_Profiles"]
+            This.EnsureDefaultHotkeyGroup(ProfileName)
+    }
+
+    AddClientToDefaultHotkeyGroup(ClientName, ProfileName := "") {
+        ClientName := Trim(This.CleanTitle(ClientName))
+        if (ClientName = "")
+            return ""
+        if (ProfileName = "")
+            ProfileName := This.LastUsedProfile
+
+        AutoGroupName := This.EnsureDefaultHotkeyGroup(ProfileName)
+        if (AutoGroupName = "")
+            return ""
+        Characters := This._JSON["_Profiles"][ProfileName]["Hotkey Groups"][AutoGroupName]["Characters"]
+        for StoredName in Characters {
+            if (StoredName = ClientName)
+                return ""
+        }
+
+        Characters.Push(ClientName)
+        SetTimer(This.Save_Settings_Delay_Timer, -200)
+        return AutoGroupName
+    }
+
     Hotkey_Groups[key?] {
         get {
             if (IsSet(key)) {
