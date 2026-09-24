@@ -474,14 +474,20 @@
         This.S_Gui["HKCharlist"].OnEvent("Change", (obj, *) => SaveHKGroupList(obj))
 
         Hotkey_Groups.Push This.S_Gui.Add("Text", "x320 y328", Tr("groups.forward"))
-        HKForwards := This.S_Gui.Add("Edit", "x320 y348 w150 Disabled vForwardsKey")
+        HKForwards := This.S_Gui.Add("Edit", "x320 y348 w95 Disabled vForwardsKey")
         Hotkey_Groups.Push HKForwards
         This.S_Gui["ForwardsKey"].OnEvent("Change", (obj, *) => SaveHKGroupList(obj))
+        CaptureForwardsButton := This.S_Gui.Add("Button", "x420 y347 w90 h24 Disabled", Tr("groups.capture"))
+        CaptureForwardsButton.OnEvent("Click", (*) => CaptureGroupHotkey(HKForwards))
+        Hotkey_Groups.Push CaptureForwardsButton
 
         Hotkey_Groups.Push This.S_Gui.Add("Text", "x320 y400", Tr("groups.backward"))
-        HKBackwards := This.S_Gui.Add("Edit", "x320 y420 w150 Disabled vBackwardsdKey")
+        HKBackwards := This.S_Gui.Add("Edit", "x320 y420 w95 Disabled vBackwardsdKey")
         Hotkey_Groups.Push HKBackwards
         This.S_Gui["BackwardsdKey"].OnEvent("Change", (obj, *) => SaveHKGroupList(obj))
+        CaptureBackwardsButton := This.S_Gui.Add("Button", "x420 y419 w90 h24 Disabled", Tr("groups.capture"))
+        CaptureBackwardsButton.OnEvent("Click", (*) => CaptureGroupHotkey(HKBackwards))
+        Hotkey_Groups.Push CaptureBackwardsButton
 
         This.S_Gui.Controls.Profile_Settings.PsDDL["Hotkey Groups"] := Hotkey_Groups
         for k, v in This.S_Gui.Controls.Profile_Settings.PsDDL["Hotkey Groups"]
@@ -504,6 +510,7 @@
             }
             EditObj.value := "", ForwardHKObj.value := "", BackwardHKObj.value := ""
             ForwardHKObj.Enabled := 1, BackwardHKObj.Enabled := 1, EditObj.Enabled := 1
+            CaptureForwardsButton.Enabled := 1, CaptureBackwardsButton.Enabled := 1
             DeleteButton.Enabled := 1
             ddlObj.Choose(ArrayIndex)
             This.ScheduleProfileApply()
@@ -523,6 +530,7 @@
             ddlObj.Add(This.GetGroupList())
             ForwardHKObj.value := "", BackwardHKObj.value := "", EditObj.value := ""
             ForwardHKObj.Enabled := 0, BackwardHKObj.Enabled := 0, EditObj.Enabled := 0
+            CaptureForwardsButton.Enabled := 0, CaptureBackwardsButton.Enabled := 0
             This.ScheduleProfileApply()
         }
 
@@ -537,9 +545,28 @@
                 EditObj.value := text, EditObj.Enabled := !IsAutoGroup
                 ForwardHKObj.value := SelectedGroup["ForwardsHotkey"], ForwardHKObj.Enabled := 1
                 BackwardHKObj.value := SelectedGroup["BackwardsHotkey"], BackwardHKObj.Enabled := 1
+                CaptureForwardsButton.Enabled := 1, CaptureBackwardsButton.Enabled := 1
                 if (IsSet(DeleteButtonObj))
                     DeleteButtonObj.Enabled := !IsAutoGroup
             }
+        }
+
+        CaptureGroupHotkey(TargetControl) {
+            CaptureGui := Gui("+Owner" This.S_Gui.Hwnd " -MinimizeBox -MaximizeBox -SysMenu", Tr("groups.capture_title"))
+            CaptureGui.MarginX := 24
+            CaptureGui.MarginY := 20
+            CaptureGui.SetFont("s10 w400")
+            CaptureGui.Add("Text", "w370 Center", Tr("groups.capture_prompt"))
+            CaptureGui.Show("AutoSize Center")
+
+            CapturedHotkey := ""
+            try CapturedHotkey := HotkeyCapture.CaptureKeyboardHotkey()
+            finally CaptureGui.Destroy()
+
+            if (CapturedHotkey = "")
+                return
+            TargetControl.Value := CapturedHotkey
+            SaveHKGroupList(TargetControl)
         }
 
         SaveHKGroupList(obj) {

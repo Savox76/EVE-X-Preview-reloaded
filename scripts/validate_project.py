@@ -253,6 +253,44 @@ def validate_group_cycle_reliability() -> None:
         fail("Client switching must not automatically send gameplay input to EVE")
 
 
+def validate_hotkey_capture() -> None:
+    main = (ROOT / "Main.ahk").read_text(encoding="utf-8-sig")
+    settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
+    helper_path = ROOT / "src" / "HotkeyCapture.ahk"
+    test_path = ROOT / "tests" / "hotkey-capture.ahk"
+    workflow = (ROOT / ".github" / "workflows" / "quality-release.yml").read_text(encoding="utf-8")
+    if not helper_path.is_file():
+        fail("Keyboard hotkey capture helper is missing")
+    helper = helper_path.read_text(encoding="utf-8-sig")
+
+    required_helper = [
+        "class HotkeyCapture",
+        'Hook := InputHook("L0")',
+        'Hook.KeyOpt("{All}", "E")',
+        'Hook.KeyOpt("{LCtrl}{RCtrl}{LAlt}{RAlt}{LShift}{RShift}{LWin}{RWin}", "-E")',
+        "return Hook.EndMods . Hook.EndKey",
+    ]
+    missing = [entry for entry in required_helper if entry not in helper]
+    if missing:
+        fail(f"Keyboard hotkey capture is incomplete: {missing}")
+    if "#Include <../src/HotkeyCapture>" not in main:
+        fail("HotkeyCapture helper is not included by the application")
+    if not test_path.is_file():
+        fail("Keyboard hotkey capture regression test is missing")
+    if "Test hotkey capture" not in workflow or "tests/hotkey-capture.ahk" not in workflow:
+        fail("Windows CI does not execute the hotkey capture regression test")
+
+    required_ui = [
+        'CaptureForwardsButton.OnEvent("Click", (*) => CaptureGroupHotkey(HKForwards))',
+        'CaptureBackwardsButton.OnEvent("Click", (*) => CaptureGroupHotkey(HKBackwards))',
+        "CapturedHotkey := HotkeyCapture.CaptureKeyboardHotkey()",
+        'Tr("groups.capture_prompt")',
+    ]
+    missing = [entry for entry in required_ui if entry not in settings_gui]
+    if missing:
+        fail(f"Cycle-group hotkey capture UI is incomplete: {missing}")
+
+
 def validate_live_profile_settings() -> None:
     main_class = (ROOT / "src" / "Main_Class.ahk").read_text(encoding="utf-8-sig")
     settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
@@ -440,6 +478,7 @@ def main() -> int:
         validate_removed_thumbnail_minimum,
         validate_thumbnail_settings_layout,
         validate_group_cycle_reliability,
+        validate_hotkey_capture,
         validate_live_profile_settings,
         validate_color_picker,
         validate_portable_contract,
