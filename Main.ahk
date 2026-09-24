@@ -7,6 +7,7 @@
 #Include <../src/ColorPicker>
 #Include <../src/UpdateChecker>
 #Include <../src/GroupCycle>
+#Include <../src/HotkeyCapture>
 #Include <../src/Main_Class>
 #Include <../src/ThumbWindow>
 #Include <../src/TrayMenu>
@@ -30,8 +31,8 @@ A_MaxHotKeysPerInterval := 10000
 TODO #########################
 */
 
-;@Ahk2Exe-SetVersion 2.0.6.0
-;@Ahk2Exe-SetFileVersion 2.0.6.0
+;@Ahk2Exe-SetVersion 2.0.7.0
+;@Ahk2Exe-SetFileVersion 2.0.7.0
 ;@Ahk2Exe-SetCopyright g0nzo83 and Savox76 contributors
 ;@Ahk2Exe-SetDescription EVE-X-Preview Reloaded
 ;@Ahk2Exe-SetProductName EVE-X-Preview Reloaded

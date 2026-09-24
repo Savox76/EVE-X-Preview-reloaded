@@ -51,6 +51,18 @@ jobs:
             -NoNewWindow
           if ($testProcess.ExitCode -ne 0) { throw "Hotkey group regression tests failed with exit code $($testProcess.ExitCode)" }
 
+      - name: Test hotkey capture
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $testProcess = Start-Process `
+            -FilePath "$PWD/build/tools/autohotkey/AutoHotkey64.exe" `
+            -ArgumentList "/ErrorStdOut", "`"$PWD/tests/hotkey-capture.ahk`"" `
+            -Wait `
+            -PassThru `
+            -NoNewWindow
+          if ($testProcess.ExitCode -ne 0) { throw "Hotkey capture regression tests failed with exit code $($testProcess.ExitCode)" }
+
       - name: Compile and package portable version
         shell: pwsh
         run: |
