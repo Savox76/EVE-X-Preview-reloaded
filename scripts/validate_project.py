@@ -75,6 +75,14 @@ def validate_default_settings() -> None:
     if "Example Name" in source or "Example Char" in source:
         fail("Default settings must not contain example client placeholders")
 
+    default_group = settings["_Profiles"]["Default"]["Hotkey Groups"].get("Default")
+    if not isinstance(default_group, dict):
+        fail("The automatically maintained Default cycle group is missing")
+    if default_group.get("Characters") != []:
+        fail("The Default cycle group must start without placeholder characters")
+    if default_group.get("AutoIncludeDetectedClients") is not True:
+        fail("The Default cycle group must automatically include detected clients")
+
 
 def validate_client_discovery() -> None:
     main_class = (ROOT / "src" / "Main_Class.ahk").read_text(encoding="utf-8-sig")
@@ -87,6 +95,16 @@ def validate_client_discovery() -> None:
         fail("New profiles are not populated with currently active clients")
     if "JSON.Load(JSON.Dump(SourceProfile))" not in properties:
         fail("New profiles must be deep copies")
+    required_default_group_discovery = [
+        "This.EnsureDefaultHotkeyGroups()",
+        "This.AddClientToDefaultHotkeyGroup(ClientName, ProfileName)",
+        "This.RefreshAutoHotkeyGroupEditor(DefaultGroupName)",
+    ]
+    missing = [entry for entry in required_default_group_discovery if entry not in main_class]
+    if missing:
+        fail(f"Detected clients are not connected to the Default cycle group: {missing}")
+    if "EnsureDefaultHotkeyGroup(ProfileName := \"\")" not in properties:
+        fail("Existing profiles do not receive a compatible Default cycle group")
 
 
 def validate_thumbnail_lock() -> None:
@@ -223,6 +241,7 @@ def validate_group_cycle_reliability() -> None:
     required_guidance = [
         'Tr("groups.help")',
         'Tr("groups.characters")',
+        'Tr("groups.default_protected")',
         'Tr("hotkeys.help")',
     ]
     missing = [entry for entry in required_guidance if entry not in settings_gui]

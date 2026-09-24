@@ -15,7 +15,7 @@ The language can be changed under **Global Settings / Allgemeine Einstellungen**
 
 Color fields provide a native Windows color palette and still accept hexadecimal or RGB input. Character names from running EVE clients are saved automatically in the active profile for hotkeys and individual colors. The selectable next development packages are documented in the [`development master plan`](docs/MASTERPLAN.md); evaluated ideas and bug reports from the upstream project remain tracked in the [`original-repository backlog`](docs/ORIGINAL_REPO_BACKLOG.md).
 
-New profiles immediately receive all currently active character names without restarting. Thumbnail Settings also provides a per-profile lock that prevents accidental right-drag movement and mouse resizing. Stable version 2.0.0 also hardens forward and backward group cycling: unavailable clients are skipped with a bounded search, minimized targets are activated reliably, and stale minimize actions cannot interfere with a rapid switch. Version 2.0.1 aligns the complete Thumbnail Settings page on a consistent two-column grid. Version 2.0.2 automatically stores thumbnail and EVE-window layouts per profile and applies profile settings immediately without restarting. Version 2.0.3 removes the configurable minimum thumbnail size so previews can be scaled freely down to the smallest positive size Windows supports. Version 2.0.4 replaces the parallel custom-color text lists with one scrollable row per character; clicking a color field opens the Windows palette directly. Version 2.0.5 clarifies the difference between direct character hotkeys and optional cycle groups directly in the settings UI.
+New profiles immediately receive all currently active character names without restarting. Thumbnail Settings also provides a per-profile lock that prevents accidental right-drag movement and mouse resizing. Stable version 2.0.0 also hardens forward and backward group cycling: unavailable clients are skipped with a bounded search, minimized targets are activated reliably, and stale minimize actions cannot interfere with a rapid switch. Version 2.0.1 aligns the complete Thumbnail Settings page on a consistent two-column grid. Version 2.0.2 automatically stores thumbnail and EVE-window layouts per profile and applies profile settings immediately without restarting. Version 2.0.3 removes the configurable minimum thumbnail size so previews can be scaled freely down to the smallest positive size Windows supports. Version 2.0.4 replaces the parallel custom-color text lists with one scrollable row per character; clicking a color field opens the Windows palette directly. Version 2.0.5 clarifies the difference between direct character hotkeys and optional cycle groups directly in the settings UI. Version 2.0.6 adds an automatically maintained Default cycle group containing every detected character in the profile.
 
 ---
 
@@ -135,11 +135,11 @@ Each detected character has one row with separate fields for the active border, 
 
 ### **Profile Settings - Cycle Groups**
 
-Cycle groups are optional. Create one only when several characters should be activated in a defined order with a forward and/or backward hotkey. Characters that are not currently running are skipped. A cycle group never sends gameplay input to EVE.
+Every profile receives an automatically maintained **Default** group containing all detected characters. Assign only its forward and/or backward hotkey to start cycling immediately. Characters that are not currently running are skipped. Additional groups remain optional for a different selection or order, and no cycle group sends gameplay input to EVE.
 
 | Option | Description |
 | --- | --- |
-| Select Group | Creates and deletes independent cycle lists. Each group must have a unique name. |
+| Select Group | Default is maintained automatically and cannot be deleted. Additional independent cycle lists can be created and deleted. |
 | Characters in cycle order | Enter one character name per line. The activation sequence runs from top to bottom. |
 | Forward hotkey <br> Backward hotkey | Activates the next or previous available character in the list. |
 

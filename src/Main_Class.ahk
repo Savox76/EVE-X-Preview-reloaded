@@ -89,6 +89,7 @@ Class Main_Class extends ThumbWindow {
         This.AutoSaveClientPositions_Timer := ObjBindMethod(This, "AutoSaveClientPositions")
         This.ProfileHotkeyRegistrations := []
         This.ApplyingProfileSettings := false
+        This.EnsureDefaultHotkeyGroups()
         ;Timer property to remove Thumbnails for closed EVE windows 
         This.DestroyThumbnails := ObjBindMethod(This, "EvEWindowDestroy")
         This.DestroyThumbnailsToggle := 1
@@ -303,6 +304,7 @@ Class Main_Class extends ThumbWindow {
             return false
 
         Profile := This._JSON["_Profiles"][ProfileName]
+        This.EnsureDefaultHotkeyGroup(ProfileName)
         Changed := false
         FoundHotkey := false
         for HotkeyEntry in Profile["Hotkeys"] {
@@ -314,6 +316,13 @@ Class Main_Class extends ThumbWindow {
         if (!FoundHotkey) {
             Profile["Hotkeys"].Push(Map(ClientName, ""))
             Changed := true
+        }
+
+        DefaultGroupName := This.AddClientToDefaultHotkeyGroup(ClientName, ProfileName)
+        if (DefaultGroupName != "") {
+            Changed := true
+            if (ProfileName = This.LastUsedProfile)
+                try This.RefreshAutoHotkeyGroupEditor(DefaultGroupName)
         }
 
         if (This.AddCustomColorCharacter(ClientName, ProfileName)) {

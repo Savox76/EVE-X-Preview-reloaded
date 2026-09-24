@@ -1,22 +1,22 @@
-## EVE-X-Preview Reloaded 2.0.5
+## EVE-X-Preview Reloaded 2.0.6
 
 ### Changed
 
-- **Hotkeys** is now named **Character hotkeys** and explains that each entry activates one specific character directly.
-- **Hotkey groups** is now named **Cycle groups** and explains that groups are optional lists for forward/backward character switching.
-- The cycle-group character list now has its own descriptive label.
-- Both explanations are available in German and English.
-- Existing hotkeys, groups, profiles and switching behavior remain unchanged.
-- Character switching deliberately continues to activate windows only; it does not generate automated gameplay input.
+- Every profile now receives an automatically maintained **Default** cycle group.
+- Detected characters are appended to Default automatically, including characters already known by existing profiles.
+- Only currently running clients are considered while cycling; unavailable characters continue to be skipped safely.
+- The Default character list is read-only and the group cannot be deleted accidentally.
+- Forward and backward hotkeys remain intentionally empty so existing assignments cannot conflict.
+- Additional manually maintained groups and all existing profile settings remain unchanged.
 
 ### Automated verification
 
-- The project contract requires the explanatory text for both hotkey sections.
-- A regression guard rejects automatic `Send` or `ControlSend` gameplay input in the EVE switching paths.
-- Existing group-cycle regression tests, localization checks, compilation, portable ZIP creation and ZIP content checks remain mandatory.
+- The project contract requires the Default group schema without placeholder characters.
+- Existing profiles, new profiles and live client discovery are all checked for Default-group integration.
+- Existing group-cycle regression tests, the gameplay-input guard, localization checks, compilation and portable ZIP verification remain mandatory.
 
 ### Recommended practical check
 
-- Open **Profile Settings → Character hotkeys** and confirm that the direct-switch explanation is fully visible.
-- Open **Profile Settings → Cycle groups** and confirm that the optional group purpose and character order are clear.
-- Switch directly to one character and cycle through a group to confirm that existing assignments still work unchanged.
+- Open **Profile Settings → Cycle groups** and confirm that Default is selected and contains the detected characters.
+- Set a forward and/or backward hotkey, then confirm that it cycles through running clients and skips closed ones.
+- Create a manual group and confirm that its list remains freely editable and independent from Default.

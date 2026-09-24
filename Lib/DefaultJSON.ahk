@@ -50,7 +50,14 @@
             "Thumbnail Positions": {},
             "Client Possitions": {},
             "Thumbnail Visibility":{},
-            "Hotkey Groups":{},
+            "Hotkey Groups":{
+                "Default": {
+                    "Characters": [],
+                    "ForwardsHotkey": "",
+                    "BackwardsHotkey": "",
+                    "AutoIncludeDetectedClients": true
+                }
+            },
             "Custom Colors":{                
                 "cColorActive": "0",
                 "cColors": {
