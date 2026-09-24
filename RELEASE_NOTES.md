@@ -1,22 +1,22 @@
-## EVE-X-Preview Reloaded 2.0.4
+## EVE-X-Preview Reloaded 2.0.5
 
 ### Changed
 
-- Profile Settings → Custom Colors now shows one scrollable table row per character.
-- Every row contains separate fields for the active border, text and inactive border colors.
-- Clicking a color field opens the native Windows color palette immediately; the old select-a-row-then-click workflow has been removed.
-- Detected EVE characters continue to be added automatically. Characters can also be added or removed manually.
-- Existing profiles and color assignments remain compatible.
-- An unknown character can no longer inherit the colors of the last configured row.
+- **Hotkeys** is now named **Character hotkeys** and explains that each entry activates one specific character directly.
+- **Hotkey groups** is now named **Cycle groups** and explains that groups are optional lists for forward/backward character switching.
+- The cycle-group character list now has its own descriptive label.
+- Both explanations are available in German and English.
+- Existing hotkeys, groups, profiles and switching behavior remain unchanged.
+- Character switching deliberately continues to activate windows only; it does not generate automated gameplay input.
 
 ### Automated verification
 
-- The project contract requires the direct-click color table and its character-based data mapping.
-- The old parallel text fields and separate row-color buttons are rejected.
-- Existing color picker, localization, profile application, compilation, portable ZIP creation and ZIP content checks remain mandatory.
+- The project contract requires the explanatory text for both hotkey sections.
+- A regression guard rejects automatic `Send` or `ControlSend` gameplay input in the EVE switching paths.
+- Existing group-cycle regression tests, localization checks, compilation, portable ZIP creation and ZIP content checks remain mandatory.
 
 ### Recommended practical check
 
-- Open **Profile Settings → Custom Colors** and confirm that each character occupies exactly one row.
-- Click each of the three color fields in a row and confirm that the Windows color palette opens for that exact field.
-- Add or remove a character and switch profiles to confirm that rows and colors remain profile-specific.
+- Open **Profile Settings → Character hotkeys** and confirm that the direct-switch explanation is fully visible.
+- Open **Profile Settings → Cycle groups** and confirm that the optional group purpose and character order are clear.
+- Switch directly to one character and cycle through a group to confirm that existing assignments still work unchanged.

@@ -454,12 +454,13 @@
         This.S_Gui.Controls.Profile_Settings.PsDDL["Hotkey Groups"] := [], Hotkey_Groups := []
 
         Hotkey_Groups.Push This.S_Gui.Add("GroupBox", "x20 y80 h440 w500 Section", "")
-        Hotkey_Groups.Push This.S_Gui.Add("Text", "x58 yp+130", Tr("groups.select"))
-        ddl := This.S_Gui.Add("DropDownList", " xp-30 yp+18 w180 vHotkeyGroupDDL", This.GetGroupList())
+        Hotkey_Groups.Push This.S_Gui.Add("Text", "x35 y205 w450 h36", Tr("groups.help"))
+        Hotkey_Groups.Push This.S_Gui.Add("Text", "x58 y245", Tr("groups.select"))
+        ddl := This.S_Gui.Add("DropDownList", "x28 y263 w180 vHotkeyGroupDDL", This.GetGroupList())
         Hotkey_Groups.Push ddl
         This.S_Gui["HotkeyGroupDDL"].OnEvent("Change", (*) => SetEditText(ddl, EditBox, HKForwards, HKBackwards))
 
-        DeleteButton := This.S_Gui.Add("Button", "xs+340 yp-1 w80", Tr("common.delete"))
+        DeleteButton := This.S_Gui.Add("Button", "x360 y262 w80", Tr("common.delete"))
         NewButton := This.S_Gui.Add("Button", "x+5 yp w80", Tr("common.new"))
         DeleteButton.OnEvent("Click", (*) => Delete_Group(ddl, HKForwards, HKBackwards, EditBox))
         NewButton.OnEvent("Click", (*) => CreateNewGroup(ddl, HKForwards, HKBackwards, EditBox))
@@ -467,17 +468,18 @@
         Hotkey_Groups.Push DeleteButton
         Hotkey_Groups.Push NewButton
 
-        EditBox := This.S_Gui.Add("Edit", "xs+8 y275 w250 h225 -Wrap +HScroll Disabled vHKCharlist")
+        Hotkey_Groups.Push This.S_Gui.Add("Text", "x28 y298", Tr("groups.characters"))
+        EditBox := This.S_Gui.Add("Edit", "x28 y318 w250 h180 -Wrap +HScroll Disabled vHKCharlist")
         Hotkey_Groups.Push EditBox
         This.S_Gui["HKCharlist"].OnEvent("Change", (obj, *) => SaveHKGroupList(obj))
 
-        Hotkey_Groups.Push This.S_Gui.Add("Text", "xs300 yp20", Tr("groups.forward"))
-        HKForwards := This.S_Gui.Add("Edit", "xp yp+20 w150 Disabled vForwardsKey")
+        Hotkey_Groups.Push This.S_Gui.Add("Text", "x320 y318", Tr("groups.forward"))
+        HKForwards := This.S_Gui.Add("Edit", "x320 y338 w150 Disabled vForwardsKey")
         Hotkey_Groups.Push HKForwards
         This.S_Gui["ForwardsKey"].OnEvent("Change", (obj, *) => SaveHKGroupList(obj))
 
-        Hotkey_Groups.Push This.S_Gui.Add("Text", "xp yp50", Tr("groups.backward"))
-        HKBackwards := This.S_Gui.Add("Edit", "xp yp+20 w150 Disabled vBackwardsdKey")
+        Hotkey_Groups.Push This.S_Gui.Add("Text", "x320 y390", Tr("groups.backward"))
+        HKBackwards := This.S_Gui.Add("Edit", "x320 y410 w150 Disabled vBackwardsdKey")
         Hotkey_Groups.Push HKBackwards
         This.S_Gui["BackwardsdKey"].OnEvent("Change", (obj, *) => SaveHKGroupList(obj))
 
@@ -564,13 +566,14 @@
             }
         }
 
-        Hotkeys.Push This.S_Gui.Add("Text", " x115 yp+130 section", Tr("hotkeys.character"))
-        HKCharList := This.S_Gui.Add("Edit", " xp-30 yp20 w180 h350 -Wrap vHotkeyCharList", Charlist)
+        Hotkeys.Push This.S_Gui.Add("Text", "x35 y205 w450 h36", Tr("hotkeys.help"))
+        Hotkeys.Push This.S_Gui.Add("Text", "x115 y250 section", Tr("hotkeys.character"))
+        HKCharList := This.S_Gui.Add("Edit", "x85 y270 w180 h325 -Wrap vHotkeyCharList", Charlist)
         Hotkeys.Push HKCharList
         HKCharList.OnEvent("Change", (obj, *) => EventHandler(obj))
 
-        Hotkeys.Push This.S_Gui.Add("Text", " xs+210 ys", Tr("hotkeys.hotkey"))
-        HKKeylist := This.S_Gui.Add("Edit", " xp-50 yp20 w180 h350 -Wrap vHotkeyList", Hklist)
+        Hotkeys.Push This.S_Gui.Add("Text", "x325 y250", Tr("hotkeys.hotkey"))
+        HKKeylist := This.S_Gui.Add("Edit", "x295 y270 w180 h325 -Wrap vHotkeyList", Hklist)
         Hotkeys.Push HKKeylist
         HKKeylist.OnEvent("Change", (obj, *) => EventHandler(obj))
 

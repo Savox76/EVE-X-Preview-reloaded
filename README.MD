@@ -15,7 +15,7 @@ The language can be changed under **Global Settings / Allgemeine Einstellungen**
 
 Color fields provide a native Windows color palette and still accept hexadecimal or RGB input. Character names from running EVE clients are saved automatically in the active profile for hotkeys and individual colors. The selectable next development packages are documented in the [`development master plan`](docs/MASTERPLAN.md); evaluated ideas and bug reports from the upstream project remain tracked in the [`original-repository backlog`](docs/ORIGINAL_REPO_BACKLOG.md).
 
-New profiles immediately receive all currently active character names without restarting. Thumbnail Settings also provides a per-profile lock that prevents accidental right-drag movement and mouse resizing. Stable version 2.0.0 also hardens forward and backward group cycling: unavailable clients are skipped with a bounded search, minimized targets are activated reliably, and stale minimize actions cannot interfere with a rapid switch. Version 2.0.1 aligns the complete Thumbnail Settings page on a consistent two-column grid. Version 2.0.2 automatically stores thumbnail and EVE-window layouts per profile and applies profile settings immediately without restarting. Version 2.0.3 removes the configurable minimum thumbnail size so previews can be scaled freely down to the smallest positive size Windows supports. Version 2.0.4 replaces the parallel custom-color text lists with one scrollable row per character; clicking a color field opens the Windows palette directly.
+New profiles immediately receive all currently active character names without restarting. Thumbnail Settings also provides a per-profile lock that prevents accidental right-drag movement and mouse resizing. Stable version 2.0.0 also hardens forward and backward group cycling: unavailable clients are skipped with a bounded search, minimized targets are activated reliably, and stale minimize actions cannot interfere with a rapid switch. Version 2.0.1 aligns the complete Thumbnail Settings page on a consistent two-column grid. Version 2.0.2 automatically stores thumbnail and EVE-window layouts per profile and applies profile settings immediately without restarting. Version 2.0.3 removes the configurable minimum thumbnail size so previews can be scaled freely down to the smallest positive size Windows supports. Version 2.0.4 replaces the parallel custom-color text lists with one scrollable row per character; clicking a color field opens the Windows palette directly. Version 2.0.5 clarifies the difference between direct character hotkeys and optional cycle groups directly in the settings UI.
 
 ---
 
@@ -133,16 +133,19 @@ Each detected character has one row with separate fields for the active border, 
 <br>
 
 
-### **Profile Settings - Hotkey Groups**
+### **Profile Settings - Cycle Groups**
+
+Cycle groups are optional. Create one only when several characters should be activated in a defined order with a forward and/or backward hotkey. Characters that are not currently running are skipped. A cycle group never sends gameplay input to EVE.
+
 | Option | Description |
 | --- | --- |
-| Select Group | Enables the creation and deletion of hotkey groups. Each group must have a unique name  |
-| Hotkey Groups Text field| The character names that belong to the group are entered here. The names must be entered one below the other. The activation sequence is from top to bottom |
-| Forwards Hotkey <br> Backwards Hotkey | *Explanation of the hotkeys, see below* |
+| Select Group | Creates and deletes independent cycle lists. Each group must have a unique name. |
+| Characters in cycle order | Enter one character name per line. The activation sequence runs from top to bottom. |
+| Forward hotkey <br> Backward hotkey | Activates the next or previous available character in the list. |
 
-### **Profile Settings - Hotkeys**
-|**The character names must be entered one below the other and the corresponding hotkey on the opposite side <br> The same hotkey may only be assigned to one character!** <br> *Explanation of the hotkeys, see below*|
-|---|
+### **Profile Settings - Character Hotkeys**
+
+Assign a separate hotkey to activate a specific character directly. No cycle group is required. Character names and hotkeys must occupy matching rows, and the same hotkey may only be assigned once.
 
 ### **Hotkeys - Explanation**
 There are several ways to specify hotkeys <br> For a detailed description you can have a look at the following pages <br> [Hotkey Modifier Symbols](https://www.autohotkey.com/docs/v2/Hotkeys.htm#Symbols) and [List Of Keys](https://www.autohotkey.com/docs/v2/KeyList.htm)

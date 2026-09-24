@@ -193,6 +193,8 @@ def validate_thumbnail_settings_layout() -> None:
 def validate_group_cycle_reliability() -> None:
     main = (ROOT / "Main.ahk").read_text(encoding="utf-8-sig")
     main_class = (ROOT / "src" / "Main_Class.ahk").read_text(encoding="utf-8-sig")
+    settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
+    thumb_window = (ROOT / "src" / "ThumbWindow.ahk").read_text(encoding="utf-8-sig")
     helper = (ROOT / "src" / "GroupCycle.ahk").read_text(encoding="utf-8-sig")
     workflow = (ROOT / ".github" / "workflows" / "quality-release.yml").read_text(encoding="utf-8")
     test_file = ROOT / "tests" / "group-cycle.ahk"
@@ -217,6 +219,19 @@ def validate_group_cycle_reliability() -> None:
         fail("Group cycle regression test is missing")
     if "Test hotkey group cycling" not in workflow or "tests/group-cycle.ahk" not in workflow:
         fail("Windows CI does not execute the group cycle regression test")
+
+    required_guidance = [
+        'Tr("groups.help")',
+        'Tr("groups.characters")',
+        'Tr("hotkeys.help")',
+    ]
+    missing = [entry for entry in required_guidance if entry not in settings_gui]
+    if missing:
+        fail(f"Hotkey section guidance is incomplete: {missing}")
+
+    gameplay_sources = main_class + thumb_window
+    if re.search(r'(?m)^\s*(?:Send|ControlSend)\s*[\("]', gameplay_sources):
+        fail("Client switching must not automatically send gameplay input to EVE")
 
 
 def validate_live_profile_settings() -> None:
