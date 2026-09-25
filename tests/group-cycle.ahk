@@ -9,16 +9,16 @@ AssertEqual(Actual, Expected, Label) {
 Characters := ["Alpha", "Bravo", "Charlie", "Delta"]
 AllAvailable := ["Alpha", "Bravo", "Charlie", "Delta"]
 
-AssertEqual(GroupCycle.SelectIndex(Characters, "Alpha", AllAvailable, "ForwardsHotkey"), 2, "forward next")
-AssertEqual(GroupCycle.SelectIndex(Characters, "Delta", AllAvailable, "ForwardsHotkey"), 1, "forward wrap")
-AssertEqual(GroupCycle.SelectIndex(Characters, "Alpha", AllAvailable, "BackwardsHotkey"), 4, "backward wrap")
-AssertEqual(GroupCycle.SelectIndex(Characters, "Charlie", AllAvailable, "BackwardsHotkey"), 2, "backward previous")
+AssertEqual(GroupCycle.SelectIndex(Characters, "Alpha", AllAvailable, "ForwardsHotkey"), 4, "forward wrap")
+AssertEqual(GroupCycle.SelectIndex(Characters, "Charlie", AllAvailable, "ForwardsHotkey"), 2, "forward previous")
+AssertEqual(GroupCycle.SelectIndex(Characters, "Alpha", AllAvailable, "BackwardsHotkey"), 2, "backward next")
+AssertEqual(GroupCycle.SelectIndex(Characters, "Delta", AllAvailable, "BackwardsHotkey"), 1, "backward wrap")
 
 PartlyAvailable := ["Alpha", "Charlie", "Delta"]
-AssertEqual(GroupCycle.SelectIndex(Characters, "Alpha", PartlyAvailable, "ForwardsHotkey"), 3, "skip unavailable forward")
+AssertEqual(GroupCycle.SelectIndex(Characters, "Alpha", PartlyAvailable, "ForwardsHotkey"), 4, "skip unavailable forward")
 AssertEqual(GroupCycle.SelectIndex(Characters, "Charlie", ["Alpha", "Charlie"], "BackwardsHotkey"), 1, "skip unavailable backward")
-AssertEqual(GroupCycle.SelectIndex(Characters, "Outside", PartlyAvailable, "ForwardsHotkey"), 1, "outside group forward")
-AssertEqual(GroupCycle.SelectIndex(Characters, "Outside", PartlyAvailable, "BackwardsHotkey"), 4, "outside group backward")
+AssertEqual(GroupCycle.SelectIndex(Characters, "Outside", PartlyAvailable, "ForwardsHotkey"), 4, "outside group forward")
+AssertEqual(GroupCycle.SelectIndex(Characters, "Outside", PartlyAvailable, "BackwardsHotkey"), 1, "outside group backward")
 AssertEqual(GroupCycle.SelectIndex(Characters, "Alpha", [], "ForwardsHotkey"), 0, "no available client")
 
 NameCharacters := ["Eve Phillips", "Riinn Garner"]

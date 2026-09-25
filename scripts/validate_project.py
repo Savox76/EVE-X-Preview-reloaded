@@ -233,6 +233,8 @@ def validate_group_cycle_reliability() -> None:
         fail(f"Reliable client activation is incomplete: {missing}")
     if "loop Characters.Length" not in helper:
         fail("Group client selection must be bounded by the configured group size")
+    if 'Step := Direction = "ForwardsHotkey" ? -1 : 1' not in helper:
+        fail("Forward and backward cycle directions do not match the settings UI")
     if not test_file.is_file():
         fail("Group cycle regression test is missing")
     if "Test hotkey group cycling" not in workflow or "tests/group-cycle.ahk" not in workflow:

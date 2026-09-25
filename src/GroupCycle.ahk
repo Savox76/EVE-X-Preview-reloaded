@@ -12,7 +12,10 @@ class GroupCycle {
             }
         }
 
-        Step := Direction = "BackwardsHotkey" ? -1 : 1
+        ; Match the direction labels used by the settings UI. The detected client
+        ; order is traversed towards the preceding entry for Forward and towards
+        ; the following entry for Backward.
+        Step := Direction = "ForwardsHotkey" ? -1 : 1
         CandidateIndex := CurrentIndex
             ? CurrentIndex + Step
             : (Step > 0 ? 1 : Characters.Length)
