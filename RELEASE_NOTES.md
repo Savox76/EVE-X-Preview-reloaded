@@ -1,23 +1,19 @@
-## EVE-X-Preview Reloaded 2.0.8
+## EVE-X-Preview Reloaded 2.0.9
 
 ### Fixed
 
-- Clearing an existing hotkey no longer tries to register incomplete intermediate text and no longer shows a false invalid-hotkey message.
-- Function keys such as `F1` through `F24` are captured by their actual key names.
-- Ctrl, Alt, Shift and Windows-key combinations are captured atomically and normalized to valid AutoHotkey syntax.
-- Cycle-group hotkeys now have an explicit **Clear** action.
-- Character hotkeys can be captured or cleared for the currently selected hotkey row.
-- The global suspend-hotkey field now uses the same capture and clear behavior.
-- Manual advanced syntax remains possible and is applied only after leaving the field.
+- Corrected the swapped cycle directions: the forward hotkey now follows the intended forward path and the backward hotkey follows the opposite path.
+- Existing forward and backward assignments remain in their fields; users do not need to exchange their configured keys.
+- Skipping unavailable clients and wrap-around behavior continue to work in both directions.
 
 ### Automated verification
 
-- Windows CI distinguishes the number row from Numpad keys and now also exercises function keys and modifier combinations.
-- The project contract prevents hotkey fields from registering partial text on every keystroke.
-- Existing group-cycle, gameplay-input, localization, compilation and portable ZIP checks remain mandatory.
+- The group-cycle regression test now checks the UI-facing meaning of Forward and Backward, including wrap-around and unavailable clients.
+- The project contract locks the direction mapping so it cannot silently be reversed again.
+- Existing hotkey-capture, gameplay-input, localization, compilation and portable ZIP checks remain mandatory.
 
 ### Recommended practical check
 
-- Capture `F1` as a forward or character hotkey and verify that the field displays `F1`.
-- Capture a combination such as Ctrl+Alt+F12 and verify that it switches only when the complete combination is pressed.
-- Use **Clear** and verify that the field becomes empty without an error message.
+- Open **Profile Settings → Cycle groups** and keep the existing forward and backward assignments unchanged.
+- Starting from the same character, press each hotkey once and confirm that they now move in opposite, correctly labelled directions.
+- Confirm that a closed client is still skipped in either direction.
