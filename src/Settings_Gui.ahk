@@ -121,9 +121,17 @@
 
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("DDL", "xs+290 ys-3 w180 Section vLanguage Choose" (This.Language = "de" ? 1 : 2), [Tr("common.german"), Tr("common.english")])
         This.S_Gui["Language"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "xp y+5 w150 vSuspend_Hotkeys_Hotkey", This.Suspend_Hotkeys_Hotkey)
-        This.S_Gui["Suspend_Hotkeys_Hotkey"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
-        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("DDL", "xp y+5 w230 vTTT vHotkey_Scoope Choose" (This.Global_Hotkeys ? 1 : 2), [Tr("global.scope_global"), Tr("global.scope_eve")])
+        SuspendHotkeyControl := This.S_Gui.Add("Edit", "xp y+5 w100 vSuspend_Hotkeys_Hotkey", This.Suspend_Hotkeys_Hotkey)
+        This.S_Gui.Controls.Global_Settings.Push SuspendHotkeyControl
+        SuspendHotkeyControl.OnEvent("LoseFocus", (obj, *) => gSettings_EventHandler(obj))
+        SuspendHotkeyControl.GetPos(&SuspendX, &SuspendY, &SuspendWidth, &SuspendHeight)
+        CaptureSuspendButton := This.S_Gui.Add("Button", "x" (SuspendX + 105) " y" (SuspendY - 3) " w100 h24", Tr("groups.capture_short"))
+        CaptureSuspendButton.OnEvent("Click", (*) => CaptureSuspendHotkey())
+        This.S_Gui.Controls.Global_Settings.Push CaptureSuspendButton
+        ClearSuspendButton := This.S_Gui.Add("Button", "x" (SuspendX + 210) " y" (SuspendY - 3) " w40 h24", Tr("groups.clear"))
+        ClearSuspendButton.OnEvent("Click", (*) => ClearSuspendHotkey())
+        This.S_Gui.Controls.Global_Settings.Push ClearSuspendButton
+        This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("DDL", "x" SuspendX " y" (SuspendY + SuspendHeight + 5) " w230 vTTT vHotkey_Scoope Choose" (This.Global_Hotkeys ? 1 : 2), [Tr("global.scope_global"), Tr("global.scope_eve")])
         This.S_Gui["Hotkey_Scoope"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
 
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "xp y+5 w120 section vThumbnailBackgroundColor", This.ThumbnailBackgroundColor)
@@ -160,6 +168,28 @@
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Text", "xs y+9 ", Tr("common.milliseconds") ":")
         This.S_Gui.Controls.Global_Settings.Push This.S_Gui.Add("Edit", "xp+80 yp-3 w40 vMinimizeclients_Delay", This.Minimizeclients_Delay)
         This.S_Gui["Minimizeclients_Delay"].OnEvent("Change", (obj, *) => gSettings_EventHandler(obj))
+
+        CaptureSuspendHotkey() {
+            CaptureGui := Gui("+Owner" This.S_Gui.Hwnd " -MinimizeBox -MaximizeBox -SysMenu", Tr("groups.capture_title"))
+            CaptureGui.MarginX := 24
+            CaptureGui.MarginY := 20
+            CaptureGui.SetFont("s10 w400")
+            CaptureGui.Add("Text", "w370 Center", Tr("groups.capture_prompt"))
+            CaptureGui.Show("AutoSize Center")
+
+            CapturedHotkey := ""
+            try CapturedHotkey := HotkeyCapture.CaptureKeyboardHotkey()
+            finally CaptureGui.Destroy()
+            if (CapturedHotkey = "")
+                return
+            SuspendHotkeyControl.Value := CapturedHotkey
+            gSettings_EventHandler(SuspendHotkeyControl)
+        }
+
+        ClearSuspendHotkey() {
+            SuspendHotkeyControl.Value := ""
+            gSettings_EventHandler(SuspendHotkeyControl)
+        }
 
         gSettings_EventHandler(obj) {
             if (obj.name = "Language") {
@@ -453,7 +483,7 @@
     Hotkey_GroupsCtrl() {
         This.S_Gui.Controls.Profile_Settings.PsDDL["Hotkey Groups"] := [], Hotkey_Groups := []
 
-        Hotkey_Groups.Push This.S_Gui.Add("GroupBox", "x20 y80 h440 w500 Section", "")
+        Hotkey_Groups.Push This.S_Gui.Add("GroupBox", "x20 y80 h440 w565 Section", "")
         Hotkey_Groups.Push This.S_Gui.Add("Text", "x35 y195 w450 h50", Tr("groups.help"))
         Hotkey_Groups.Push This.S_Gui.Add("Text", "x58 y255", Tr("groups.select"))
         ddl := This.S_Gui.Add("DropDownList", "x28 y273 w180 vHotkeyGroupDDL", This.GetGroupList())
@@ -474,18 +504,24 @@
         This.S_Gui["HKCharlist"].OnEvent("Change", (obj, *) => SaveHKGroupList(obj))
 
         Hotkey_Groups.Push This.S_Gui.Add("Text", "x320 y328", Tr("groups.forward"))
-        HKForwards := This.S_Gui.Add("Edit", "x320 y348 w95 Disabled vForwardsKey")
+        HKForwards := This.S_Gui.Add("Edit", "x320 y348 w170 Disabled vForwardsKey")
         Hotkey_Groups.Push HKForwards
-        This.S_Gui["ForwardsKey"].OnEvent("Change", (obj, *) => SaveHKGroupList(obj))
-        CaptureForwardsButton := This.S_Gui.Add("Button", "x420 y347 w90 h24 Disabled", Tr("groups.capture"))
+        This.S_Gui["ForwardsKey"].OnEvent("LoseFocus", (obj, *) => SaveHKGroupList(obj))
+        ClearForwardsButton := This.S_Gui.Add("Button", "x495 y347 w75 h24 Disabled", Tr("groups.clear"))
+        ClearForwardsButton.OnEvent("Click", (*) => ClearGroupHotkey(HKForwards))
+        Hotkey_Groups.Push ClearForwardsButton
+        CaptureForwardsButton := This.S_Gui.Add("Button", "x320 y376 w250 h24 Disabled", Tr("groups.capture"))
         CaptureForwardsButton.OnEvent("Click", (*) => CaptureGroupHotkey(HKForwards))
         Hotkey_Groups.Push CaptureForwardsButton
 
-        Hotkey_Groups.Push This.S_Gui.Add("Text", "x320 y400", Tr("groups.backward"))
-        HKBackwards := This.S_Gui.Add("Edit", "x320 y420 w95 Disabled vBackwardsdKey")
+        Hotkey_Groups.Push This.S_Gui.Add("Text", "x320 y416", Tr("groups.backward"))
+        HKBackwards := This.S_Gui.Add("Edit", "x320 y436 w170 Disabled vBackwardsdKey")
         Hotkey_Groups.Push HKBackwards
-        This.S_Gui["BackwardsdKey"].OnEvent("Change", (obj, *) => SaveHKGroupList(obj))
-        CaptureBackwardsButton := This.S_Gui.Add("Button", "x420 y419 w90 h24 Disabled", Tr("groups.capture"))
+        This.S_Gui["BackwardsdKey"].OnEvent("LoseFocus", (obj, *) => SaveHKGroupList(obj))
+        ClearBackwardsButton := This.S_Gui.Add("Button", "x495 y435 w75 h24 Disabled", Tr("groups.clear"))
+        ClearBackwardsButton.OnEvent("Click", (*) => ClearGroupHotkey(HKBackwards))
+        Hotkey_Groups.Push ClearBackwardsButton
+        CaptureBackwardsButton := This.S_Gui.Add("Button", "x320 y464 w250 h24 Disabled", Tr("groups.capture"))
         CaptureBackwardsButton.OnEvent("Click", (*) => CaptureGroupHotkey(HKBackwards))
         Hotkey_Groups.Push CaptureBackwardsButton
 
@@ -511,6 +547,7 @@
             EditObj.value := "", ForwardHKObj.value := "", BackwardHKObj.value := ""
             ForwardHKObj.Enabled := 1, BackwardHKObj.Enabled := 1, EditObj.Enabled := 1
             CaptureForwardsButton.Enabled := 1, CaptureBackwardsButton.Enabled := 1
+            ClearForwardsButton.Enabled := 1, ClearBackwardsButton.Enabled := 1
             DeleteButton.Enabled := 1
             ddlObj.Choose(ArrayIndex)
             This.ScheduleProfileApply()
@@ -531,6 +568,7 @@
             ForwardHKObj.value := "", BackwardHKObj.value := "", EditObj.value := ""
             ForwardHKObj.Enabled := 0, BackwardHKObj.Enabled := 0, EditObj.Enabled := 0
             CaptureForwardsButton.Enabled := 0, CaptureBackwardsButton.Enabled := 0
+            ClearForwardsButton.Enabled := 0, ClearBackwardsButton.Enabled := 0
             This.ScheduleProfileApply()
         }
 
@@ -546,6 +584,7 @@
                 ForwardHKObj.value := SelectedGroup["ForwardsHotkey"], ForwardHKObj.Enabled := 1
                 BackwardHKObj.value := SelectedGroup["BackwardsHotkey"], BackwardHKObj.Enabled := 1
                 CaptureForwardsButton.Enabled := 1, CaptureBackwardsButton.Enabled := 1
+                ClearForwardsButton.Enabled := 1, ClearBackwardsButton.Enabled := 1
                 if (IsSet(DeleteButtonObj))
                     DeleteButtonObj.Enabled := !IsAutoGroup
             }
@@ -566,6 +605,11 @@
             if (CapturedHotkey = "")
                 return
             TargetControl.Value := CapturedHotkey
+            SaveHKGroupList(TargetControl)
+        }
+
+        ClearGroupHotkey(TargetControl) {
+            TargetControl.Value := ""
             SaveHKGroupList(TargetControl)
         }
 
@@ -639,22 +683,80 @@
             }
         }
 
-        Hotkeys.Push This.S_Gui.Add("Text", "x35 y205 w450 h36", Tr("hotkeys.help"))
-        Hotkeys.Push This.S_Gui.Add("Text", "x115 y250 section", Tr("hotkeys.character"))
-        HKCharList := This.S_Gui.Add("Edit", "x85 y270 w180 h325 -Wrap vHotkeyCharList", Charlist)
+        Hotkeys.Push This.S_Gui.Add("Text", "x35 y200 w450 h52", Tr("hotkeys.help"))
+        Hotkeys.Push This.S_Gui.Add("Text", "x115 y255 section", Tr("hotkeys.character"))
+        HKCharList := This.S_Gui.Add("Edit", "x85 y275 w180 h275 -Wrap vHotkeyCharList", Charlist)
         Hotkeys.Push HKCharList
-        HKCharList.OnEvent("Change", (obj, *) => EventHandler(obj))
+        HKCharList.OnEvent("LoseFocus", (obj, *) => EventHandler(obj))
 
-        Hotkeys.Push This.S_Gui.Add("Text", "x325 y250", Tr("hotkeys.hotkey"))
-        HKKeylist := This.S_Gui.Add("Edit", "x295 y270 w180 h325 -Wrap vHotkeyList", Hklist)
+        Hotkeys.Push This.S_Gui.Add("Text", "x325 y255", Tr("hotkeys.hotkey"))
+        HKKeylist := This.S_Gui.Add("Edit", "x295 y275 w180 h275 -Wrap vHotkeyList", Hklist)
         Hotkeys.Push HKKeylist
-        HKKeylist.OnEvent("Change", (obj, *) => EventHandler(obj))
+        HKKeylist.OnEvent("LoseFocus", (obj, *) => EventHandler(obj))
+
+        CaptureCharacterButton := This.S_Gui.Add("Button", "x295 y560 w125 h28", Tr("groups.capture_short"))
+        CaptureCharacterButton.OnEvent("Click", (*) => CaptureCharacterHotkey())
+        Hotkeys.Push CaptureCharacterButton
+        ClearCharacterButton := This.S_Gui.Add("Button", "x425 y560 w50 h28", Tr("groups.clear"))
+        ClearCharacterButton.OnEvent("Click", (*) => ClearCharacterHotkey())
+        Hotkeys.Push ClearCharacterButton
 
         This.S_Gui.Controls.Profile_Settings.PsDDL["Hotkeys"] := Hotkeys
         for k, v in This.S_Gui.Controls.Profile_Settings.PsDDL["Hotkeys"]
             v.Visible := 0
 
-        ;Parse All hotkeys to a Array on value change
+        CaptureCharacterHotkey() {
+            RowNumber := SelectedHotkeyRow()
+            if (!IsValidCharacterRow(RowNumber))
+                return
+
+            CaptureGui := Gui("+Owner" This.S_Gui.Hwnd " -MinimizeBox -MaximizeBox -SysMenu", Tr("groups.capture_title"))
+            CaptureGui.MarginX := 24
+            CaptureGui.MarginY := 20
+            CaptureGui.SetFont("s10 w400")
+            CaptureGui.Add("Text", "w370 Center", Tr("groups.capture_prompt"))
+            CaptureGui.Show("AutoSize Center")
+
+            CapturedHotkey := ""
+            try CapturedHotkey := HotkeyCapture.CaptureKeyboardHotkey()
+            finally CaptureGui.Destroy()
+            if (CapturedHotkey != "")
+                SetHotkeyRow(RowNumber, CapturedHotkey)
+        }
+
+        ClearCharacterHotkey() {
+            RowNumber := SelectedHotkeyRow()
+            if (IsValidCharacterRow(RowNumber))
+                SetHotkeyRow(RowNumber, "")
+        }
+
+        SelectedHotkeyRow() {
+            return SendMessage(0x00C9, -1, 0, , "ahk_id " HKKeylist.Hwnd) + 1
+        }
+
+        IsValidCharacterRow(RowNumber) {
+            CharacterLines := StrSplit(HKCharList.Value, "`n", "`r")
+            if (RowNumber <= CharacterLines.Length && Trim(CharacterLines[RowNumber]) != "")
+                return true
+            MsgBox(Tr("hotkeys.select_row"), AppInfo.Name, "Iconi")
+            return false
+        }
+
+        SetHotkeyRow(RowNumber, HotkeyValue) {
+            CharacterLines := StrSplit(HKCharList.Value, "`n", "`r")
+            HotkeyLines := StrSplit(HKKeylist.Value, "`n", "`r")
+            while (HotkeyLines.Length < CharacterLines.Length)
+                HotkeyLines.Push("")
+            HotkeyLines[RowNumber] := HotkeyValue
+
+            UpdatedText := ""
+            loop CharacterLines.Length
+                UpdatedText .= (A_Index > 1 ? "`r`n" : "") HotkeyLines[A_Index]
+            HKKeylist.Value := UpdatedText
+            EventHandler(HKKeylist)
+        }
+
+        ; Parse all hotkeys only after a complete edit or an atomic capture/clear.
         EventHandler(obj) {
             tempvar := []
             ListChars := StrSplit(This.S_Gui["HotkeyCharList"].value, "`n"), ListHotkeys := StrSplit(This.S_Gui["HotkeyList"].value, "`n")
