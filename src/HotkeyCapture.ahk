@@ -13,6 +13,15 @@ class HotkeyCapture {
             return ""
         if (Hook.EndKey = "Escape" && Hook.EndMods = "")
             return ""
-        return Hook.EndMods . Hook.EndKey
+        return This.NormalizeModifiers(Hook.EndMods) . Hook.EndKey
+    }
+
+    static NormalizeModifiers(Modifiers) {
+        Prefix := ""
+        for Symbol in ["^", "!", "+", "#"] {
+            if (InStr(Modifiers, Symbol))
+                Prefix .= Symbol
+        }
+        return Prefix
     }
 }

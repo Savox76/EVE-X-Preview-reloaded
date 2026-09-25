@@ -255,6 +255,7 @@ def validate_group_cycle_reliability() -> None:
 
 def validate_hotkey_capture() -> None:
     main = (ROOT / "Main.ahk").read_text(encoding="utf-8-sig")
+    main_class = (ROOT / "src" / "Main_Class.ahk").read_text(encoding="utf-8-sig")
     settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
     helper_path = ROOT / "src" / "HotkeyCapture.ahk"
     test_path = ROOT / "tests" / "hotkey-capture.ahk"
@@ -268,7 +269,8 @@ def validate_hotkey_capture() -> None:
         'Hook := InputHook("L0")',
         'Hook.KeyOpt("{All}", "E")',
         'Hook.KeyOpt("{LCtrl}{RCtrl}{LAlt}{RAlt}{LShift}{RShift}{LWin}{RWin}", "-E")',
-        "return Hook.EndMods . Hook.EndKey",
+        "return This.NormalizeModifiers(Hook.EndMods) . Hook.EndKey",
+        "static NormalizeModifiers(Modifiers)",
     ]
     missing = [entry for entry in required_helper if entry not in helper]
     if missing:
@@ -283,12 +285,40 @@ def validate_hotkey_capture() -> None:
     required_ui = [
         'CaptureForwardsButton.OnEvent("Click", (*) => CaptureGroupHotkey(HKForwards))',
         'CaptureBackwardsButton.OnEvent("Click", (*) => CaptureGroupHotkey(HKBackwards))',
+        'ClearForwardsButton.OnEvent("Click", (*) => ClearGroupHotkey(HKForwards))',
+        'ClearBackwardsButton.OnEvent("Click", (*) => ClearGroupHotkey(HKBackwards))',
         "CapturedHotkey := HotkeyCapture.CaptureKeyboardHotkey()",
         'Tr("groups.capture_prompt")',
+        'This.S_Gui["ForwardsKey"].OnEvent("LoseFocus"',
+        'This.S_Gui["BackwardsdKey"].OnEvent("LoseFocus"',
+        "CaptureCharacterHotkey()",
+        "ClearCharacterHotkey()",
+        "SetHotkeyRow(RowNumber, HotkeyValue)",
+        'HKKeylist.OnEvent("LoseFocus"',
+        "CaptureSuspendHotkey()",
+        "ClearSuspendHotkey()",
+        'SuspendHotkeyControl.OnEvent("LoseFocus"',
     ]
     missing = [entry for entry in required_ui if entry not in settings_gui]
     if missing:
         fail(f"Cycle-group hotkey capture UI is incomplete: {missing}")
+    forbidden_live_hotkey_edits = [
+        'This.S_Gui["ForwardsKey"].OnEvent("Change"',
+        'This.S_Gui["BackwardsdKey"].OnEvent("Change"',
+        'HKKeylist.OnEvent("Change"',
+        'This.S_Gui["Suspend_Hotkeys_Hotkey"].OnEvent("Change"',
+    ]
+    remaining = [entry for entry in forbidden_live_hotkey_edits if entry in settings_gui]
+    if remaining:
+        fail(f"Hotkey fields still register incomplete intermediate text: {remaining}")
+
+    registration_start = main_class.index("    RegisterManagedProfileHotkey(KeyName, Callback, Criterion)")
+    registration_end = main_class.index("    ClearProfileHotkeys()", registration_start)
+    registration = main_class[registration_start:registration_end]
+    empty_guard = 'if (KeyName = "")\n            return false'
+    hotkey_registration = 'Hotkey(KeyName, Callback, "P1")'
+    if empty_guard not in registration or registration.index(empty_guard) > registration.index(hotkey_registration):
+        fail("An empty hotkey must be treated as an unassigned key before registration")
 
 
 def validate_live_profile_settings() -> None:
