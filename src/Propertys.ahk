@@ -512,6 +512,16 @@ class Propertys extends TrayMenu {
             }
         }
 
+        ; WinGetList follows the current window Z-order. Without normalization,
+        ; profiles created while different clients are active can receive the
+        ; same characters in opposite cycle order. Keep only the automatic
+        ; group deterministic; user-created groups retain their manual order.
+        StableCharacters := GroupCycle.StableCharacterOrder(AutoGroup["Characters"])
+        if (!GroupCycle.HasSameCharacterOrder(AutoGroup["Characters"], StableCharacters)) {
+            AutoGroup["Characters"] := StableCharacters
+            Changed := true
+        }
+
         if (Changed && This.HasProp("Save_Settings_Delay_Timer"))
             SetTimer(This.Save_Settings_Delay_Timer, -200)
         return AutoGroupName

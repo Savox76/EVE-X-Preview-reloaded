@@ -46,7 +46,7 @@
   "colors.inactive_border": "Inaktiver Rahmen",
   "colors.table_help": "Erkannte Charaktere werden automatisch ergänzt. Klicke direkt auf ein Farbfeld, um die Farbpalette zu öffnen.",
   "groups.select": "Gruppe auswählen:",
-  "groups.help": "„Default“ enthält automatisch alle erkannten Charaktere. Nutze „Hotkey erfassen“, damit Funktionstasten, Nummernblock und Tastenkombinationen vollständig erkannt werden.",
+  "groups.help": "„Default“ enthält automatisch alle erkannten Charaktere in stabiler alphabetischer Reihenfolge. Nutze „Hotkey erfassen“, damit Funktionstasten, Nummernblock und Tastenkombinationen vollständig erkannt werden.",
   "groups.characters": "Charaktere in Schaltreihenfolge:",
   "groups.default_protected": "Die automatisch gepflegte Gruppe „Default“ kann nicht gelöscht werden.",
   "groups.forward": "Hotkey vorwärts:",

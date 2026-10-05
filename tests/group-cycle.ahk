@@ -9,6 +9,17 @@ AssertEqual(Actual, Expected, Label) {
 Characters := ["Alpha", "Bravo", "Charlie", "Delta"]
 AllAvailable := ["Alpha", "Bravo", "Charlie", "Delta"]
 
+UnstableCharacters := ["Charlie", "alpha", "Delta", "Bravo", "ALPHA", "EVE - Echo", ""]
+StableCharacters := GroupCycle.StableCharacterOrder(UnstableCharacters)
+AssertEqual(StableCharacters.Length, 5, "stable order removes duplicate and empty names")
+AssertEqual(StableCharacters[1], "alpha", "stable order first character")
+AssertEqual(StableCharacters[2], "Bravo", "stable order second character")
+AssertEqual(StableCharacters[3], "Charlie", "stable order third character")
+AssertEqual(StableCharacters[4], "Delta", "stable order fourth character")
+AssertEqual(StableCharacters[5], "Echo", "stable order normalizes window title")
+AssertEqual(GroupCycle.HasSameCharacterOrder(StableCharacters, ["alpha", "Bravo", "Charlie", "Delta", "Echo"]), true, "same stable order")
+AssertEqual(GroupCycle.HasSameCharacterOrder(StableCharacters, ["Bravo", "alpha", "Charlie", "Delta", "Echo"]), false, "different stable order")
+
 AssertEqual(GroupCycle.SelectIndex(Characters, "Alpha", AllAvailable, "ForwardsHotkey"), 4, "forward wrap")
 AssertEqual(GroupCycle.SelectIndex(Characters, "Charlie", AllAvailable, "ForwardsHotkey"), 2, "forward previous")
 AssertEqual(GroupCycle.SelectIndex(Characters, "Alpha", AllAvailable, "BackwardsHotkey"), 2, "backward next")
