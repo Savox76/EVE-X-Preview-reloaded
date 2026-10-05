@@ -211,6 +211,7 @@ def validate_thumbnail_settings_layout() -> None:
 def validate_group_cycle_reliability() -> None:
     main = (ROOT / "Main.ahk").read_text(encoding="utf-8-sig")
     main_class = (ROOT / "src" / "Main_Class.ahk").read_text(encoding="utf-8-sig")
+    properties = (ROOT / "src" / "Propertys.ahk").read_text(encoding="utf-8-sig")
     settings_gui = (ROOT / "src" / "Settings_Gui.ahk").read_text(encoding="utf-8-sig")
     thumb_window = (ROOT / "src" / "ThumbWindow.ahk").read_text(encoding="utf-8-sig")
     helper = (ROOT / "src" / "GroupCycle.ahk").read_text(encoding="utf-8-sig")
@@ -235,6 +236,10 @@ def validate_group_cycle_reliability() -> None:
         fail("Group client selection must be bounded by the configured group size")
     if 'Step := Direction = "ForwardsHotkey" ? -1 : 1' not in helper:
         fail("Forward and backward cycle directions do not match the settings UI")
+    if "GroupCycle.StableCharacterOrder(AutoGroup[\"Characters\"])" not in properties:
+        fail("Automatic cycle groups are not normalized across profiles")
+    if "user-created groups retain their manual order" not in properties:
+        fail("Automatic ordering must not overwrite user-created cycle groups")
     if not test_file.is_file():
         fail("Group cycle regression test is missing")
     if "Test hotkey group cycling" not in workflow or "tests/group-cycle.ahk" not in workflow:

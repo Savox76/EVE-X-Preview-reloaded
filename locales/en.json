@@ -46,7 +46,7 @@
   "colors.inactive_border": "Inactive border",
   "colors.table_help": "Detected characters are added automatically. Click a color field directly to open the color palette.",
   "groups.select": "Select group:",
-  "groups.help": "Default automatically contains every detected character. Use Capture hotkey so function keys, Numpad keys and key combinations are detected completely.",
+  "groups.help": "Default automatically contains every detected character in a stable alphabetical order. Use Capture hotkey so function keys, Numpad keys and key combinations are detected completely.",
   "groups.characters": "Characters in cycle order:",
   "groups.default_protected": "The automatically maintained Default group cannot be deleted.",
   "groups.forward": "Forward hotkey:",

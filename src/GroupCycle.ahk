@@ -1,4 +1,45 @@
 class GroupCycle {
+    static StableCharacterOrder(Characters) {
+        Ordered := []
+        if (!IsObject(Characters))
+            return Ordered
+
+        for Character in Characters {
+            if (Type(Character) != "String")
+                continue
+            Character := This.NormalizeTitle(Character)
+            if (Character = "")
+                continue
+
+            Duplicate := false
+            InsertIndex := Ordered.Length + 1
+            for Index, ExistingCharacter in Ordered {
+                Comparison := StrCompare(Character, ExistingCharacter, false)
+                if (Comparison = 0) {
+                    Duplicate := true
+                    break
+                }
+                if (Comparison < 0) {
+                    InsertIndex := Index
+                    break
+                }
+            }
+            if (!Duplicate)
+                Ordered.InsertAt(InsertIndex, Character)
+        }
+        return Ordered
+    }
+
+    static HasSameCharacterOrder(Left, Right) {
+        if (!IsObject(Left) || !IsObject(Right) || Left.Length != Right.Length)
+            return false
+        for Index, Character in Left {
+            if (Character != Right[Index])
+                return false
+        }
+        return true
+    }
+
     static SelectIndex(Characters, ActiveTitle, AvailableTitles, Direction) {
         if (!IsObject(Characters) || Characters.Length = 0)
             return 0
